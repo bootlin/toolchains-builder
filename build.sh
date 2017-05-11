@@ -21,18 +21,24 @@ function set_qemu_config {
             -machine virt -cpu cortex-a57 -machine type=virt
             -kernel ${testdir}/images/Image
             -append \"console=ttyAMA0\""
-    elif [ ${arch} == "mipsel" ]; then
+    elif [ ${arch} == "mips" ]; then
         qemu_defconfig="qemu_mips32r2_malta_defconfig"
+        qemu_system_command="qemu-system-mips
+            -machine malta
+            -kernel ${testdir}/images/vmlinux
+            -drive file=${testdir}/images/rootfs.ext2,index=0,media=disk
+            -append \"root=/dev/hda rw\""
+    elif [ ${arch} == "mipsel" ]; then
+        qemu_defconfig="qemu_mips32r2el_malta_defconfig"
         qemu_system_command="qemu-system-mipsel
             -machine malta
-            -kernel ${testdir}/images/Image
-            -drive file=${testdir}/images/rootfs.cpio,index=0,media=disk
-            -append \"root=/dev/sda rw\""
+            -kernel ${testdir}/images/vmlinux
+            -drive file=${testdir}/images/rootfs.ext2,index=0,media=disk
+            -append \"root=/dev/hda rw\""
     fi
 }
 
 function boot_test {
-    # cd ${testdir}/images
     echo "  booting test system ... "
     qemu_system_command="${qemu_system_command}
             -serial telnet:127.0.0.1:4000,server,nowait,nodelay
