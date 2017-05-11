@@ -16,11 +16,11 @@ function set_qemu_config {
             -append \"root=/dev/sda rw\""
     elif [ ${arch} == "aarch64" ]; then
         qemu_defconfig="qemu_aarch64_virt_defconfig"
+        # Qemu 2.9 has been tested and works, 2.5 does not.
         qemu_system_command="qemu-system-aarch64
             -machine virt -cpu cortex-a57 -machine type=virt
             -kernel ${testdir}/images/Image
-            -initrd ${testdir}/images/rootfs.cpio
-            -append \"root=/dev/sda rw\""
+            -append \"console=ttyAMA0\""
     elif [ ${arch} == "mipsel" ]; then
         qemu_defconfig="qemu_mips32r2_malta_defconfig"
         qemu_system_command="qemu-system-mipsel
