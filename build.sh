@@ -5,20 +5,29 @@ TOOLCHAIN_BUILD_DIR=${TOOLCHAIN_DIR}/build/
 TOOLCHAIN_BR_DIR=${TOOLCHAIN_BUILD_DIR}/buildroot
 TOOLCHAIN_VERSION=$(git --git-dir=${TOOLCHAIN_BR_DIR}/.git describe)
 
-function set_qemu_defconfig {
+function set_qemu_config {
     if [ ${arch} == "arm" ]; then
         qemu_defconfig="qemu_arm_versatile_defconfig"
+        qemu_machine="versatilepb"
+        qemu_dtb="versatile-pb.dtb"
+    elif [ ${arch} == "aarch64" ]; then
+        qemu_defconfig="qemu_aarch64_virt_defconfig"
+        qemu_machine="virt"
+        qemu_dtb="virt.dtb"
     fi
+}
+function eval_command() {
+  "$@";
 }
 
 function boot_test {
     # cd ${testdir}/images
     macaddress="f8:ca:b8:3f:ae:e9"
     echo "  booting test system ... "
-    qemu-system-arm \
-        -machine versatilepb \
+    qemu-system-${arch} \
+        -machine ${qemu_machine} \
         -kernel ${testdir}/images/zImage \
-        -dtb ${testdir}/images/versatile-pb.dtb \
+        -dtb ${testdir}/images/${qemu_dtb} \
         -hda ${testdir}/images/rootfs.ext2 \
         -append "root=/dev/sda rw" \
         -serial telnet:127.0.0.1:4000,server,nowait,nodelay \
@@ -35,15 +44,6 @@ function boot_test {
 }
 
 function build_test {
-    overlaydir=${testdir}/overlay
-    arch=$(grep "BR2_ARCH=" ${configfile} | sed 's/BR2_ARCH="\(.*\)"/\1/')
-    endianess=$(grep "BR2_ENDIAN=" ${configfile} | sed 's/BR2_ENDIAN="\(.*\)"/\1/')
-    gcc_version=$(grep "^BR2_GCC_VERSION_" ${configfile} | sed 's/BR2_GCC_VERSION_\(.*\)_X=.*/\1/')
-    linux_version=$(grep "^BR2_KERNEL_HEADERS_" ${configfile} | sed 's/BR2_KERNEL_HEADERS_\(.*\)=./\1/')
-    locale=$(grep "^BR2_TOOLCHAIN_BUILDROOT_LOCALE" ${configfile} | sed 's/BR2_TOOLCHAIN_BUILDROOT_LOCALE=\(.\)/\1/')
-
-    set_qemu_defconfig
-
     # Create test directory for the new toolchain
     rm -rf ${testdir}
     mkdir ${testdir}
@@ -123,14 +123,21 @@ function generate {
     configfile=${builddir}/.config
 
     echo "Generating ${name}..."
-    # build
+    build
+
+    overlaydir=${testdir}/overlay
+    arch=$(grep "BR2_ARCH=" ${configfile} | sed 's/BR2_ARCH="\(.*\)"/\1/')
+    endianess=$(grep "BR2_ENDIAN=" ${configfile} | sed 's/BR2_ENDIAN="\(.*\)"/\1/')
+    gcc_version=$(grep "^BR2_GCC_VERSION_" ${configfile} | sed 's/BR2_GCC_VERSION_\(.*\)_X=.*/\1/')
+    linux_version=$(grep "^BR2_KERNEL_HEADERS_" ${configfile} | sed 's/BR2_KERNEL_HEADERS_\(.*\)=./\1/')
+    locale=$(grep "^BR2_TOOLCHAIN_BUILDROOT_LOCALE" ${configfile} | sed 's/BR2_TOOLCHAIN_BUILDROOT_LOCALE=\(.\)/\1/')
+    set_qemu_config
 
     # Test the toolchain
     echo "Building a test system using ${name}..."
-    # build_test
+    build_test
 
     echo "Booting the test system in qemu..."
-
     boot_test
     return
 
