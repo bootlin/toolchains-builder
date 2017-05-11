@@ -1,0 +1,15 @@
+#!/bin/sh
+
+case "$1" in
+    start)
+    echo "TROLL"
+    sleep 2
+    echo "POUET"
+    ;;
+    *)
+    echo "This is the toolchain test suite"
+    echo "Usage: $0 start"
+    exit 1
+esac
+
+exit $?
