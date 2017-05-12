@@ -1,4 +1,4 @@
-image: debian:oldstable
+image: ubuntu:zesty
 
 before_script:
   - dpkg --add-architecture i386
@@ -6,7 +6,7 @@ before_script:
   - apt-get install -y -qq --no-install-recommends
     build-essential locales bc ca-certificates file rsync gcc-multilib
     git bzr cvs mercurial subversion libc6:i386 unzip wget cpio curl
-    qemu-system-*
+    qemu-system-* debootstrap schroot
     # To be able to generate a toolchain with locales, enable one UTF-8 locale
   - sed -i 's/# \(en_US.UTF-8\)/\1/' /etc/locale.gen
   - /usr/sbin/locale-gen
@@ -14,5 +14,5 @@ before_script:
 
 build_toolchains:
   script:
-    - ./build.sh arm
+    - ./build.sh aarch64
 
