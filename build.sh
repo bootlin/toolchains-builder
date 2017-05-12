@@ -1,9 +1,19 @@
 #!/bin/bash
 
-TOOLCHAIN_DIR=~/toolchains-builder/
+if git clone git://git.buildroot.net/buildroot; then
+    # buildroot likely did not exist: patching it.
+    cd buildroot
+    curl http://free-electrons.com/~thomas/pub/0001-mpc-mpfr-gmp-build-statically-for-the-host.patch |patch -p1
+    curl http://free-electrons.com/~thomas/pub/0002-toolchain-attempt-to-fix-the-toolchain-wrapper.patch |patch -p1
+    cd ..
+fi
+
+TOOLCHAIN_DIR=$(pwd)
 TOOLCHAIN_BUILD_DIR=${TOOLCHAIN_DIR}/builds
 TOOLCHAIN_BR_DIR=${TOOLCHAIN_DIR}/buildroot
 TOOLCHAIN_VERSION=$(git --git-dir=${TOOLCHAIN_BR_DIR}/.git describe)
+
+mkdir -p ${TOOLCHAIN_BUILD_DIR} &>/dev/null
 
 function set_qemu_config {
     if [ ${arch} == "arm" ]; then
@@ -120,7 +130,8 @@ function build {
     make -C ${TOOLCHAIN_BR_DIR} O=${builddir} > ${logfile} 2>&1
     if [ $? -ne 0 ] ; then
         echo "  finished at $(date) ... FAILED"
-        return
+        cat ${logfile}
+        return 1
     fi
 
     echo "  finished at $(date) ... SUCCESS"
@@ -136,7 +147,7 @@ function generate {
     testdir=${toolchaindir}-tests
     logfile=${TOOLCHAIN_BUILD_DIR}/${name}-${TOOLCHAIN_VERSION}-build.log
     testlogfile=${TOOLCHAIN_BUILD_DIR}/${name}-${TOOLCHAIN_VERSION}-test.log
-    builddir=${TOOLCHAIN_BUILD_DIR}/toolchain-build/
+    builddir=${TOOLCHAIN_BUILD_DIR}/toolchain-build
     configfile=${builddir}/.config
 
     echo "Generating ${name}..."
