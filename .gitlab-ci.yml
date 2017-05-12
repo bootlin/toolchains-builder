@@ -1,0 +1,7 @@
+before_script:
+  - apt-get update -qq && apt-get install -y -qq expect qemu-system-*
+
+build_toolchains:
+  script:
+    - ./build.sh
+
