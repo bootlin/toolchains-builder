@@ -1,7 +1,13 @@
 #!/bin/bash
 
 echo "Building $1"
-exit 0
+echo "Target: $2"
+
+if [ "$2" == "ci_debug" ]; then
+    echo "ci_debug is set as target, you should see this line, but the build won't go further."
+    echo "Exiting properly."
+    exit 0;
+fi
 
 if git clone git://git.buildroot.net/buildroot; then
     # buildroot needs patchs
@@ -15,7 +21,6 @@ main_dir=$(pwd)
 build_dir=${main_dir}/builds
 chroot_script="build_chroot.sh"
 buildroot_dir=${main_dir}/buildroot
-
 
 function set_qemu_config {
     if [ ${arch} == "arm" ]; then

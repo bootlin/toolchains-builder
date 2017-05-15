@@ -9,6 +9,58 @@ common_config="./configs/common.config"
 gitlab_base=".gitlab-ci.yml.in"
 git_build_branch="builds"
 
+function show_help {
+    cat - <<EOF
+Usage: $0 [-a arch] [-l libc] [-v version] [-dh]
+
+    -h          show this help
+    -d          debug output
+
+    -t target   defines what to do:
+           ci_debug:    just launch the ci jobs, but does not really 
+                        compiles the toolchains. Useful for CI debugging.
+           build_debug: launch the ci jobs and compiles the toolchains, 
+                        but doesn't send them as releases.
+           release:     launch the ci jobs and compiles the toolchains, 
+                        then send them as releases and trigger the web page 
+                        update.
+            This option defaults to ci_debug in order not to eat all the CPU
+            by accident or misuse.
+
+    -a arch      specify architecture to build (see \`ls configs/arch/*\`)
+    -l libc      specify libc to use (see \`ls configs/libc/*\`)
+    -v version   specify version to build (see \`ls configs/version/*\`)
+
+EOF
+}
+
+debug=0
+opt_arch="*"
+opt_libc="*"
+opt_version="*"
+opt_target="ci_debug"
+
+while getopts "a:l:v:dh" opt; do
+    case "$opt" in
+    d) debug=1
+        ;;
+    a) opt_arch=$OPTARG
+        ;;
+    l) opt_libc=$OPTARG
+        ;;
+    v) opt_version=$OPTARG
+        ;;
+    t) opt_target=$OPTARG
+        ;;
+    *|h|\?)
+        show_help
+        exit 0
+        ;;
+    esac
+done
+
+if [ $debug -eq 0 ]; then exec 2>/dev/null; fi
+
 function check_config {
     cp ${config_file} ${br_path}/.config
     cd ${br_path}
@@ -35,9 +87,9 @@ git checkout -b ${git_build_branch}
 
 cp ${gitlab_base} .gitlab-ci.yml
 
-for arch in $(ls ./configs/arch/*.config); do
-    for libc in $(ls ./configs/libc/*.config); do
-        for version in $(ls ./configs/version/*.config); do
+for arch in $(ls ./configs/arch/${opt_arch}.config); do
+    for libc in $(ls ./configs/libc/${opt_libc}.config); do
+        for version in $(ls ./configs/version/${opt_version}.config); do
             arch_name=$(basename ${arch} .config)
             libc_name=$(basename ${libc} .config)
             version_name=$(basename ${version} .config)
@@ -50,7 +102,7 @@ for arch in $(ls ./configs/arch/*.config); do
                 cat .gitlab-ci.yml - > .gitlab-ci.yml.tmp <<EOF
 ${release_name}:
   script:
-    - ./build.sh ${release_name}
+    - ./build.sh ${release_name} ${opt_target}
 
 EOF
                 mv .gitlab-ci.yml.tmp .gitlab-ci.yml
