@@ -17,14 +17,17 @@ Usage: $0 [-a arch] [-l libc] [-v version] [-dh]
     -d          debug output
 
     -t target   defines what to do:
-           ci_debug:    just launch the ci jobs, but does not really 
+           no_push:     just prepare the config files and the commit in
+                        the build branch, but don't push (do not trigger the
+                        Gitlab CI). Useful for debugging.
+           ci_debug:    just launch the ci jobs, but does not really
                         compiles the toolchains. Useful for CI debugging.
-           build_debug: launch the ci jobs and compiles the toolchains, 
+           build_debug: launch the ci jobs and compiles the toolchains,
                         but doesn't send them as releases.
-           release:     launch the ci jobs and compiles the toolchains, 
-                        then send them as releases and trigger the web page 
+           release:     launch the ci jobs and compiles the toolchains,
+                        then send them as releases and trigger the web page
                         update.
-            This option defaults to ci_debug in order not to eat all the CPU
+            This option defaults to no_push in order not to trigger builds
             by accident or misuse.
 
     -a arch      specify architecture to build (see \`ls configs/arch/*\`)
@@ -38,7 +41,7 @@ debug=0
 opt_arch="*"
 opt_libc="*"
 opt_version="*"
-opt_target="ci_debug"
+opt_target="no_push"
 
 while getopts "a:l:v:t:dh" opt; do
     case "$opt" in
@@ -118,7 +121,9 @@ done
 git add .
 git add -f .gitlab-ci.yml
 git commit -m "Build bot: trigger new builds"
-git push -u -f gitlab ${git_build_branch}
+if [ "$opt_target" != "no_push" ]; then
+    git push -u -f gitlab ${git_build_branch}
+fi
 
 git checkout $git_current_branch
 

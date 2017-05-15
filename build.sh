@@ -178,13 +178,13 @@ function generate {
     return $return_value
 }
 
-if [ $# -eq 1 ]; then
+if [ $# -eq 2 ]; then
     if ! generate $1; then
         echo "Something went wrong. Exiting with code 1"
         exit 1
     fi
 else
-    echo "Usage: $0 configname.config"
+    echo "Usage: $0 configname.config target"
     exit 1
 fi
 
