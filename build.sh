@@ -131,7 +131,10 @@ function generate {
     name=$1
 
     echo "Generating ${name}..."
-    launch_build $1
+    if ! launch_build $1; then
+        echo "Toolchain build failed, not going further"
+        exit 1
+    fi
 
     toolchain_name=$(basename ${build_dir}/${name}-*)
     toolchain_dir="${build_dir}/${toolchain_name}"
@@ -147,29 +150,42 @@ function generate {
     locale=$(grep "^BR2_TOOLCHAIN_BUILDROOT_LOCALE" ${configfile} | sed 's/BR2_TOOLCHAIN_BUILDROOT_LOCALE=\(.\)/\1/')
     set_qemu_config
 
+    return_value=0
     # Test the toolchain
     echo "Building a test system using ${name}..."
-    build_test
+    if build_test; then
+        echo "Booting the test system in qemu..."
+        if boot_test; then
+            echo "Booting passed"
+        else
+            echo "Booting failed"
+            return_value=1
+        fi
+    else
+        echo "Test system failed to build"
+        return_value=1
+    fi
 
-    echo "Booting the test system in qemu..."
-    boot_test
-    return
+    if [ $return_value -eq 1 ]; then
+        echo "THIS TOOLCHAIN MAY NOT WORK, OR THERE MAY BE A PROBLEM IN THE CONFIGURATION, PLEASE CHECK!"
+        toolchain_name="${toolchain_name}-UNTESTED"
+    fi
 
     # Everything works, package the toolchain
-    (cd ${build_dir}; tar cjf `basename ${toolchain_dir}`.tar.bz2 `basename
-    ${toolchain_dir}`)
-
-    # Remove toolchain directory
-    # rm -rf ${toolchain_dir}
-
-    # Remove build directory
-    # rm -rf ${builddir}
+    echo "Packaging the toolchain as ${toolchain_name}.tar.bz2"
+    cd ${build_dir}
+    tar cjf `basename ${toolchain_name}`.tar.bz2 `basename ${toolchain_dir}`
+    return $return_value
 }
 
 if [ $# -eq 1 ]; then
-    generate $1
+    if ! generate $1; then
+        echo "Something went wrong. Exiting with code 1"
+        exit 1
+    fi
 else
     echo "Usage: $0 configname.config"
+    exit 1
 fi
 
 

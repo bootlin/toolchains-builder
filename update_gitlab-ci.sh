@@ -40,7 +40,7 @@ opt_libc="*"
 opt_version="*"
 opt_target="ci_debug"
 
-while getopts "a:l:v:dh" opt; do
+while getopts "a:l:v:t:dh" opt; do
     case "$opt" in
     d) debug=1
         ;;

@@ -51,7 +51,10 @@ function build {
     make -C ${TOOLCHAIN_BR_DIR} O=${builddir} > ${logfile} 2>&1
     if [ $? -ne 0 ] ; then
         echo "  finished at $(date) ... FAILED"
+        echo "  printing the logs before exiting"
+        echo "=================== BEGIN LOG FILE ======================"
         cat ${logfile}
+        echo "==================== END LOG FILE ======================="
         return 1
     fi
 
@@ -64,7 +67,10 @@ function build {
 
 if [ $# -eq 1 ]; then
     echo "Generating ${name}..."
-    build $1
+    if ! build $1; then
+        echo "Error in toolchain build. Exiting"
+        exit 1
+    fi
 else
     echo "Usage: $0 toolchain_name"
 fi
