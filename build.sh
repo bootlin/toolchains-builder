@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "Building $1"
+exit 0
+
 if git clone git://git.buildroot.net/buildroot; then
     # buildroot needs patchs
     cd buildroot
@@ -112,7 +115,7 @@ function launch_build {
     mkdir -p ${build_dir}
     debootstrap --variant=buildd lenny ${build_dir} http://archive.debian.org/debian/
     cp ${chroot_script} ${build_dir}
-    cp -r configs ${build_dir}
+    cp ${1}.config ${build_dir}
     cp chroot.conf /etc/schroot/schroot.conf
     cp /etc/resolv.conf ${build_dir}/etc/resolv.conf
     echo "  chrooting to ${build_dir}"
@@ -161,9 +164,7 @@ function generate {
 if [ $# -eq 1 ]; then
     generate $1
 else
-    for toolchain in *.config ; do
-        generate ${toolchain%%.config}
-    done
+    echo "Usage: $0 configname.config"
 fi
 
 

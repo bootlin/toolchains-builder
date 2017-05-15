@@ -16,7 +16,6 @@ if git clone git://git.buildroot.net/buildroot; then
 fi
 
 TOOLCHAIN_DIR=$(pwd)
-TOOLCHAIN_CONFIG_DIR=${TOOLCHAIN_DIR}/configs
 TOOLCHAIN_BUILD_DIR=${TOOLCHAIN_DIR}
 TOOLCHAIN_BR_DIR=${TOOLCHAIN_DIR}/buildroot
 TOOLCHAIN_VERSION=$(git --git-dir=${TOOLCHAIN_BR_DIR}/.git describe)
@@ -39,7 +38,7 @@ function build {
     mkdir ${builddir}
 
     # Create the configuration
-    cp ${TOOLCHAIN_CONFIG_DIR}/${name}.config ${configfile}
+    cp ${name}.config ${configfile}
     echo "BR2_JLEVEL=16" >> ${configfile}
     echo "BR2_HOST_DIR=\"${toolchaindir}\"" >> ${configfile}
 
