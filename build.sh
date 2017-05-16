@@ -94,7 +94,7 @@ function build_test {
     echo "BR2_TOOLCHAIN_EXTERNAL_PATH=\"${toolchain_dir}\"" >> ${testconfigfile}
     echo "BR2_TOOLCHAIN_EXTERNAL_GCC_${gcc_version}=y" >> ${testconfigfile}
     echo "BR2_TOOLCHAIN_EXTERNAL_HEADERS_${linux_version}=y" >> ${testconfigfile}
-    if [ ${locale} == "y" ]; then
+    if [ "${locale}" == "y" ]; then
         echo "BR2_TOOLCHAIN_EXTERNAL_LOCALE=y" >> ${testconfigfile}
     fi
     if grep "BR2_PTHREAD_DEBUG is not set" ${configfile} > /dev/null 2>&1; then
@@ -109,6 +109,10 @@ function build_test {
     make -C ${buildroot_dir} O=${test_dir} > ${testlogfile} 2>&1
     if [ $? -ne 0 ] ; then
         echo "  finished test system build at $(date) ... FAILED"
+        echo "  printing the end of the logs before exiting"
+        echo "=================== BEGIN LOG FILE ======================"
+        tail -n 200 ${testlogfile}
+        echo "==================== END LOG FILE ======================="
         return 1
     fi
     echo "  finished test system build at $(date) ... SUCCESS"
@@ -118,7 +122,7 @@ function launch_build {
     echo "  Setup chroot and launch build"
     rm -rf ${build_dir}
     mkdir -p ${build_dir}
-    debootstrap --variant=buildd lenny ${build_dir} http://archive.debian.org/debian/
+    debootstrap --variant=buildd squeeze ${build_dir} http://archive.debian.org/debian/ 2>&1 1>/dev/null
     cp ${chroot_script} ${build_dir}
     cp ${1}.config ${build_dir}
     cp chroot.conf /etc/schroot/schroot.conf

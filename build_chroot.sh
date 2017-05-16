@@ -3,6 +3,7 @@
 apt-get install -y --force-yes -qq --no-install-recommends \
     build-essential locales bc ca-certificates file rsync gcc-multilib \
     git bzr cvs mercurial subversion unzip wget cpio curl git-core \
+    libc6-i386 2>&1 1>/dev/null
 
 sed -i 's/# \(en_US.UTF-8\)/\1/' /etc/locale.gen
 /usr/sbin/locale-gen
@@ -51,9 +52,9 @@ function build {
     make -C ${TOOLCHAIN_BR_DIR} O=${builddir} > ${logfile} 2>&1
     if [ $? -ne 0 ] ; then
         echo "  finished at $(date) ... FAILED"
-        echo "  printing the logs before exiting"
+        echo "  printing the end of the logs before exiting"
         echo "=================== BEGIN LOG FILE ======================"
-        cat ${logfile}
+        tail -n 200 ${logfile}
         echo "==================== END LOG FILE ======================="
         return 1
     fi
