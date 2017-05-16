@@ -9,7 +9,7 @@ if [ "$2" == "ci_debug" ]; then
     exit 0;
 fi
 
-if git clone git://git.buildroot.net/buildroot; then
+if git clone git@github.com:buildroot/buildroot.git; then
     # buildroot needs patchs
     cd buildroot
     curl http://free-electrons.com/~thomas/pub/0001-mpc-mpfr-gmp-build-statically-for-the-host.patch |patch -p1
@@ -158,6 +158,7 @@ function make_br_fragment {
     locale=$(grep "^BR2_TOOLCHAIN_BUILDROOT_LOCALE" ${configfile} | sed 's/BR2_TOOLCHAIN_BUILDROOT_LOCALE=\(.\)/\1/')
     libc=$(grep "^BR2_TOOLCHAIN_BUILDROOT_LIBC=\".*\"" ${configfile} | sed 's/BR2_TOOLCHAIN_BUILDROOT_LIBC="\(.*\)"/\1/')
 
+    echo "BR2_WGET=\"wget --passive-ftp -nd -t 3 --no-check-certificate\"" >> ${fragment_file}
     echo "BR2_TOOLCHAIN_EXTERNAL=y" >> ${fragment_file}
     echo "BR2_TOOLCHAIN_EXTERNAL_CUSTOM=y" >> ${fragment_file}
     echo "BR2_TOOLCHAIN_EXTERNAL_PREINSTALLED=y" >> ${fragment_file}

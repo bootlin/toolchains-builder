@@ -8,7 +8,7 @@ apt-get install -y --force-yes -qq --no-install-recommends \
 sed -i 's/# \(en_US.UTF-8\)/\1/' /etc/locale.gen
 /usr/sbin/locale-gen
 
-if git clone git://git.buildroot.net/buildroot; then
+if git clone git@github.com:buildroot/buildroot.git; then
     # buildroot needs patchs
     cd buildroot
     curl http://free-electrons.com/~thomas/pub/0001-mpc-mpfr-gmp-build-statically-for-the-host.patch |patch -p1
