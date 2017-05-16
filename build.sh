@@ -17,6 +17,7 @@ if git clone git://git.buildroot.net/buildroot; then
     cd ..
 fi
 
+ssh_server="gitlabci@libskia.so"
 main_dir=$(pwd)
 build_dir=${main_dir}/builds
 chroot_script="build_chroot.sh"
@@ -179,6 +180,7 @@ function generate {
     echo "Packaging the toolchain as ${toolchain_name}.tar.bz2"
     cd ${build_dir}
     tar cjf `basename ${toolchain_name}`.tar.bz2 `basename ${toolchain_dir}`
+    scp "${toolchain_name}.tar.bz2" ${ssh_server}:
     return $return_value
 }
 
