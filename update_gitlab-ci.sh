@@ -69,7 +69,9 @@ function check_config {
     cd ${br_path}
     make olddefconfig 1>&2
     make savedefconfig 1>&2
-    if ! diff ${base_dir}/${config_file} defconfig 1>&2; then
+    sort defconfig > /tmp/sorteddefconfig
+    sort ${base_dir}/${config_file} > /tmp/sortedconfigfile
+    if ! diff /tmp/sortedconfigfile /tmp/sorteddefconfig 1>&2; then
         echo "CONFIG does not work" 1>&2
         cd ${base_dir}
         return 1
