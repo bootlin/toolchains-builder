@@ -189,8 +189,8 @@ function generate {
     toolchain_name=$(basename ${build_dir}/${name}-*)
     toolchain_dir="${build_dir}/${toolchain_name}"
     configfile=${toolchain_dir}/buildroot.config
-    test_dir=${toolchain_dir}-tests
-    testlogfile=${build_dir}/${toolchain_name}-test.log
+    test_dir=${build_dir}/test-${toolchain_name}
+    testlogfile=${build_dir}/test-${toolchain_name}-build.log
     overlaydir=${test_dir}/overlay
 
     make_br_fragment
