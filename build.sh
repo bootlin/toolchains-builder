@@ -22,6 +22,7 @@ main_dir=$(pwd)
 build_dir=${main_dir}/builds
 chroot_script="build_chroot.sh"
 buildroot_dir=${main_dir}/buildroot
+fragment_file=${build_dir}/br_fragment
 
 function set_qemu_config {
     if [ ${arch} == "arm" ]; then
@@ -117,18 +118,7 @@ function build_test {
     echo "  generating configuration"
     cp ${buildroot_dir}/configs/${qemu_defconfig} ${testconfigfile}
     echo "BR2_ROOTFS_OVERLAY=\"${test_dir}/overlay\"" >> ${testconfigfile}
-    echo "BR2_TOOLCHAIN_EXTERNAL=y" >> ${testconfigfile}
-    echo "BR2_TOOLCHAIN_EXTERNAL_CUSTOM=y" >> ${testconfigfile}
-    echo "BR2_TOOLCHAIN_EXTERNAL_PREINSTALLED=y" >> ${testconfigfile}
-    echo "BR2_TOOLCHAIN_EXTERNAL_PATH=\"${toolchain_dir}\"" >> ${testconfigfile}
-    echo "BR2_TOOLCHAIN_EXTERNAL_GCC_${gcc_version}=y" >> ${testconfigfile}
-    echo "BR2_TOOLCHAIN_EXTERNAL_HEADERS_${linux_version}=y" >> ${testconfigfile}
-    if [ "${locale}" == "y" ]; then
-        echo "BR2_TOOLCHAIN_EXTERNAL_LOCALE=y" >> ${testconfigfile}
-    fi
-    if grep "BR2_PTHREAD_DEBUG is not set" ${configfile} > /dev/null 2>&1; then
-        echo "BR2_TOOLCHAIN_EXTERNAL_HAS_THREADS_DEBUG=n" >> ${testconfigfile}
-    fi
+    cat ${fragment_file} >> ${testconfigfile}
 
     # Starting the system build
     echo "  starting test system build at $(date)"
@@ -160,6 +150,33 @@ function launch_build {
     chroot ${build_dir} ./build_chroot.sh $1
 }
 
+function make_br_fragment {
+    arch=$(grep "BR2_ARCH=" ${configfile} | sed 's/BR2_ARCH="\(.*\)"/\1/')
+    endianess=$(grep "BR2_ENDIAN=" ${configfile} | sed 's/BR2_ENDIAN="\(.*\)"/\1/')
+    gcc_version=$(grep "^BR2_GCC_VERSION_" ${configfile} | sed 's/BR2_GCC_VERSION_\(.*\)_X=.*/\1/')
+    linux_version=$(grep "^BR2_KERNEL_HEADERS_" ${configfile} | sed 's/BR2_KERNEL_HEADERS_\(.*\)=./\1/')
+    locale=$(grep "^BR2_TOOLCHAIN_BUILDROOT_LOCALE" ${configfile} | sed 's/BR2_TOOLCHAIN_BUILDROOT_LOCALE=\(.\)/\1/')
+    libc=$(grep "^BR2_TOOLCHAIN_BUILDROOT_LIBC=\".*\"" ${configfile} | sed 's/BR2_TOOLCHAIN_BUILDROOT_LIBC="\(.*\)"/\1/')
+
+    echo "BR2_TOOLCHAIN_EXTERNAL=y" >> ${fragment_file}
+    echo "BR2_TOOLCHAIN_EXTERNAL_CUSTOM=y" >> ${fragment_file}
+    echo "BR2_TOOLCHAIN_EXTERNAL_PREINSTALLED=y" >> ${fragment_file}
+    echo "BR2_TOOLCHAIN_EXTERNAL_PATH=\"${toolchain_dir}\"" >> ${fragment_file}
+    echo "BR2_TOOLCHAIN_EXTERNAL_GCC_${gcc_version}=y" >> ${fragment_file}
+    echo "BR2_TOOLCHAIN_EXTERNAL_HEADERS_${linux_version}=y" >> ${fragment_file}
+    if [ "${locale}" == "y" ]; then
+        echo "BR2_TOOLCHAIN_EXTERNAL_LOCALE=y" >> ${fragment_file}
+    fi
+    if grep "BR2_PTHREAD_DEBUG is not set" ${configfile} > /dev/null 2>&1; then
+        echo "BR2_TOOLCHAIN_EXTERNAL_HAS_THREADS_DEBUG=n" >> ${fragment_file}
+    fi
+    if [ "${libc}" == "glibc" ]; then
+        echo "BR2_TOOLCHAIN_EXTERNAL_CUSTOM_GLIBC=y" >> ${fragment_file}
+    elif [ "${libc}" == "musl" ]; then
+        echo "BR2_TOOLCHAIN_EXTERNAL_CUSTOM_MUSL=y" >> ${fragment_file}
+    fi
+}
+
 function generate {
     name=$1
 
@@ -174,13 +191,9 @@ function generate {
     configfile=${toolchain_dir}/buildroot.config
     test_dir=${toolchain_dir}-tests
     testlogfile=${build_dir}/${toolchain_name}-test.log
-
     overlaydir=${test_dir}/overlay
-    arch=$(grep "BR2_ARCH=" ${configfile} | sed 's/BR2_ARCH="\(.*\)"/\1/')
-    endianess=$(grep "BR2_ENDIAN=" ${configfile} | sed 's/BR2_ENDIAN="\(.*\)"/\1/')
-    gcc_version=$(grep "^BR2_GCC_VERSION_" ${configfile} | sed 's/BR2_GCC_VERSION_\(.*\)_X=.*/\1/')
-    linux_version=$(grep "^BR2_KERNEL_HEADERS_" ${configfile} | sed 's/BR2_KERNEL_HEADERS_\(.*\)=./\1/')
-    locale=$(grep "^BR2_TOOLCHAIN_BUILDROOT_LOCALE" ${configfile} | sed 's/BR2_TOOLCHAIN_BUILDROOT_LOCALE=\(.\)/\1/')
+
+    make_br_fragment
     set_qemu_config
 
     return_value=0
@@ -207,6 +220,7 @@ function generate {
     # Everything works, package the toolchain
     echo "Packaging the toolchain as ${toolchain_name}.tar.bz2"
     cd ${build_dir}
+    cp ${fragment_file} ${toolchain_dir}
     tar cjf `basename ${toolchain_name}`.tar.bz2 `basename ${toolchain_dir}`
     scp "${toolchain_name}.tar.bz2" ${ssh_server}:
     return $return_value
