@@ -39,7 +39,7 @@ function set_qemu_config {
             -machine versatilepb
             -kernel ${test_dir}/images/zImage
             -dtb ${test_dir}/images/versatile-pb.dtb
-            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk
+            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/sda rw\""
     elif [ ${arch_name} == "aarch64" ]; then
         qemu_defconfig="qemu_aarch64_virt_defconfig"
@@ -50,45 +50,47 @@ function set_qemu_config {
             -append \"console=ttyAMA0\""
     elif [ ${arch_name} == "i386-core2" ]; then
         qemu_defconfig="qemu_x86_defconfig"
+        sed -i "s/tty1/ttyS0" ${buildroot_dir}/configs/${qemu_defconfig}
         qemu_system_command="qemu-system-i386
             -machine pc
-            -kernel ${test_dir}/images/vmlinux
-            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk
-            -append \"root=/dev/hda rw\""
+            -kernel ${test_dir}/images/bzImage
+            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
+            -append \"root=/dev/sda rw console=ttyS0\""
     elif [ ${arch_name} == "i386-i686" ]; then
         qemu_defconfig="qemu_x86_defconfig"
+        sed -i "s/tty1/ttyS0" ${buildroot_dir}/configs/${qemu_defconfig}
         qemu_system_command="qemu-system-i386
             -machine pc
-            -kernel ${test_dir}/images/vmlinux
-            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk
-            -append \"root=/dev/hda rw\""
+            -kernel ${test_dir}/images/bzImage
+            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
+            -append \"root=/dev/sda rw console=ttyS0\""
     elif [ ${arch_name} == "mips" ]; then
         qemu_defconfig="qemu_mips32r2_malta_defconfig"
         qemu_system_command="qemu-system-mips
             -machine malta
             -kernel ${test_dir}/images/vmlinux
-            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk
+            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/hda rw\""
     elif [ ${arch_name} == "mipsel" ]; then
         qemu_defconfig="qemu_mips32r2el_malta_defconfig"
         qemu_system_command="qemu-system-mipsel
             -machine malta
             -kernel ${test_dir}/images/vmlinux
-            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk
+            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/hda rw\""
     elif [ ${arch_name} == "m68k-68040" ]; then
         qemu_defconfig="qemu_m68k_q800_defconfig"
         qemu_system_command="qemu-system-m68k
             -machine an5206
             -kernel ${test_dir}/images/vmlinux
-            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk
+            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/hda rw\""
     elif [ ${arch_name} == "m68k-508" ]; then
         qemu_defconfig="qemu_m68k_mcf5208_defconfig"
         qemu_system_command="qemu-system-m68k
             -machine mcf5208evb
             -kernel ${test_dir}/images/vmlinux
-            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk
+            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/hda rw\""
     fi
 }
