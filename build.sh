@@ -29,7 +29,7 @@ build_dir=${main_dir}/builds
 chroot_script="build_chroot.sh"
 buildroot_dir=${main_dir}/buildroot
 fragment_file=${build_dir}/br_fragment
-base_url="https://libskia.so/pub/gitlabci/"
+base_url="https:\/\/libskia.so\/pub\/gitlabci"
 
 function set_qemu_config {
     arch_name=$(echo "${toolchain_name}" |sed "s/--/\t/" |cut -f 1)
