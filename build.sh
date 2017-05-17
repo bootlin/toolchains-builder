@@ -217,6 +217,7 @@ function generate {
     if [ $return_value -eq 1 ]; then
         echo "THIS TOOLCHAIN MAY NOT WORK, OR THERE MAY BE A PROBLEM IN THE CONFIGURATION, PLEASE CHECK!"
         toolchain_name="${toolchain_name}-UNTESTED"
+        return_value=0
     fi
 
     # Everything works, package the toolchain
