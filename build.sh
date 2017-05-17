@@ -2,8 +2,13 @@
 
 echo "Building $1"
 echo "Target: $2"
+echo "Buildroot tree: $3"
 
-if [ "$2" == "ci_debug" ]; then
+name="$1"
+target="$2"
+buildroot_tree="$3"
+
+if [ "$target" == "ci_debug" ]; then
     echo "ci_debug is set as target, you should see this line, but the build won't go further."
     echo "Exiting properly."
     exit 0;
@@ -12,6 +17,7 @@ fi
 if git clone https://github.com/buildroot/buildroot.git; then
     # buildroot needs patchs
     cd buildroot
+    git checkout $buildroot_tree
     curl http://free-electrons.com/~thomas/pub/0001-mpc-mpfr-gmp-build-statically-for-the-host.patch |patch -p1
     curl http://free-electrons.com/~thomas/pub/0002-toolchain-attempt-to-fix-the-toolchain-wrapper.patch |patch -p1
     cd ..
@@ -144,11 +150,11 @@ function launch_build {
     mkdir -p ${build_dir}
     debootstrap --variant=buildd squeeze ${build_dir} http://archive.debian.org/debian/ 2>&1 1>/dev/null
     cp ${chroot_script} ${build_dir}
-    cp ${1}.config ${build_dir}
+    cp ${name}.config ${build_dir}
     cp chroot.conf /etc/schroot/schroot.conf
     cp /etc/resolv.conf ${build_dir}/etc/resolv.conf
     echo "  chrooting to ${build_dir}"
-    chroot ${build_dir} ./build_chroot.sh $1
+    chroot ${build_dir} ./build_chroot.sh ${name} ${buildroot_tree}
 }
 
 function make_br_fragment {
@@ -180,10 +186,8 @@ function make_br_fragment {
 }
 
 function generate {
-    name=$1
-
     echo "Generating ${name}..."
-    if ! launch_build $1; then
+    if ! launch_build; then
         echo "Toolchain build failed, not going further"
         exit 1
     fi
@@ -229,13 +233,13 @@ function generate {
     return $return_value
 }
 
-if [ $# -eq 2 ]; then
-    if ! generate $1; then
+if [ $# -eq 3 ]; then
+    if ! generate ${name}; then
         echo "Something went wrong. Exiting with code 1"
         exit 1
     fi
 else
-    echo "Usage: $0 configname.config target"
+    echo "Usage: $0 configname.config target buildroot-tree"
     exit 1
 fi
 

@@ -11,6 +11,7 @@ sed -i 's/# \(en_US.UTF-8\)/\1/' /etc/locale.gen
 if git clone https://github.com/buildroot/buildroot.git; then
     # buildroot needs patchs
     cd buildroot
+    git checkout $2
     curl http://free-electrons.com/~thomas/pub/0001-mpc-mpfr-gmp-build-statically-for-the-host.patch |patch -p1
     curl http://free-electrons.com/~thomas/pub/0002-toolchain-attempt-to-fix-the-toolchain-wrapper.patch |patch -p1
     cd ..
@@ -66,14 +67,15 @@ function build {
     # Toolchain built
 }
 
-if [ $# -eq 1 ]; then
+if [ $# -eq 2 ]; then
     echo "Generating ${name}..."
     if ! build $1; then
         echo "Error in toolchain build. Exiting"
         exit 1
     fi
 else
-    echo "Usage: $0 toolchain_name"
+    echo "Usage: $0 toolchain_name buildroot-tree"
+    exit 1
 fi
 
 

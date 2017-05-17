@@ -30,6 +30,9 @@ Usage: $0 [-a arch] [-l libc] [-v version] [-dh]
             This option defaults to no_push in order not to trigger builds
             by accident or misuse.
 
+    -b tree-ish  checkout Buildroot to that tree-ish object (default is
+                 tag 2017.02.2)
+
     -a arch      specify architecture to build (see \`ls configs/arch/*\`)
     -l libc      specify libc to use (see \`ls configs/libc/*\`)
     -v version   specify version to build (see \`ls configs/version/*\`)
@@ -42,8 +45,9 @@ opt_arch="*"
 opt_libc="*"
 opt_version="*"
 opt_target="no_push"
+opt_brtree="2017.02.2"
 
-while getopts "a:l:v:t:dh" opt; do
+while getopts "a:l:v:t:b:dh" opt; do
     case "$opt" in
     d) debug=1
         ;;
@@ -52,6 +56,8 @@ while getopts "a:l:v:t:dh" opt; do
     l) opt_libc=$OPTARG
         ;;
     v) opt_version=$OPTARG
+        ;;
+    b) opt_brtree=$OPTARG
         ;;
     t) opt_target=$OPTARG
         ;;
@@ -86,6 +92,9 @@ function check_config {
 
 # Get buildroot if it's not done to check the configurations
 git clone https://github.com/buildroot/buildroot.git ${br_path}
+cd ${br_path}
+git checkout ${opt_brtree}
+cd ${base_dir}
 
 git branch -D ${git_build_branch}
 git checkout -b ${git_build_branch}
@@ -107,7 +116,7 @@ for arch in $(ls ./configs/arch/${opt_arch}.config); do
                 cat .gitlab-ci.yml - > .gitlab-ci.yml.tmp <<EOF
 ${release_name}:
   script:
-    - ./build.sh ${release_name} ${opt_target}
+    - ./build.sh ${release_name} ${opt_target} ${opt_brtree}
 
 EOF
                 mv .gitlab-ci.yml.tmp .gitlab-ci.yml
