@@ -92,6 +92,8 @@ function set_qemu_config {
             -kernel ${test_dir}/images/vmlinux
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/hda rw\""
+    else
+        qemu_defconfig=""
     fi
 }
 
@@ -115,6 +117,7 @@ function boot_test {
     fi
     echo "  booting test system ... SUCCESS"
     kill -9 $(cat /tmp/qemu-test.pid)
+    return 0
 }
 
 function build_test {
@@ -178,6 +181,9 @@ function make_br_fragment {
     if [ "${locale}" == "y" ]; then
         echo "BR2_TOOLCHAIN_EXTERNAL_LOCALE=y" >> ${fragment_file}
     fi
+    if ! grep "BR2_TOOLCHAIN_BUILDROOT_USE_SSP=y" ${configfile} > /dev/null 2>&1; then
+        echo "# BR2_TOOLCHAIN_EXTERNAL_HAS_SSP is not set" >> ${fragment_file}
+    fi
     if grep "BR2_PTHREAD_DEBUG is not set" ${configfile} > /dev/null 2>&1; then
         echo "BR2_TOOLCHAIN_EXTERNAL_HAS_THREADS_DEBUG=n" >> ${fragment_file}
     fi
@@ -211,17 +217,22 @@ function generate {
     return_value=0
     # Test the toolchain
     echo "Building a test system using ${name}..."
-    if build_test; then
-        echo "Booting the test system in qemu..."
-        if boot_test; then
-            echo "Booting passed"
+    if [ ${qemu_defconfig} != "" ]; then
+        if build_test; then
+            echo "Booting the test system in qemu..."
+            if boot_test; then
+                echo "Booting passed"
+            else
+                echo "Booting failed"
+                return_value=1
+            fi
         else
-            echo "Booting failed"
+            echo "Test system failed to build"
             return_value=1
         fi
     else
-        echo "Test system failed to build"
-        return_value=1
+        echo "THIS TOOLCHAIN CAN'T BE TESTED"
+        toolchain_name="${toolchain_name}-UNTESTED"
     fi
 
     if [ $return_value -eq 1 ]; then
