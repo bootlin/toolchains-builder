@@ -9,7 +9,7 @@ if [ "$2" == "ci_debug" ]; then
     exit 0;
 fi
 
-if git clone git@github.com:buildroot/buildroot.git; then
+if git clone https://github.com/buildroot/buildroot.git; then
     # buildroot needs patchs
     cd buildroot
     curl http://free-electrons.com/~thomas/pub/0001-mpc-mpfr-gmp-build-statically-for-the-host.patch |patch -p1

@@ -85,7 +85,7 @@ function check_config {
 }
 
 # Get buildroot if it's not done to check the configurations
-git clone git://git.buildroot.net/buildroot ${br_path}
+git clone https://github.com/buildroot/buildroot.git ${br_path}
 
 git branch -D ${git_build_branch}
 git checkout -b ${git_build_branch}
