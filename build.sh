@@ -168,7 +168,7 @@ function make_br_fragment {
     locale=$(grep "^BR2_TOOLCHAIN_BUILDROOT_LOCALE" ${configfile} | sed 's/BR2_TOOLCHAIN_BUILDROOT_LOCALE=\(.\)/\1/')
     libc=$(grep "^BR2_TOOLCHAIN_BUILDROOT_LIBC=\".*\"" ${configfile} | sed 's/BR2_TOOLCHAIN_BUILDROOT_LIBC="\(.*\)"/\1/')
 
-    echo "BR2_WGET=\"wget --passive-ftp -nd -t 3 --no-check-certificate\"" >> ${fragment_file}
+    echo "BR2_WGET=\"wget --passive-ftp -nd -t 3 --no-check-certificate\"" >> ${fragment_file} # XXX
     echo "BR2_TOOLCHAIN_EXTERNAL=y" >> ${fragment_file}
     echo "BR2_TOOLCHAIN_EXTERNAL_CUSTOM=y" >> ${fragment_file}
     echo "BR2_TOOLCHAIN_EXTERNAL_PREINSTALLED=y" >> ${fragment_file}
@@ -180,6 +180,9 @@ function make_br_fragment {
     fi
     if grep "BR2_PTHREAD_DEBUG is not set" ${configfile} > /dev/null 2>&1; then
         echo "BR2_TOOLCHAIN_EXTERNAL_HAS_THREADS_DEBUG=n" >> ${fragment_file}
+    fi
+    if ! grep "BR2_TOOLCHAIN_HAS_THREADS_NPTL=y" ${configfile} > /dev/null 2>&1; then
+        echo "# BR2_TOOLCHAIN_EXTERNAL_HAS_THREADS_NPTL is not set" >> ${fragment_file}
     fi
     if [ "${libc}" == "glibc" ]; then
         echo "BR2_TOOLCHAIN_EXTERNAL_CUSTOM_GLIBC=y" >> ${fragment_file}
@@ -235,7 +238,7 @@ function generate {
     cp ${fragment_file} ${toolchain_dir}
     tar cjf `basename ${toolchain_name}`.tar.bz2 `basename ${toolchain_dir}`
     scp "${toolchain_name}.tar.bz2" ${ssh_server}:
-    scp "${fragment_file}" ${ssh_server}:fragments/
+    scp "${fragment_file}" ${ssh_server}:fragments/${toolchain_name}.frag
     return $return_value
 }
 
