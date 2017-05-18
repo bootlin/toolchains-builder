@@ -33,7 +33,7 @@ base_url="https:\/\/libskia.so\/pub\/gitlabci"
 
 function set_qemu_config {
     arch_name=$(echo "${toolchain_name}" |sed "s/--/\t/" |cut -f 1)
-    if [ ${arch_name} == "arm" ]; then
+    if [[ "${arch_name}" == "arm" ]]; then
         qemu_defconfig="qemu_arm_versatile_defconfig"
         qemu_system_command="qemu-system-arm
             -machine versatilepb
@@ -41,14 +41,14 @@ function set_qemu_config {
             -dtb ${test_dir}/images/versatile-pb.dtb
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/sda rw\""
-    elif [ ${arch_name} == "aarch64" ]; then
+    elif [[ "${arch_name}" =~ "aarch64"* ]]; then
         qemu_defconfig="qemu_aarch64_virt_defconfig"
         # Qemu 2.8 has been tested and works, 2.5 does not.
         qemu_system_command="qemu-system-aarch64
             -machine virt -cpu cortex-a57 -machine type=virt
             -kernel ${test_dir}/images/Image
             -append \"console=ttyAMA0\""
-    elif [ ${arch_name} == "i386-core2" ]; then
+    elif [[ "${arch_name}" == "i386-core2" ]]; then
         qemu_defconfig="qemu_x86_defconfig"
         sed -i "s/tty1/ttyS0/" ${buildroot_dir}/configs/${qemu_defconfig}
         qemu_system_command="qemu-system-i386
@@ -56,7 +56,7 @@ function set_qemu_config {
             -kernel ${test_dir}/images/bzImage
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/sda rw console=ttyS0\""
-    elif [ ${arch_name} == "i386-i686" ]; then
+    elif [[ "${arch_name}" == "i386-i686" ]]; then
         qemu_defconfig="qemu_x86_defconfig"
         sed -i "s/tty1/ttyS0/" ${buildroot_dir}/configs/${qemu_defconfig}
         qemu_system_command="qemu-system-i386
@@ -64,28 +64,42 @@ function set_qemu_config {
             -kernel ${test_dir}/images/bzImage
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/sda rw console=ttyS0\""
-    elif [ ${arch_name} == "mips" ]; then
+    elif [[ "${arch_name}" == "microblazebe" ]]; then
+        qemu_defconfig="qemu_microblazebe_mmu_defconfig"
+        qemu_system_command="qemu-system-microblaze
+            -machine petalogix-s3adsp1800
+            -kernel ${test_dir}/images/linux.bin
+            -drive file=${test_dir}/images/rootfs.cpio,index=0,media=disk,format=raw
+            -append \"root=/dev/sda rw\""
+    elif [[ "${arch_name}" == "microblazeel" ]]; then
+        qemu_defconfig="qemu_microblazeel_mmu_defconfig"
+        qemu_system_command="qemu-system-microblazeel
+            -machine petalogix-s3adsp1800
+            -kernel ${test_dir}/images/linux.bin
+            -drive file=${test_dir}/images/rootfs.cpio,index=0,media=disk,format=raw
+            -append \"root=/dev/sda rw\""
+    elif [[ "${arch_name}" == "mips" ]]; then
         qemu_defconfig="qemu_mips32r2_malta_defconfig"
         qemu_system_command="qemu-system-mips
             -machine malta
             -kernel ${test_dir}/images/vmlinux
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/hda rw\""
-    elif [ ${arch_name} == "mipsel" ]; then
+    elif [[ "${arch_name}" == "mipsel" ]]; then
         qemu_defconfig="qemu_mips32r2el_malta_defconfig"
         qemu_system_command="qemu-system-mipsel
             -machine malta
             -kernel ${test_dir}/images/vmlinux
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/hda rw\""
-    elif [ ${arch_name} == "m68k-68040" ]; then
+    elif [[ "${arch_name}" == "m68k-68040" ]]; then
         qemu_defconfig="qemu_m68k_q800_defconfig"
         qemu_system_command="qemu-system-m68k
             -machine an5206
             -kernel ${test_dir}/images/vmlinux
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/hda rw\""
-    elif [ ${arch_name} == "m68k-508" ]; then
+    elif [[ "${arch_name}" == "m68k-508" ]]; then
         qemu_defconfig="qemu_m68k_mcf5208_defconfig"
         qemu_system_command="qemu-system-m68k
             -machine mcf5208evb
