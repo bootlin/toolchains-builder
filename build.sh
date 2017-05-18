@@ -41,7 +41,7 @@ function set_qemu_config {
             -dtb ${test_dir}/images/versatile-pb.dtb
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/sda rw\""
-    elif [[ "${arch_name}" =~ "aarch64"* ]]; then
+    elif [[ "${arch_name}" == "aarch64el" ]]; then
         qemu_defconfig="qemu_aarch64_virt_defconfig"
         # Qemu 2.8 has been tested and works, 2.5 does not.
         qemu_system_command="qemu-system-aarch64
@@ -106,6 +106,13 @@ function set_qemu_config {
             -kernel ${test_dir}/images/vmlinux
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/hda rw\""
+    elif [[ "${arch_name}" == "sparc-v8" ]]; then
+        qemu_defconfig="qemu_sparc_ss10_defconfig"
+        qemu_system_command="qemu-system-sparc
+            -machine SS-10
+            -kernel ${test_dir}/images/zImage
+            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
+            -append \"root=/dev/sda rw\""
     else
         qemu_defconfig=""
     fi

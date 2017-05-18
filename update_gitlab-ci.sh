@@ -73,16 +73,17 @@ if [ $debug -eq 0 ]; then exec 2>/dev/null; fi
 function check_config {
     cp ${config_file} ${br_path}/.config
     cd ${br_path}
-    make olddefconfig 1>&2
-    make savedefconfig 1>&2
-    sort defconfig > /tmp/sorteddefconfig
-    sort ${base_dir}/${config_file} > /tmp/sortedconfigfile
-    if ! diff /tmp/sortedconfigfile /tmp/sorteddefconfig 1>&2; then
-        echo "CONFIG does not work" 1>&2
+    make olddefconfig 2>&1 1>/dev/null
+    sort .config > /tmp/sorted.config
+    sort ${base_dir}/${config_file} > /tmp/sortedfragmentfile
+    if [ $(comm -23 /tmp/sortedfragmentfile /tmp/sorted.config |wc -l) -gt 0 ]; then
+        if [ $debug -eq 1 ]; then
+            echo ""
+            comm -23 /tmp/sortedfragmentfile /tmp/sorted.config
+        fi
         cd ${base_dir}
         return 1
     fi
-    echo "CONFIG OK" 1>&2
     libc_name=$(grep "^BR2_TOOLCHAIN_BUILDROOT_LIBC=\".*\"" .config | sed 's/BR2_TOOLCHAIN_BUILDROOT_LIBC="\(.*\)"/\1/')
     release_name="${arch_name}--${libc_name}--${version_name}"
     printf "${release_name} ... "
@@ -101,30 +102,34 @@ git checkout -b ${git_build_branch}
 
 cp ${gitlab_base} .gitlab-ci.yml
 
-for arch in $(ls ./configs/arch/${opt_arch}.config); do
-    for libc in $(ls ./configs/libc/${opt_libc}.config); do
-        for version in $(ls ./configs/version/${opt_version}.config); do
-            arch_name=$(basename ${arch} .config)
-            libc_name=$(basename ${libc} .config)
-            version_name=$(basename ${version} .config)
-            name="${arch_name}-${libc_name}-${version_name}"
-            config_file=${name}.config
-            printf "Generating .gitlab-ci.yml for $name ... "
-            cat ${arch} ${libc} ${version} ${common_config} > ${config_file}
-            if check_config; then
-                mv ${config_file} ${release_name}.config
-                cat .gitlab-ci.yml - > .gitlab-ci.yml.tmp <<EOF
+function add_to_ci {
+    arch_name=$(basename ${arch} .config)
+    libc_name=$(basename ${libc} .config)
+    version_name=$(basename ${version} .config)
+    name="${arch_name}-${libc_name}-${version_name}"
+    config_file=${name}.config
+    printf "  Generating .gitlab-ci.yml for $name ... "
+    cat ${arch} ${libc} ${version} ${common_config} > ${config_file}
+    if check_config; then
+        mv ${config_file} ${release_name}.config
+        cat .gitlab-ci.yml - > .gitlab-ci.yml.tmp <<EOF
 ${release_name}:
   script:
     - ./build.sh ${release_name} ${opt_target} ${opt_brtree}
 
 EOF
-                mv .gitlab-ci.yml.tmp .gitlab-ci.yml
-                echo "OK"
-            else
-                echo "FAIL: This combination does not work"
-                rm ${config_file}
-            fi
+        mv .gitlab-ci.yml.tmp .gitlab-ci.yml
+        echo "OK"
+    else
+        echo "FAIL: This combination does not work"
+        rm ${config_file}
+    fi
+}
+
+for arch in $(ls ./configs/arch/${opt_arch}.config); do
+    for libc in $(ls ./configs/libc/${opt_libc}.config); do
+        for version in $(ls ./configs/version/${opt_version}.config); do
+            add_to_ci
         done
     done
 done
