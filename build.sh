@@ -50,7 +50,7 @@ function set_qemu_config {
             -append \"console=ttyAMA0\""
     elif [ ${arch_name} == "i386-core2" ]; then
         qemu_defconfig="qemu_x86_defconfig"
-        sed -i "s/tty1/ttyS0" ${buildroot_dir}/configs/${qemu_defconfig}
+        sed -i "s/tty1/ttyS0/" ${buildroot_dir}/configs/${qemu_defconfig}
         qemu_system_command="qemu-system-i386
             -machine pc
             -kernel ${test_dir}/images/bzImage
@@ -58,7 +58,7 @@ function set_qemu_config {
             -append \"root=/dev/sda rw console=ttyS0\""
     elif [ ${arch_name} == "i386-i686" ]; then
         qemu_defconfig="qemu_x86_defconfig"
-        sed -i "s/tty1/ttyS0" ${buildroot_dir}/configs/${qemu_defconfig}
+        sed -i "s/tty1/ttyS0/" ${buildroot_dir}/configs/${qemu_defconfig}
         qemu_system_command="qemu-system-i386
             -machine pc
             -kernel ${test_dir}/images/bzImage
@@ -148,6 +148,7 @@ function build_test {
         return 1
     fi
     echo "  finished test system build at $(date) ... SUCCESS"
+    return 0
 }
 
 function launch_build {
@@ -181,7 +182,9 @@ function make_br_fragment {
     if [ "${locale}" == "y" ]; then
         echo "BR2_TOOLCHAIN_EXTERNAL_LOCALE=y" >> ${fragment_file}
     fi
-    if ! grep "BR2_TOOLCHAIN_BUILDROOT_USE_SSP=y" ${configfile} > /dev/null 2>&1; then
+    if grep "BR2_TOOLCHAIN_HAS_SSP=y" ${configfile} > /dev/null 2>&1; then
+        echo "BR2_TOOLCHAIN_EXTERNAL_HAS_SSP=y" >> ${fragment_file}
+    else
         echo "# BR2_TOOLCHAIN_EXTERNAL_HAS_SSP is not set" >> ${fragment_file}
     fi
     if grep "BR2_PTHREAD_DEBUG is not set" ${configfile} > /dev/null 2>&1; then
@@ -232,13 +235,13 @@ function generate {
         fi
     else
         echo "THIS TOOLCHAIN CAN'T BE TESTED"
-        toolchain_name="${toolchain_name}-UNTESTED"
+        toolchain_name="${toolchain_name}-CANTTEST"
     fi
 
     if [ $return_value -eq 1 ]; then
         echo "THIS TOOLCHAIN MAY NOT WORK, OR THERE MAY BE A PROBLEM IN THE CONFIGURATION, PLEASE CHECK!"
         toolchain_name="${toolchain_name}-UNTESTED"
-        return_value=0
+        # return_value=0
     fi
 
     # Everything works, package the toolchain
