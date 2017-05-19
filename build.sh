@@ -3,10 +3,12 @@
 echo "Building $1"
 echo "Target: $2"
 echo "Buildroot tree: $3"
+echo "Version number: $4"
 
 name="$1"
 target="$2"
 buildroot_tree="$3"
+version_number="$4"
 
 if [ "$target" == "ci_debug" ]; then
     echo "ci_debug is set as target, you should see this line, but the build won't go further."
@@ -32,7 +34,7 @@ fragment_file=${build_dir}/br_fragment
 base_url="https:\/\/libskia.so\/pub\/gitlabci"
 
 function set_qemu_config {
-    arch_name=$(echo "${toolchain_name}" |sed "s/--/\t/" |cut -f 1)
+    arch_name=$(echo "${name}" |sed "s/--/\t/" |cut -f 1)
     if [[ "${arch_name}" =~ "arm"* ]]; then
         qemu_defconfig="qemu_arm_versatile_defconfig"
         qemu_system_command="qemu-system-arm
@@ -235,11 +237,12 @@ function generate {
         exit 1
     fi
 
-    toolchain_name=$(basename ${build_dir}/${name}-*)
-    toolchain_dir="${build_dir}/${toolchain_name}"
+    release_name=${name}-$(cat ${build_dir}/br_version)
+    [[ "$version_number" != "" ]] && release_name="${release_name}-$version_number"
+    toolchain_dir="${build_dir}/${name}"
     configfile=${toolchain_dir}/buildroot.config
-    test_dir=${build_dir}/test-${toolchain_name}
-    testlogfile=${build_dir}/test-${toolchain_name}-build.log
+    test_dir=${build_dir}/test-${name}
+    testlogfile=${build_dir}/test-${name}-build.log
     overlaydir=${test_dir}/overlay
 
     make_br_fragment
@@ -263,34 +266,34 @@ function generate {
         fi
     else
         echo "THIS TOOLCHAIN CAN'T BE TESTED"
-        toolchain_name="${toolchain_name}-CANTTEST"
+        release_name="${release_name}-CANTTEST"
     fi
 
     if [ $return_value -eq 1 ]; then
         echo "THIS TOOLCHAIN MAY NOT WORK, OR THERE MAY BE A PROBLEM IN THE CONFIGURATION, PLEASE CHECK!"
-        toolchain_name="${toolchain_name}-UNTESTED"
+        release_name="${release_name}-UNTESTED"
         # return_value=0
     fi
 
     # Everything works, package the toolchain
-    echo "Packaging the toolchain as ${toolchain_name}.tar.bz2"
+    echo "Packaging the toolchain as ${release_name}.tar.bz2"
     cd ${build_dir}
     sed -i "s/PREINSTALLED/DOWNLOAD/" ${fragment_file}
-    sed -i "s/BR2_TOOLCHAIN_EXTERNAL_PATH=\".*\"/BR2_TOOLCHAIN_EXTERNAL_URL=\"${base_url}\/${toolchain_name}.tar.bz2\"/" ${fragment_file}
+    sed -i "s/BR2_TOOLCHAIN_EXTERNAL_PATH=\".*\"/BR2_TOOLCHAIN_EXTERNAL_URL=\"${base_url}\/${release_name}.tar.bz2\"/" ${fragment_file}
     cp ${fragment_file} ${toolchain_dir}
-    tar cjf `basename ${toolchain_name}`.tar.bz2 `basename ${toolchain_dir}`
-    scp "${toolchain_name}.tar.bz2" ${ssh_server}:
-    scp "${fragment_file}" ${ssh_server}:fragments/${toolchain_name}.frag
+    tar cjf `basename ${release_name}`.tar.bz2 `basename ${toolchain_dir}`
+    scp "${release_name}.tar.bz2" ${ssh_server}:
+    scp "${fragment_file}" ${ssh_server}:fragments/${release_name}.frag
     return $return_value
 }
 
-if [ $# -eq 3 ]; then
+if [ $# -ge 3 ]; then
     if ! generate ${name}; then
         echo "Something went wrong. Exiting with code 1"
         exit 1
     fi
 else
-    echo "Usage: $0 configname.config target buildroot-tree"
+    echo "Usage: $0 configname.config target buildroot-tree [version_number]"
     exit 1
 fi
 

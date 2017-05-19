@@ -11,7 +11,7 @@ git_build_branch="builds"
 
 function show_help {
     cat - <<EOF
-Usage: $0 [-a arch] [-l libc] [-v version] [-dh]
+Usage: $0 [-a arch] [-l libc] [-v version] [-t target] [-n number] [-dh]
 
     -h          show this help
     -d          debug output
@@ -30,12 +30,15 @@ Usage: $0 [-a arch] [-l libc] [-v version] [-dh]
             This option defaults to no_push in order not to trigger builds
             by accident or misuse.
 
-    -b tree-ish  checkout Buildroot to that tree-ish object (default is
-                 tag 2017.02.2)
+    -n number   allows to specify a version number that will be appended to 
+    the buildroot version (default is empty string)
 
-    -a arch      specify architecture to build (see \`ls configs/arch/*\`)
-    -l libc      specify libc to use (see \`ls configs/libc/*\`)
-    -v version   specify version to build (see \`ls configs/version/*\`)
+    -b tree-ish checkout Buildroot to that tree-ish object (default is
+                tag 2017.02.2)
+
+    -a arch     specify architecture to build (see \`ls configs/arch/*\`)
+    -l libc     specify libc to use (see \`ls configs/libc/*\`)
+    -v version  specify version to build (see \`ls configs/version/*\`)
 
 EOF
 }
@@ -46,8 +49,9 @@ opt_libc="*"
 opt_version="*"
 opt_target="no_push"
 opt_brtree="2017.02.2"
+opt_number=""
 
-while getopts "a:l:v:t:b:dh" opt; do
+while getopts "a:l:v:t:b:n:dh" opt; do
     case "$opt" in
     d) debug=1
         ;;
@@ -60,6 +64,8 @@ while getopts "a:l:v:t:b:dh" opt; do
     b) opt_brtree=$OPTARG
         ;;
     t) opt_target=$OPTARG
+        ;;
+    n) opt_number=$OPTARG
         ;;
     *|h|\?)
         show_help
@@ -121,7 +127,7 @@ function add_to_ci {
         cat .gitlab-ci.yml - > .gitlab-ci.yml.tmp <<EOF
 ${release_name}:
   script:
-    - ./build.sh ${release_name} ${opt_target} ${opt_brtree}
+    - ./build.sh ${release_name} ${opt_target} ${opt_brtree} ${opt_number}
 
 EOF
         mv .gitlab-ci.yml.tmp .gitlab-ci.yml

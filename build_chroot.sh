@@ -21,11 +21,12 @@ fi
 TOOLCHAIN_DIR=$(pwd)
 TOOLCHAIN_BUILD_DIR=${TOOLCHAIN_DIR}
 TOOLCHAIN_BR_DIR=${TOOLCHAIN_DIR}/buildroot
-TOOLCHAIN_VERSION=$(git --git-dir=${TOOLCHAIN_BR_DIR}/.git describe)
+
+git --git-dir=${TOOLCHAIN_BR_DIR}/.git describe > br_version
 
 name=$1
-toolchaindir=${TOOLCHAIN_BUILD_DIR}/${name}-${TOOLCHAIN_VERSION}
-logfile=${TOOLCHAIN_BUILD_DIR}/${name}-${TOOLCHAIN_VERSION}-build.log
+toolchaindir=${TOOLCHAIN_BUILD_DIR}/${name}
+logfile=${TOOLCHAIN_BUILD_DIR}/${name}-build.log
 builddir=${TOOLCHAIN_BUILD_DIR}/toolchain-build
 configfile=${builddir}/.config
 
