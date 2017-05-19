@@ -86,7 +86,6 @@ function check_config {
     fi
     libc_name=$(grep "^BR2_TOOLCHAIN_BUILDROOT_LIBC=\".*\"" .config | sed 's/BR2_TOOLCHAIN_BUILDROOT_LIBC="\(.*\)"/\1/')
     release_name="${arch_name}--${libc_name}--${version_name}"
-    printf "${release_name} ... "
     cd ${base_dir}
     return 0
 }
@@ -107,9 +106,16 @@ function add_to_ci {
     libc_name=$(basename ${libc} .config)
     version_name=$(basename ${version} .config)
     name="${arch_name}-${libc_name}-${version_name}"
-    config_file=${name}.config
+    config_file=${name}
     printf "  Generating .gitlab-ci.yml for $name ... "
     cat ${arch} ${libc} ${version} ${common_config} > ${config_file}
+    for extra in $(ls -1 ./configs/extra/*.config); do
+        extra_m=$(basename ${extra} .config)
+        if [[ $name = $extra_m ]]; then 
+            printf "extra found ... "
+            cat $extra >> ${config_file}
+        fi
+    done
     if check_config; then
         mv ${config_file} ${release_name}.config
         cat .gitlab-ci.yml - > .gitlab-ci.yml.tmp <<EOF
