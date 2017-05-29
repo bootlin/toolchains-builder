@@ -22,6 +22,7 @@ if git clone https://github.com/buildroot/buildroot.git; then
     git checkout $buildroot_tree
     curl http://free-electrons.com/~thomas/pub/0001-mpc-mpfr-gmp-build-statically-for-the-host.patch |patch -p1
     curl http://free-electrons.com/~thomas/pub/0002-toolchain-attempt-to-fix-the-toolchain-wrapper.patch |patch -p1
+    curl "https://git.buildroot.org/buildroot/patch/?id=4d1c2c82e8945a5847d636458f3825c55529835b" |patch -p1
     cd ..
 fi
 
@@ -34,7 +35,6 @@ fragment_file=${build_dir}/br_fragment
 base_url="https:\/\/libskia.so\/pub\/gitlabci"
 
 function set_qemu_config {
-    arch_name=$(echo "${name}" |sed "s/--/\t/" |cut -f 1)
     if [[ "${arch_name}" =~ "arm"* ]]; then
         qemu_defconfig="qemu_arm_versatile_defconfig"
         qemu_system_command="qemu-system-arm
@@ -72,15 +72,29 @@ function set_qemu_config {
             -drive file=${test_dir}/images/rootfs.cpio,index=0,media=disk,format=raw
             -append \"root=/dev/sda rw\""
     elif [[ "${arch_name}" == "mips32" ]]; then
-        qemu_defconfig="qemu_mips32r2_malta_defconfig"
-        qemu_system_command="qemu-system-mips
+        qemu_defconfig="qemu_mips32r2el_malta_defconfig"
+        qemu_system_command="qemu-system-mipsel
             -machine malta
             -kernel ${test_dir}/images/vmlinux
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/hda rw\""
     elif [[ "${arch_name}" == "mips32r6" ]]; then
-        qemu_defconfig="qemu_mips32r2el_malta_defconfig"
+        qemu_defconfig="qemu_mips32r6el_malta_defconfig"
         qemu_system_command="qemu-system-mipsel
+            -machine malta
+            -kernel ${test_dir}/images/vmlinux
+            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
+            -append \"root=/dev/hda rw\""
+    elif [[ "${arch_name}" == "mips64" ]]; then
+        qemu_defconfig="qemu_mips64el_malta_defconfig"
+        qemu_system_command="qemu-system-mips64el
+            -machine malta
+            -kernel ${test_dir}/images/vmlinux
+            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
+            -append \"root=/dev/hda rw\""
+    elif [[ "${arch_name}" == "mips64r6" ]]; then
+        qemu_defconfig="qemu_mips64r6el_malta_defconfig"
+        qemu_system_command="qemu-system-mips64el
             -machine malta
             -kernel ${test_dir}/images/vmlinux
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
@@ -99,6 +113,14 @@ function set_qemu_config {
             -kernel ${test_dir}/images/vmlinux
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/hda rw\""
+    elif [[ "${arch_name}" == "powerpc64-power8" ]]; then
+        qemu_defconfig="qemu_ppc64_pseries_defconfig"
+        sed -i "s/hvc0/ttyS0/" ${buildroot_dir}/configs/${qemu_defconfig}
+        qemu_system_command="qemu-system-ppc64
+            -machine pseries
+            -kernel ${test_dir}/images/vmlinux
+            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
+            -append \"root=/dev/sda rw\""
     elif [[ "${arch_name}" == "sparcv8" ]]; then
         qemu_defconfig="qemu_sparc_ss10_defconfig"
         qemu_system_command="qemu-system-sparc
@@ -121,6 +143,21 @@ function set_qemu_config {
             -machine pc
             -kernel ${test_dir}/images/bzImage
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
+            -append \"root=/dev/sda rw console=ttyS0\""
+    elif [[ "${arch_name}" == "x86-64-core-i7" ]]; then
+        qemu_defconfig="qemu_x86_64_defconfig"
+        sed -i "s/tty1/ttyS0/" ${buildroot_dir}/configs/${qemu_defconfig}
+        qemu_system_command="qemu-system-x86_64
+            -machine pc
+            -kernel ${test_dir}/images/bzImage
+            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
+            -append \"root=/dev/sda rw console=ttyS0\""
+    elif [[ "${arch_name}" == "xtensa-lx60" ]]; then
+        qemu_defconfig="qemu_xtensa_lx60_defconfig"
+        qemu_system_command="qemu-system-xtensa
+            -machine lx60
+            -kernel ${test_dir}/images/Image.elf
+            -drive file=${test_dir}/images/rootfs.cpio,index=0,media=disk,format=raw
             -append \"root=/dev/sda rw console=ttyS0\""
     else
         qemu_defconfig=""
@@ -195,14 +232,14 @@ function launch_build {
 }
 
 function make_br_fragment {
-    arch=$(grep "BR2_ARCH=" ${configfile} | sed 's/BR2_ARCH="\(.*\)"/\1/')
-    endianess=$(grep "BR2_ENDIAN=" ${configfile} | sed 's/BR2_ENDIAN="\(.*\)"/\1/')
+    echo "  Making BR fragment to use the toolchain"
     gcc_version=$(grep "^BR2_GCC_VERSION_" ${configfile} | sed 's/BR2_GCC_VERSION_\(.*\)_X=.*/\1/')
     linux_version=$(grep "^BR2_KERNEL_HEADERS_" ${configfile} | sed 's/BR2_KERNEL_HEADERS_\(.*\)=./\1/')
     locale=$(grep "^BR2_TOOLCHAIN_BUILDROOT_LOCALE" ${configfile} | sed 's/BR2_TOOLCHAIN_BUILDROOT_LOCALE=\(.\)/\1/')
     libc=$(grep "^BR2_TOOLCHAIN_BUILDROOT_LIBC=\".*\"" ${configfile} | sed 's/BR2_TOOLCHAIN_BUILDROOT_LIBC="\(.*\)"/\1/')
 
     echo "BR2_WGET=\"wget --passive-ftp -nd -t 3 --no-check-certificate\"" >> ${fragment_file} # XXX
+    cat ${main_dir}/configs/arch/${arch_name}.config >> ${fragment_file}
     echo "BR2_TOOLCHAIN_EXTERNAL=y" >> ${fragment_file}
     echo "BR2_TOOLCHAIN_EXTERNAL_CUSTOM=y" >> ${fragment_file}
     echo "BR2_TOOLCHAIN_EXTERNAL_PREINSTALLED=y" >> ${fragment_file}
@@ -228,6 +265,10 @@ function make_br_fragment {
     elif [ "${libc}" == "musl" ]; then
         echo "BR2_TOOLCHAIN_EXTERNAL_CUSTOM_MUSL=y" >> ${fragment_file}
     fi
+
+    echo "BEGIN FRAGMENT"
+    cat ${fragment_file}
+    echo "END FRAGMENT"
 }
 
 function generate {
@@ -237,6 +278,7 @@ function generate {
         exit 1
     fi
 
+    arch_name=$(echo "${name}" |sed "s/--/\t/" |cut -f 1)
     release_name=${name}-$(cat ${build_dir}/br_version)
     [[ "$version_number" != "" ]] && release_name="${release_name}-$version_number"
     toolchain_dir="${build_dir}/${name}"
@@ -258,7 +300,7 @@ function generate {
                 echo "Booting passed"
             else
                 echo "Booting failed"
-                return_value=1
+                return_value=2
             fi
         else
             echo "Test system failed to build"
@@ -272,6 +314,10 @@ function generate {
     if [ $return_value -eq 1 ]; then
         echo "THIS TOOLCHAIN MAY NOT WORK, OR THERE MAY BE A PROBLEM IN THE CONFIGURATION, PLEASE CHECK!"
         release_name="${release_name}-UNTESTED"
+        # return_value=0
+    elif [ $return_value -eq 2 ]; then
+        echo "THIS TOOLCHAIN MAY BUILD BROKEN BINARIES, OR THERE MAY BE A PROBLEM IN THE CONFIGURATION, PLEASE CHECK!"
+        release_name="${release_name}-NOBOOT"
         # return_value=0
     fi
 
