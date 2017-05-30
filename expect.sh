@@ -1,7 +1,7 @@
 #!/usr/bin/expect
 #
 
-set timeout 90
+set timeout 180
 
 spawn telnet localhost 4000
 

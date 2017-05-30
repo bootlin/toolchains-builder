@@ -307,18 +307,24 @@ function generate {
             return_value=1
         fi
     else
-        echo "THIS TOOLCHAIN CAN'T BE TESTED"
-        release_name="${release_name}-CANTTEST"
+        return_value=3
     fi
 
     if [ $return_value -eq 1 ]; then
         echo "THIS TOOLCHAIN MAY NOT WORK, OR THERE MAY BE A PROBLEM IN THE CONFIGURATION, PLEASE CHECK!"
-        release_name="${release_name}-UNTESTED"
-        # return_value=0
+        release_name="${release_name}-BF"
+        return_value=0
     elif [ $return_value -eq 2 ]; then
         echo "THIS TOOLCHAIN MAY BUILD BROKEN BINARIES, OR THERE MAY BE A PROBLEM IN THE CONFIGURATION, PLEASE CHECK!"
-        release_name="${release_name}-NOBOOT"
-        # return_value=0
+        release_name="${release_name}-NB"
+        return_value=0
+    elif [ $return_value -eq 3 ]; then
+        echo "THIS TOOLCHAIN CAN NOT BE TESTED!"
+        release_name="${release_name}-CT"
+        return_value=0
+    else
+        release_name="${release_name}-OK"
+        return_value=0
     fi
 
     # Everything works, package the toolchain
