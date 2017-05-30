@@ -71,28 +71,28 @@ function set_qemu_config {
             -kernel ${test_dir}/images/linux.bin
             -drive file=${test_dir}/images/rootfs.cpio,index=0,media=disk,format=raw
             -append \"root=/dev/sda rw\""
-    elif [[ "${arch_name}" == "mips32" ]]; then
+    elif [[ "${arch_name}" == "mips32el" ]]; then
         qemu_defconfig="qemu_mips32r2el_malta_defconfig"
         qemu_system_command="qemu-system-mipsel
             -machine malta
             -kernel ${test_dir}/images/vmlinux
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/hda rw\""
-    elif [[ "${arch_name}" == "mips32r6" ]]; then
+    elif [[ "${arch_name}" == "mips32r6el" ]]; then
         qemu_defconfig="qemu_mips32r6el_malta_defconfig"
         qemu_system_command="qemu-system-mipsel
             -machine malta
             -kernel ${test_dir}/images/vmlinux
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/hda rw\""
-    elif [[ "${arch_name}" == "mips64" ]]; then
+    elif [[ "${arch_name}" == "mips64el" ]]; then
         qemu_defconfig="qemu_mips64el_malta_defconfig"
         qemu_system_command="qemu-system-mips64el
             -machine malta
             -kernel ${test_dir}/images/vmlinux
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/hda rw\""
-    elif [[ "${arch_name}" == "mips64r6" ]]; then
+    elif [[ "${arch_name}" == "mips64r6el" ]]; then
         qemu_defconfig="qemu_mips64r6el_malta_defconfig"
         qemu_system_command="qemu-system-mips64el
             -machine malta
