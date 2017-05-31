@@ -27,7 +27,7 @@ git --git-dir=${TOOLCHAIN_BR_DIR}/.git describe > br_version
 name=$1
 toolchaindir=${TOOLCHAIN_BUILD_DIR}/${name}
 logfile=${TOOLCHAIN_BUILD_DIR}/${name}-build.log
-builddir=${TOOLCHAIN_BUILD_DIR}/toolchain-build
+builddir=${TOOLCHAIN_BUILD_DIR}/output
 configfile=${builddir}/.config
 
 mkdir -p ${TOOLCHAIN_BUILD_DIR} &>/dev/null
@@ -51,7 +51,7 @@ function build {
     make -C ${TOOLCHAIN_BR_DIR} O=${builddir} olddefconfig > /dev/null 2>&1
 
     # Build
-    timeout 175m make -C ${TOOLCHAIN_BR_DIR} O=${builddir} > ${logfile} 2>&1
+    timeout 225m make -C ${TOOLCHAIN_BR_DIR} O=${builddir} > ${logfile} 2>&1
     if [ $? -ne 0 ] ; then
         echo "  finished at $(date) ... FAILED"
         echo "  printing the end of the logs before exiting"
@@ -66,6 +66,12 @@ function build {
     fi
 
     echo "  finished at $(date) ... SUCCESS"
+
+    # Making legals
+    echo "  making legal infos at $(date)"
+    make -C ${TOOLCHAIN_BR_DIR} O=${builddir} legal-info > /dev/null 2>&1
+    echo "  finished at $(date)"
+
     cp ${configfile} ${toolchaindir}/buildroot.config
     mv ${toolchaindir}/usr/* ${toolchaindir}/
     rmdir ${toolchaindir}/usr

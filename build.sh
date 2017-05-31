@@ -274,6 +274,22 @@ function make_br_fragment {
     echo "END FRAGMENT"
 }
 
+function package {
+    echo "Packaging the toolchain as ${release_name}.tar.bz2"
+    cd ${build_dir}
+    sed -i "s/PREINSTALLED/DOWNLOAD/" ${fragment_file}
+    sed -i "s/BR2_TOOLCHAIN_EXTERNAL_PATH=\".*\"/BR2_TOOLCHAIN_EXTERNAL_URL=\"${base_url}\/${release_name}.tar.bz2\"/" ${fragment_file}
+    cp ${build_dir}/output/target/usr/bin/gdbserver ${toolchain_dir}/usr/*/sysroot/usr/bin/
+    cp ${build_dir}/output/legal-info/host-manifest.csv ${toolchain_dir}/manifest.csv
+    cp ${fragment_file} ${toolchain_dir}
+    tar cjf `basename ${release_name}`.tar.bz2 `basename ${toolchain_dir}`
+    ssh ${ssh_server} "mkdir -p ${target}/fragments"
+    scp "${release_name}.tar.bz2" ${ssh_server}:${target}/
+    scp "${fragment_file}" ${ssh_server}:${target}/fragments/${release_name}.frag
+    rsync -r ${build_dir}/output/legal-info/host-licenses/ ${ssh_server}:${target}/licenses/
+    rsync -r ${build_dir}/output/legal-info/host-sources/ ${ssh_server}:${target}/sources/
+}
+
 function generate {
     echo "Generating ${name}..."
     if ! launch_build; then
@@ -331,16 +347,8 @@ function generate {
     fi
 
     # Everything works, package the toolchain
-    echo "Packaging the toolchain as ${release_name}.tar.bz2"
-    cd ${build_dir}
-    sed -i "s/PREINSTALLED/DOWNLOAD/" ${fragment_file}
-    sed -i "s/BR2_TOOLCHAIN_EXTERNAL_PATH=\".*\"/BR2_TOOLCHAIN_EXTERNAL_URL=\"${base_url}\/${release_name}.tar.bz2\"/" ${fragment_file}
-    cp ${buildroot_dir}/output/target/usr/bin/gdbserver ${toolchain_dir}/usr/*/sysroot/usr/bin/
-    cp ${fragment_file} ${toolchain_dir}
-    tar cjf `basename ${release_name}`.tar.bz2 `basename ${toolchain_dir}`
-    ssh ${ssh_server} "mkdir -p ${target}/fragments"
-    scp "${release_name}.tar.bz2" ${ssh_server}:${target}/
-    scp "${fragment_file}" ${ssh_server}:${target}/fragments/${release_name}.frag
+    package
+
     return $return_value
 }
 
