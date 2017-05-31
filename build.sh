@@ -223,6 +223,8 @@ function launch_build {
     rm -rf ${build_dir}
     mkdir -p ${build_dir}
     debootstrap --variant=buildd squeeze ${build_dir} http://archive.debian.org/debian/ 2>&1 1>/dev/null
+    mkdir ${build_dir}/proc
+    mount --bind /proc ${build_dir}/proc
     cp ${chroot_script} ${build_dir}
     cp ${name}.config ${build_dir}
     cp chroot.conf /etc/schroot/schroot.conf

@@ -43,7 +43,6 @@ function build {
 
     # Create the configuration
     cp ${name}.config ${configfile}
-    echo "BR2_JLEVEL=16" >> ${configfile}
     echo "BR2_HOST_DIR=\"${toolchaindir}\"" >> ${configfile}
 
     echo "  starting at $(date)"
