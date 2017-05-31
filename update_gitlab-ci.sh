@@ -3,6 +3,7 @@
 
 base_dir=$(pwd)
 br_path=${base_dir}/buildroot
+frag_dir=${base_dir}/frags
 
 git_current_branch=$(git symbolic-ref -q --short HEAD)
 common_config="./configs/common.config"
@@ -113,23 +114,33 @@ git checkout -b ${git_build_branch}
 
 cp ${gitlab_base} .gitlab-ci.yml
 
+mkdir ${frag_dir}
+
 function add_to_ci {
     arch_name=$(basename ${arch} .config)
     libc_name=$(basename ${libc} .config)
     version_name=$(basename ${version} .config)
     name="${arch_name}-${libc_name}-${version_name}"
-    config_file=${name}
+    config_file=${frag_dir}/${name}
     printf "  Generating .gitlab-ci.yml for $name ... "
     cat ${arch} ${libc} ${version} ${common_config} > ${config_file}
-    for extra in $(ls -1 ./configs/extra/*.config); do
-        extra_m=$(basename ${extra} .config)
-        if [[ $name = $extra_m ]]; then 
+    for extra in $(ls -1 ${base_dir}/configs/extra/); do
+        extra_m=${extra%.config}
+        if [[ $name = $extra_m ]]; then
             printf "extra found ... "
-            cat $extra >> ${config_file}
+            cat "${base_dir}/configs/extra/$extra" >> ${config_file}
         fi
     done
     if check_config; then
-        mv ${config_file} ${release_name}.config
+        for optional in $(ls -1 ${base_dir}/configs/optionals/); do
+            optional_m=${optional%.config}
+            if [[ $name = $optional_m ]]; then
+                printf "optional found ... "
+                cat "${base_dir}/configs/optionals/$optional" >> ${config_file}
+            fi
+        done
+        unset optional
+        mv ${config_file} ${frag_dir}/${release_name}.config
         cat .gitlab-ci.yml - > .gitlab-ci.yml.tmp <<EOF
 ${release_name}:
   script:

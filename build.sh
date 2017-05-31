@@ -28,6 +28,7 @@ fi
 
 ssh_server="gitlabci@toolchains.free-electrons.com"
 main_dir=$(pwd)
+frag_dir=${main_dir}/frags
 build_dir=${main_dir}/builds
 chroot_script="build_chroot.sh"
 buildroot_dir=${main_dir}/buildroot
@@ -226,7 +227,7 @@ function launch_build {
     mkdir ${build_dir}/proc
     mount --bind /proc ${build_dir}/proc
     cp ${chroot_script} ${build_dir}
-    cp ${name}.config ${build_dir}
+    cp ${frag_dir}/${name}.config ${build_dir}
     cp chroot.conf /etc/schroot/schroot.conf
     cp /etc/resolv.conf ${build_dir}/etc/resolv.conf
     echo "  chrooting to ${build_dir}"
