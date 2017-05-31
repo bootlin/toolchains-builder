@@ -74,6 +74,12 @@ while getopts "a:l:v:t:b:n:dh" opt; do
     esac
 done
 
+if [ "${opt_number}" = "" ]; then
+    echo "You MUST specify a version number with -n <number>"
+    exit 1
+fi
+
+
 if [ $debug -eq 0 ]; then exec 2>/dev/null; fi
 
 function check_config {
