@@ -337,8 +337,9 @@ function generate {
     cp ${buildroot_dir}/output/target/usr/bin/gdbserver ${toolchain_dir}/usr/*/sysroot/usr/bin/
     cp ${fragment_file} ${toolchain_dir}
     tar cjf `basename ${release_name}`.tar.bz2 `basename ${toolchain_dir}`
-    scp "${release_name}.tar.bz2" ${ssh_server}:
-    scp "${fragment_file}" ${ssh_server}:fragments/${release_name}.frag
+    ssh ${ssh_server} "mkdir -p ${target}/fragments"
+    scp "${release_name}.tar.bz2" ${ssh_server}:${target}/
+    scp "${fragment_file}" ${ssh_server}:${target}/fragments/${release_name}.frag
     return $return_value
 }
 
