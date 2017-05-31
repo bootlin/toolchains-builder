@@ -156,7 +156,7 @@ git add .
 git add -f .gitlab-ci.yml
 git commit -m "Build bot: trigger new builds"
 if [ "$opt_target" != "no_push" ]; then
-    git push -u -f gitlab ${git_build_branch}
+    git push -u -f origin ${git_build_branch}
 fi
 
 git checkout $git_current_branch
