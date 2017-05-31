@@ -26,7 +26,7 @@ if git clone https://github.com/buildroot/buildroot.git; then
     cd ..
 fi
 
-ssh_server="gitlabci@libskia.so"
+ssh_server="gitlabci@toolchains.free-electrons.com"
 main_dir=$(pwd)
 build_dir=${main_dir}/builds
 chroot_script="build_chroot.sh"
