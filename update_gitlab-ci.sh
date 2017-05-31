@@ -88,7 +88,7 @@ function check_config {
     cd ${br_path}
     make olddefconfig 2>&1 1>/dev/null
     sort .config > /tmp/sorted.config
-    sort ${base_dir}/${config_file} > /tmp/sortedfragmentfile
+    sort ${config_file} > /tmp/sortedfragmentfile
     if [ $(comm -23 /tmp/sortedfragmentfile /tmp/sorted.config |wc -l) -gt 0 ]; then
         if [ $debug -eq 1 ]; then
             echo ""
@@ -139,7 +139,6 @@ function add_to_ci {
                 cat "${base_dir}/configs/optionals/$optional" >> ${config_file}
             fi
         done
-        unset optional
         mv ${config_file} ${frag_dir}/${release_name}.config
         cat .gitlab-ci.yml - > .gitlab-ci.yml.tmp <<EOF
 ${release_name}:
