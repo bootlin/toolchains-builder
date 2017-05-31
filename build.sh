@@ -332,6 +332,7 @@ function generate {
     cd ${build_dir}
     sed -i "s/PREINSTALLED/DOWNLOAD/" ${fragment_file}
     sed -i "s/BR2_TOOLCHAIN_EXTERNAL_PATH=\".*\"/BR2_TOOLCHAIN_EXTERNAL_URL=\"${base_url}\/${release_name}.tar.bz2\"/" ${fragment_file}
+    cp ${buildroot_dir}/output/target/usr/bin/gdbserver ${toolchain_dir}/usr/*/sysroot/usr/bin/
     cp ${fragment_file} ${toolchain_dir}
     tar cjf `basename ${release_name}`.tar.bz2 `basename ${toolchain_dir}`
     scp "${release_name}.tar.bz2" ${ssh_server}:
