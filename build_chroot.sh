@@ -52,13 +52,17 @@ function build {
     make -C ${TOOLCHAIN_BR_DIR} O=${builddir} olddefconfig > /dev/null 2>&1
 
     # Build
-    make -C ${TOOLCHAIN_BR_DIR} O=${builddir} > ${logfile} 2>&1
+    timeout 175m make -C ${TOOLCHAIN_BR_DIR} O=${builddir} > ${logfile} 2>&1
     if [ $? -ne 0 ] ; then
         echo "  finished at $(date) ... FAILED"
         echo "  printing the end of the logs before exiting"
         echo "=================== BEGIN LOG FILE ======================"
         tail -n 200 ${logfile}
         echo "==================== END LOG FILE ======================="
+        make -C ${TOOLCHAIN_BR_DIR} O=${builddir} savedefconfig > /dev/null 2>&1
+        echo "=================== BEGIN DEFCONFIG ======================"
+        cat ${builddir}/defconfig
+        echo "==================== END DEFCONFIG ======================="
         return 1
     fi
 
