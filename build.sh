@@ -279,7 +279,7 @@ function package {
     cd ${build_dir}
     sed -i "s/PREINSTALLED/DOWNLOAD/" ${fragment_file}
     sed -i "s/BR2_TOOLCHAIN_EXTERNAL_PATH=\".*\"/BR2_TOOLCHAIN_EXTERNAL_URL=\"${base_url}\/${release_name}.tar.bz2\"/" ${fragment_file}
-    cp ${build_dir}/output/target/usr/bin/gdbserver ${toolchain_dir}/usr/*/sysroot/usr/bin/
+    cp ${build_dir}/output/target/usr/bin/gdbserver ${toolchain_dir}/*/sysroot/usr/bin/
     cp ${build_dir}/output/legal-info/host-manifest.csv ${toolchain_dir}/manifest.csv
     cp ${fragment_file} ${toolchain_dir}
     tar cjf `basename ${release_name}`.tar.bz2 `basename ${toolchain_dir}`
