@@ -33,7 +33,7 @@ build_dir=${main_dir}/builds
 chroot_script="build_chroot.sh"
 buildroot_dir=${main_dir}/buildroot
 fragment_file=${build_dir}/br_fragment
-base_url="https:\/\/libskia.so\/pub\/gitlabci"
+base_url="https:\/\/toolchains.free-electrons.com\/${target}\/toolchains"
 
 function set_qemu_config {
     if [[ "${arch_name}" =~ "arm"* ]]; then
@@ -283,11 +283,12 @@ function package {
     cp ${build_dir}/output/legal-info/host-manifest.csv ${toolchain_dir}/manifest.csv
     cp ${fragment_file} ${toolchain_dir}
     tar cjf `basename ${release_name}`.tar.bz2 `basename ${toolchain_dir}`
-    ssh ${ssh_server} "mkdir -p ${target}/fragments"
-    scp "${release_name}.tar.bz2" ${ssh_server}:${target}/
-    scp "${fragment_file}" ${ssh_server}:${target}/fragments/${release_name}.frag
-    rsync -r ${build_dir}/output/legal-info/host-licenses/ ${ssh_server}:${target}/licenses/
-    rsync -r ${build_dir}/output/legal-info/host-sources/ ${ssh_server}:${target}/sources/
+    ssh ${ssh_server} "mkdir -p www/${target}/fragments"
+    ssh ${ssh_server} "mkdir -p www/${target}/toolchains"
+    rsync "${release_name}.tar.bz2" ${ssh_server}:www/${target}/toolchains/
+    rsync "${fragment_file}" ${ssh_server}:www/${target}/fragments/${release_name}.frag
+    rsync -r ${build_dir}/output/legal-info/host-licenses/ ${ssh_server}:www/${target}/licenses/
+    rsync -r ${build_dir}/output/legal-info/host-sources/ ${ssh_server}:www/${target}/sources/
 }
 
 function generate {
