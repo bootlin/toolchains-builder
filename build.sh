@@ -37,11 +37,11 @@ base_url="https:\/\/toolchains.free-electrons.com\/${target}\/toolchains"
 
 function set_qemu_config {
     if [[ "${arch_name}" =~ "arm"* ]]; then
-        qemu_defconfig="qemu_arm_versatile_defconfig"
+        qemu_defconfig="qemu_arm_vexpress_defconfig"
         qemu_system_command="qemu-system-arm
-            -machine versatilepb
+            -machine vexpress-a9
             -kernel ${test_dir}/images/zImage
-            -dtb ${test_dir}/images/versatile-pb.dtb
+            -dtb ${test_dir}/images/vexpress-v2p-ca9.dtb
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/sda rw\""
     elif [[ "${arch_name}" == "aarch64" ]]; then
