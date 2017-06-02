@@ -285,6 +285,8 @@ function package {
     tar cjf `basename ${release_name}`.tar.bz2 `basename ${toolchain_dir}`
     ssh ${ssh_server} "mkdir -p www/${target}/fragments"
     ssh ${ssh_server} "mkdir -p www/${target}/toolchains"
+    ssh ${ssh_server} "mkdir -p www/${target}/manifests"
+    rsync ${build_dir}/output/legal-info/host-manifest.csv ${ssh_server}:www/${target}/manifests/${release_name}.csv
     rsync "${release_name}.tar.bz2" ${ssh_server}:www/${target}/toolchains/
     rsync "${fragment_file}" ${ssh_server}:www/${target}/fragments/${release_name}.frag
     rsync -r ${build_dir}/output/legal-info/host-licenses/ ${ssh_server}:www/${target}/licenses/
