@@ -286,6 +286,8 @@ function package {
     ssh ${ssh_server} "mkdir -p www/${target}/fragments"
     ssh ${ssh_server} "mkdir -p www/${target}/toolchains"
     ssh ${ssh_server} "mkdir -p www/${target}/manifests"
+    ssh ${ssh_server} "mkdir -p www/${target}/build_test_logs"
+    rsync ${testlogfile} ${ssh_server}:www/${target}/build_test_logs/
     rsync ${build_dir}/output/legal-info/host-manifest.csv ${ssh_server}:www/${target}/manifests/${release_name}.csv
     rsync "${release_name}.tar.bz2" ${ssh_server}:www/${target}/toolchains/
     rsync "${fragment_file}" ${ssh_server}:www/${target}/fragments/${release_name}.frag
@@ -295,8 +297,15 @@ function package {
 
 function generate {
     echo "Generating ${name}..."
+
+    logfile=${build_dir}/${name}-build.log
+    testlogfile=${build_dir}/${name}-test.log
+
     if ! launch_build; then
         echo "Toolchain build failed, not going further"
+        echo "Uploading build log"
+        ssh ${ssh_server} "mkdir -p www/${target}/build_logs"
+        rsync ${logfile} ${ssh_server}:www/${target}/build_logs/
         exit 1
     fi
 
@@ -306,7 +315,6 @@ function generate {
     toolchain_dir="${build_dir}/${name}"
     configfile=${toolchain_dir}/buildroot.config
     test_dir=${build_dir}/test-${name}
-    testlogfile=${build_dir}/test-${name}-build.log
     overlaydir=${test_dir}/overlay
 
     make_br_fragment
