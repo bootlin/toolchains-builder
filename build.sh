@@ -343,7 +343,6 @@ This doesn't mean that this toolchain doesn't work, just that it hasn't been
 successfully tested.
 FLAG: SYSTEM-BUILD-FAILED
 EOF
-        return_value=0
     elif [ $return_value -eq 2 ]; then
         echo "THIS TOOLCHAIN MAY BUILD BROKEN BINARIES, OR THERE MAY BE A PROBLEM IN THE CONFIGURATION, PLEASE CHECK!"
         cat - >> ${manifest_file} <<EOF
@@ -353,7 +352,6 @@ This doesn't mean that this toolchain doesn't work, just that it hasn't been
 successfully tested.
 FLAG: NO-BOOT
 EOF
-        return_value=0
     elif [ $return_value -eq 3 ]; then
         echo "THIS TOOLCHAIN CAN NOT BE TESTED!"
         cat - >> ${manifest_file} <<EOF
