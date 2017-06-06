@@ -111,14 +111,14 @@ function set_qemu_config {
             -kernel ${test_dir}/images/vmlinux
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/hda rw\""
-    elif [[ "${arch_name}" == "mips64el" ]]; then                       # mips64el
+    elif [[ "${arch_name}" == "mips64el-n32" ]]; then                   # mips64el-n32
         qemu_defconfig="qemu_mips64el_malta_defconfig"
         qemu_system_command="qemu-system-mips64el
             -machine malta
             -kernel ${test_dir}/images/vmlinux
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/hda rw\""
-    elif [[ "${arch_name}" == "mips64r6el" ]]; then                     # mips64r6el
+    elif [[ "${arch_name}" == "mips64r6el-n32" ]]; then                 # mips64r6el-n32
         qemu_defconfig="qemu_mips64r6el_malta_defconfig"
         qemu_system_command="qemu-system-mips64el
             -machine malta
@@ -151,7 +151,7 @@ function set_qemu_config {
             -kernel ${test_dir}/images/vmlinux
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/sda rw\""
-    elif [[ "${arch_name}" == "sh4" ]]; then                            # sh4
+    elif [[ "${arch_name}" == "sh-sh4" ]]; then                         # sh4
         qemu_defconfig="qemu_sh4_r2d_defconfig"
         qemu_system_command="qemu-system-sh4
             -machine r2d
