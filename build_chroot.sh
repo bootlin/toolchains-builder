@@ -15,6 +15,9 @@ if git clone https://github.com/buildroot/buildroot.git; then
     curl http://free-electrons.com/~thomas/pub/0001-mpc-mpfr-gmp-build-statically-for-the-host.patch |patch -p1
     curl http://free-electrons.com/~thomas/pub/0002-toolchain-attempt-to-fix-the-toolchain-wrapper.patch |patch -p1
     curl "https://git.buildroot.org/buildroot/patch/?id=4d1c2c82e8945a5847d636458f3825c55529835b" |patch -p1
+    curl https://patchwork.ozlabs.org/patch/770835/raw/ |patch -p1
+    curl https://patchwork.ozlabs.org/patch/770834/raw/ |patch -p1
+    curl https://patchwork.ozlabs.org/patch/770836/raw/ |patch -p1
     cd ..
 fi
 
