@@ -36,7 +36,7 @@ fragment_file=${build_dir}/br_fragment
 base_url="https:\/\/toolchains.free-electrons.com\/${target}\/toolchains"
 
 function set_qemu_config {
-    if [[ "${arch_name}" =~ "arm"* ]]; then
+    if [[ "${arch_name}" =~ ^"armv".* ]]; then                           # arm*
         qemu_defconfig="qemu_arm_vexpress_defconfig"
         qemu_system_command="qemu-system-arm
             -machine vexpress-a9
@@ -44,77 +44,106 @@ function set_qemu_config {
             -dtb ${test_dir}/images/vexpress-v2p-ca9.dtb
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/sda rw\""
-    elif [[ "${arch_name}" == "aarch64" ]]; then
+    elif [[ "${arch_name}" == "aarch64" ]]; then                        # aarch64
         qemu_defconfig="qemu_aarch64_virt_defconfig"
         # Qemu 2.8 has been tested and works, 2.5 does not.
         qemu_system_command="qemu-system-aarch64
             -machine virt -cpu cortex-a53 -machine type=virt
             -kernel ${test_dir}/images/Image
             -append \"console=ttyAMA0\""
-    elif [[ "${arch_name}" == "aarch64be" ]]; then
+    elif [[ "${arch_name}" == "aarch64be" ]]; then                      # aarch64be
         qemu_defconfig="qemu_aarch64_virt_defconfig"
         # Qemu 2.8 has been tested and works, 2.5 does not.
         qemu_system_command="qemu-system-aarch64
             -machine virt -cpu cortex-a53 -machine type=virt
             -kernel ${test_dir}/images/Image
             -append \"console=ttyAMA0\""
-    elif [[ "${arch_name}" == "microblazebe" ]]; then
+    elif [[ "${arch_name}" == "bfin" ]]; then                           # bfin
+        qemu_defconfig="gdb_bfin_bf512_defconfig"
+        qemu_system_command=""
+    elif [[ "${arch_name}" == "microblazebe" ]]; then                   # microblazebe
         qemu_defconfig="qemu_microblazebe_mmu_defconfig"
         qemu_system_command="qemu-system-microblaze
             -machine petalogix-s3adsp1800
             -kernel ${test_dir}/images/linux.bin
             -drive file=${test_dir}/images/rootfs.cpio,index=0,media=disk,format=raw
             -append \"root=/dev/sda rw\""
-    elif [[ "${arch_name}" == "microblazeel" ]]; then
+    elif [[ "${arch_name}" == "microblazeel" ]]; then                   # microblazeel
         qemu_defconfig="qemu_microblazeel_mmu_defconfig"
         qemu_system_command="qemu-system-microblazeel
             -machine petalogix-s3adsp1800
             -kernel ${test_dir}/images/linux.bin
             -drive file=${test_dir}/images/rootfs.cpio,index=0,media=disk,format=raw
             -append \"root=/dev/sda rw\""
-    elif [[ "${arch_name}" == "mips32el" ]]; then
+    elif [[ "${arch_name}" == "mips32" ]]; then                         # mips32
+        qemu_defconfig="qemu_mips32r2_malta_defconfig"
+        qemu_system_command="qemu-system-mips
+            -machine malta
+            -kernel ${test_dir}/images/vmlinux
+            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
+            -append \"root=/dev/hda rw\""
+    elif [[ "${arch_name}" == "mips32el" ]]; then                       # mips32el
         qemu_defconfig="qemu_mips32r2el_malta_defconfig"
         qemu_system_command="qemu-system-mipsel
             -machine malta
             -kernel ${test_dir}/images/vmlinux
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/hda rw\""
-    elif [[ "${arch_name}" == "mips32r6el" ]]; then
+    elif [[ "${arch_name}" == "mips32r5el" ]]; then                     # mips32r5el
+        qemu_defconfig="qemu_mips32r2el_malta_defconfig"
+        qemu_system_command="qemu-system-mipsel
+            -machine malta
+            -cpu P5600
+            -kernel ${test_dir}/images/vmlinux
+            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
+            -append \"root=/dev/hda rw\""
+    elif [[ "${arch_name}" == "mips32r6el" ]]; then                     # mips32r6el
         qemu_defconfig="qemu_mips32r6el_malta_defconfig"
         qemu_system_command="qemu-system-mipsel
             -machine malta
             -kernel ${test_dir}/images/vmlinux
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/hda rw\""
-    elif [[ "${arch_name}" == "mips64el" ]]; then
+    elif [[ "${arch_name}" == "mips64" ]]; then                         # mips64
+        qemu_defconfig="qemu_mips64_malta_defconfig"
+        qemu_system_command="qemu-system-mips64
+            -machine malta
+            -kernel ${test_dir}/images/vmlinux
+            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
+            -append \"root=/dev/hda rw\""
+    elif [[ "${arch_name}" == "mips64el" ]]; then                       # mips64el
         qemu_defconfig="qemu_mips64el_malta_defconfig"
         qemu_system_command="qemu-system-mips64el
             -machine malta
             -kernel ${test_dir}/images/vmlinux
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/hda rw\""
-    elif [[ "${arch_name}" == "mips64r6el" ]]; then
+    elif [[ "${arch_name}" == "mips64r6el" ]]; then                     # mips64r6el
         qemu_defconfig="qemu_mips64r6el_malta_defconfig"
         qemu_system_command="qemu-system-mips64el
             -machine malta
             -kernel ${test_dir}/images/vmlinux
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/hda rw\""
-    elif [[ "${arch_name}" == "m68k-68xxx" ]]; then
+    elif [[ "${arch_name}" == "m68k-68xxxx" ]]; then                    # m68k-68xxxx
         qemu_defconfig="qemu_m68k_q800_defconfig"
         qemu_system_command="qemu-system-m68k
             -machine an5206
             -kernel ${test_dir}/images/vmlinux
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/hda rw\""
-    elif [[ "${arch_name}" == "m68k-coldfire" ]]; then
+    elif [[ "${arch_name}" == "m68k-coldfire" ]]; then                  # m68k-coldfire
         qemu_defconfig="qemu_m68k_mcf5208_defconfig"
         qemu_system_command="qemu-system-m68k
             -machine mcf5208evb
             -kernel ${test_dir}/images/vmlinux
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/hda rw\""
-    elif [[ "${arch_name}" == "powerpc64-power8" ]]; then
+    elif [[ "${arch_name}" == "nios2" ]]; then                          # nios2
+        qemu_defconfig="qemu_nios2_10m50_defconfig"
+        qemu_system_command="qemu-system-nios2
+            -kernel ${test_dir}/images/vmlinux"
+    elif [[ "${arch_name}" == "powerpc64-power8" ]]; then               # powerpc64-power8
         qemu_defconfig="qemu_ppc64_pseries_defconfig"
         sed -i "s/hvc0/ttyS0/" ${buildroot_dir}/configs/${qemu_defconfig}
         qemu_system_command="qemu-system-ppc64
@@ -122,14 +151,28 @@ function set_qemu_config {
             -kernel ${test_dir}/images/vmlinux
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/sda rw\""
-    elif [[ "${arch_name}" == "sparcv8" ]]; then
+    elif [[ "${arch_name}" == "sh4" ]]; then                            # sh4
+        qemu_defconfig="qemu_sh4_r2d_defconfig"
+        qemu_system_command="qemu-system-sh4
+            -machine r2d
+            -kernel ${test_dir}/images/zImage
+            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
+            -append \"root=/dev/sda rw console=ttySC1,115200 noiotrap\""
+    elif [[ "${arch_name}" == "sparc64" ]]; then                        # sparc64
+        qemu_defconfig="qemu_sparc64_sun4u_defconfig"
+        qemu_system_command="qemu-system-sparc64
+            -machine sun4u
+            -kernel ${test_dir}/images/vmlinux
+            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
+            -append \"root=/dev/sda rw console=ttyS0,115200\""
+    elif [[ "${arch_name}" == "sparcv8" ]]; then                        # sparcv8
         qemu_defconfig="qemu_sparc_ss10_defconfig"
         qemu_system_command="qemu-system-sparc
             -machine SS-10
             -kernel ${test_dir}/images/zImage
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
-            -append \"root=/dev/sda rw\""
-    elif [[ "${arch_name}" == "x86-core2" ]]; then
+            -append \"root=/dev/sda rw console=ttyS0,115200\""
+    elif [[ "${arch_name}" == "x86-core2" ]]; then                      # x86-core2
         qemu_defconfig="qemu_x86_defconfig"
         sed -i "s/tty1/ttyS0/" ${buildroot_dir}/configs/${qemu_defconfig}
         qemu_system_command="qemu-system-i386
@@ -137,7 +180,7 @@ function set_qemu_config {
             -kernel ${test_dir}/images/bzImage
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/sda rw console=ttyS0\""
-    elif [[ "${arch_name}" == "x86-i686" ]]; then
+    elif [[ "${arch_name}" == "x86-i686" ]]; then                       # x86-i686
         qemu_defconfig="qemu_x86_defconfig"
         sed -i "s/tty1/ttyS0/" ${buildroot_dir}/configs/${qemu_defconfig}
         qemu_system_command="qemu-system-i386
@@ -145,7 +188,7 @@ function set_qemu_config {
             -kernel ${test_dir}/images/bzImage
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/sda rw console=ttyS0\""
-    elif [[ "${arch_name}" == "x86-64-core-i7" ]]; then
+    elif [[ "${arch_name}" == "x86-64-core-i7" ]]; then                 # x86-64-core-i7
         qemu_defconfig="qemu_x86_64_defconfig"
         sed -i "s/tty1/ttyS0/" ${buildroot_dir}/configs/${qemu_defconfig}
         qemu_system_command="qemu-system-x86_64
@@ -153,7 +196,7 @@ function set_qemu_config {
             -kernel ${test_dir}/images/bzImage
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/sda rw console=ttyS0\""
-    elif [[ "${arch_name}" == "xtensa-lx60" ]]; then
+    elif [[ "${arch_name}" == "xtensa-lx60" ]]; then                    # xtensa-lx60
         qemu_defconfig="qemu_xtensa_lx60_defconfig"
         qemu_system_command="qemu-system-xtensa
             -machine lx60
@@ -162,6 +205,7 @@ function set_qemu_config {
             -append \"root=/dev/sda rw console=ttyS0\""
     else
         qemu_defconfig=""
+        qemu_system_command=""
     fi
 }
 
@@ -308,6 +352,9 @@ function generate {
         rsync ${logfile} ${ssh_server}:www/${target}/build_logs/
         exit 1
     fi
+    echo "Uploading build log"
+    ssh ${ssh_server} "mkdir -p www/${target}/build_logs"
+    rsync ${logfile} ${ssh_server}:www/${target}/build_logs/
 
     arch_name=$(echo "${name}" |sed "s/--/\t/" |cut -f 1)
     release_name=${name}-$(cat ${build_dir}/br_version)
@@ -325,12 +372,16 @@ function generate {
     echo "Building a test system using ${name}..."
     if [ "${qemu_defconfig}" != "" ]; then
         if build_test; then
-            echo "Booting the test system in qemu..."
-            if boot_test; then
-                echo "Booting passed"
+            if [ "${qemu_system_command}" != "" ]; then
+                echo "Booting the test system in qemu..."
+                if boot_test; then
+                    echo "Booting passed"
+                else
+                    echo "Booting failed"
+                    return_value=2
+                fi
             else
-                echo "Booting failed"
-                return_value=2
+                echo "No boot command set, can't try to boot"
             fi
         else
             echo "Test system failed to build"
