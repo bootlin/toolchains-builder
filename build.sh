@@ -358,10 +358,10 @@ EOF
         echo "THIS TOOLCHAIN CAN NOT BE TESTED!"
         cat - >> ${manifest_file} <<EOF
 
-This toolchain has been built, but the infrastructure does not contains
+This toolchain has been built, but the infrastructure does not contains enough
 informations about testing it.
 This doesn't mean that this toolchain doesn't work, just that it hasn't been
-tested.
+fully tested.
 FLAG: CAN-NOT-TEST
 EOF
         return_value=0
@@ -436,6 +436,7 @@ function generate {
                 fi
             else
                 echo "No boot command set, can't try to boot"
+                return_value=3
             fi
         else
             echo "Test system failed to build"
