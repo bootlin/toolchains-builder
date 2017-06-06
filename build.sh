@@ -385,7 +385,9 @@ EOF
     ssh ${ssh_server} "mkdir -p www/${target}/toolchains"
     ssh ${ssh_server} "mkdir -p www/${target}/manifests"
     ssh ${ssh_server} "mkdir -p www/${target}/build_test_logs"
+    ssh ${ssh_server} "mkdir -p www/${target}/boot_test_logs"
     rsync ${testlogfile} ${ssh_server}:www/${target}/build_test_logs/                               # build test log file
+    rsync ${bootlogfile} ${ssh_server}:www/${target}/boot_test_logs/${release_name}.log             # boot test log file
     rsync ${manifest_file} ${ssh_server}:www/${target}/manifests/${release_name}.txt                # manifest
     rsync "${release_name}.tar.bz2" ${ssh_server}:www/${target}/toolchains/                         # toolchain tarball
     rsync "${fragment_file}" ${ssh_server}:www/${target}/fragments/${release_name}.frag             # BR fragment
@@ -398,6 +400,7 @@ function generate {
 
     logfile=${build_dir}/${name}-build.log
     testlogfile=${build_dir}/${name}-test.log
+    bootlogfile=/tmp/expect_session.log
 
     if ! launch_build; then
         echo "Toolchain build failed, not going further"

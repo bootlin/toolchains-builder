@@ -3,6 +3,7 @@
 
 set timeout 180
 
+log_file /tmp/expect_session.log
 spawn telnet localhost 4000
 
 expect {
