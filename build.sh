@@ -319,24 +319,78 @@ function make_br_fragment {
 }
 
 function package {
+    manifest_file=${toolchain_dir}/manifest.txt
     echo "Packaging the toolchain as ${release_name}.tar.bz2"
     cd ${build_dir}
+
+    # Update fragment file for release
     sed -i "s/PREINSTALLED/DOWNLOAD/" ${fragment_file}
     sed -i "s/BR2_TOOLCHAIN_EXTERNAL_PATH=\".*\"/BR2_TOOLCHAIN_EXTERNAL_URL=\"${base_url}\/${release_name}.tar.bz2\"/" ${fragment_file}
-    cp ${build_dir}/output/target/usr/bin/gdbserver ${toolchain_dir}/*/sysroot/usr/bin/
-    cp ${build_dir}/output/legal-info/host-manifest.csv ${toolchain_dir}/manifest.csv
     cp ${fragment_file} ${toolchain_dir}
+
+    # Get gdb
+    cp ${build_dir}/output/target/usr/bin/gdbserver ${toolchain_dir}/*/sysroot/usr/bin/
+
+    # Make the manifest
+    echo -e "${release_name}\n\n" >> ${manifest_file}
+    cat ${build_dir}/output/legal-info/host-manifest.csv|sed 's/","/\t/g'|sed 's/"//g'|cut -f 1,2,3|column -t -s $'\t' >> ${manifest_file}
+    if [ $return_value -eq 1 ]; then
+        echo "THIS TOOLCHAIN MAY NOT WORK, OR THERE MAY BE A PROBLEM IN THE CONFIGURATION, PLEASE CHECK!"
+        cat - >> ${manifest_file} <<EOF
+
+This toolchain has been built, but the test system failed to build with it.
+This doesn't mean that this toolchain doesn't work, just that it hasn't been
+successfully tested.
+FLAG: SYSTEM-BUILD-FAILED
+EOF
+        return_value=0
+    elif [ $return_value -eq 2 ]; then
+        echo "THIS TOOLCHAIN MAY BUILD BROKEN BINARIES, OR THERE MAY BE A PROBLEM IN THE CONFIGURATION, PLEASE CHECK!"
+        cat - >> ${manifest_file} <<EOF
+
+This toolchain has been built, but the test system built with it failed to boot.
+This doesn't mean that this toolchain doesn't work, just that it hasn't been
+successfully tested.
+FLAG: NO-BOOT
+EOF
+        return_value=0
+    elif [ $return_value -eq 3 ]; then
+        echo "THIS TOOLCHAIN CAN NOT BE TESTED!"
+        cat - >> ${manifest_file} <<EOF
+
+This toolchain has been built, but the infrastructure does not contains
+informations about testing it.
+This doesn't mean that this toolchain doesn't work, just that it hasn't been
+tested.
+FLAG: CAN-NOT-TEST
+EOF
+        return_value=0
+    else
+        cat - >> ${manifest_file} <<EOF
+
+This toolchain has been built, and the test system built with it has
+successfully booted.
+This doesn't mean that this toolchain will work in every cases, but it is at
+least capable of building a Linux kernel with a basic rootfs that boots.
+FLAG: TEST-OK
+EOF
+        return_value=0
+    fi
+
+    # Make the tarball
     tar cjf `basename ${release_name}`.tar.bz2 `basename ${toolchain_dir}`
+
+    # Upload everything
     ssh ${ssh_server} "mkdir -p www/${target}/fragments"
     ssh ${ssh_server} "mkdir -p www/${target}/toolchains"
     ssh ${ssh_server} "mkdir -p www/${target}/manifests"
     ssh ${ssh_server} "mkdir -p www/${target}/build_test_logs"
-    rsync ${testlogfile} ${ssh_server}:www/${target}/build_test_logs/
-    rsync ${build_dir}/output/legal-info/host-manifest.csv ${ssh_server}:www/${target}/manifests/${release_name}.csv
-    rsync "${release_name}.tar.bz2" ${ssh_server}:www/${target}/toolchains/
-    rsync "${fragment_file}" ${ssh_server}:www/${target}/fragments/${release_name}.frag
-    rsync -r ${build_dir}/output/legal-info/host-licenses/ ${ssh_server}:www/${target}/licenses/
-    rsync -r ${build_dir}/output/legal-info/host-sources/ ${ssh_server}:www/${target}/sources/
+    rsync ${testlogfile} ${ssh_server}:www/${target}/build_test_logs/                               # build test log file
+    rsync ${manifest_file} ${ssh_server}:www/${target}/manifests/${release_name}.txt                # manifest
+    rsync "${release_name}.tar.bz2" ${ssh_server}:www/${target}/toolchains/                         # toolchain tarball
+    rsync "${fragment_file}" ${ssh_server}:www/${target}/fragments/${release_name}.frag             # BR fragment
+    rsync -r ${build_dir}/output/legal-info/host-licenses/ ${ssh_server}:www/${target}/licenses/    # licenses
+    rsync -r ${build_dir}/output/legal-info/host-sources/ ${ssh_server}:www/${target}/sources/      # sources
 }
 
 function generate {
@@ -389,23 +443,6 @@ function generate {
         fi
     else
         return_value=3
-    fi
-
-    if [ $return_value -eq 1 ]; then
-        echo "THIS TOOLCHAIN MAY NOT WORK, OR THERE MAY BE A PROBLEM IN THE CONFIGURATION, PLEASE CHECK!"
-        release_name="${release_name}-BF"
-        return_value=0
-    elif [ $return_value -eq 2 ]; then
-        echo "THIS TOOLCHAIN MAY BUILD BROKEN BINARIES, OR THERE MAY BE A PROBLEM IN THE CONFIGURATION, PLEASE CHECK!"
-        release_name="${release_name}-NB"
-        return_value=0
-    elif [ $return_value -eq 3 ]; then
-        echo "THIS TOOLCHAIN CAN NOT BE TESTED!"
-        release_name="${release_name}-CT"
-        return_value=0
-    else
-        release_name="${release_name}-OK"
-        return_value=0
     fi
 
     # Everything works, package the toolchain
