@@ -164,7 +164,8 @@ function set_qemu_config {
         qemu_system_command="qemu-system-sh4
             -machine r2d
             -kernel ${test_dir}/images/zImage
-            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
+            -drive file=${test_dir}/images/rootfs.ext2,index=0,if=ide,format=raw
+            -serial null
             -append \"root=/dev/sda rw console=ttySC1,115200 noiotrap\""
     elif [[ "${arch_name}" == "sparc64" ]]; then                        # sparc64
         qemu_defconfig="qemu_sparc64_sun4u_defconfig"
@@ -208,9 +209,9 @@ function set_qemu_config {
         qemu_defconfig="qemu_xtensa_lx60_defconfig"
         qemu_system_command="qemu-system-xtensa
             -machine lx60
-            -kernel ${test_dir}/images/Image.elf
-            -drive file=${test_dir}/images/rootfs.cpio,index=0,media=disk,format=raw
-            -append \"root=/dev/sda rw console=ttyS0\""
+            -cpu dc233c
+            -monitor null
+            -kernel ${test_dir}/images/Image.elf"
     else
         qemu_defconfig=""
         qemu_system_command=""
