@@ -36,7 +36,7 @@ fragment_file=${build_dir}/br_fragment
 base_url="https:\/\/toolchains.free-electrons.com\/${target}\/toolchains"
 
 function set_qemu_config {
-    if [[ "${arch_name}" =~ ^"armv".* ]]; then                           # arm*
+    if [[ "${arch_name}" =~ ^"armv"."-".* ]]; then                      # armvX-*
         qemu_defconfig="qemu_arm_vexpress_defconfig"
         qemu_system_command="qemu-system-arm
             -machine vexpress-a9
@@ -51,13 +51,13 @@ function set_qemu_config {
             -machine virt -cpu cortex-a53 -machine type=virt
             -kernel ${test_dir}/images/Image
             -append \"console=ttyAMA0\""
-    elif [[ "${arch_name}" == "aarch64be" ]]; then                      # aarch64be
-        qemu_defconfig="qemu_aarch64_virt_defconfig"
-        # Qemu 2.8 has been tested and works, 2.5 does not.
-        qemu_system_command="qemu-system-aarch64
-            -machine virt -cpu cortex-a53 -machine type=virt
-            -kernel ${test_dir}/images/Image
-            -append \"console=ttyAMA0\""
+    # elif [[ "${arch_name}" == "aarch64be" ]]; then                      # aarch64be (not supported by qemu yet)
+    #     qemu_defconfig="qemu_aarch64_virt_defconfig"
+    #     # Qemu 2.8 has been tested and works, 2.5 does not.
+    #     qemu_system_command="qemu-system-aarch64
+    #         -machine virt -cpu cortex-a53 -machine type=virt
+    #         -kernel ${test_dir}/images/Image
+    #         -append \"console=ttyAMA0\""
     elif [[ "${arch_name}" == "bfin" ]]; then                           # bfin
         qemu_defconfig="gdb_bfin_bf512_defconfig"
         qemu_system_command=""
@@ -141,10 +141,10 @@ function set_qemu_config {
             -kernel ${test_dir}/images/vmlinux
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/hda rw\""
-    elif [[ "${arch_name}" == "nios2" ]]; then                          # nios2
-        qemu_defconfig="qemu_nios2_10m50_defconfig"
-        qemu_system_command="qemu-system-nios2
-            -kernel ${test_dir}/images/vmlinux"
+    # elif [[ "${arch_name}" == "nios2" ]]; then                          # nios2 (no support in 2.8, coming in 2.9)
+    #     qemu_defconfig="qemu_nios2_10m50_defconfig"
+    #     qemu_system_command="qemu-system-nios2
+    #         -kernel ${test_dir}/images/vmlinux"
     elif [[ "${arch_name}" == "powerpc64-power8" ]]; then               # powerpc64-power8
         qemu_defconfig="qemu_ppc64_pseries_defconfig"
         sed -i "s/hvc0/ttyS0/" ${buildroot_dir}/configs/${qemu_defconfig}
