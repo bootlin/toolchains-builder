@@ -147,12 +147,12 @@ function set_qemu_config {
     #         -kernel ${test_dir}/images/vmlinux"
     elif [[ "${arch_name}" == "powerpc64-power8" ]]; then               # powerpc64-power8
         qemu_defconfig="qemu_ppc64_pseries_defconfig"
-        sed -i "s/hvc0/ttyS0/" ${buildroot_dir}/configs/${qemu_defconfig}
         qemu_system_command="qemu-system-ppc64
             -machine pseries
+            -cpu POWER7
             -kernel ${test_dir}/images/vmlinux
-            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
-            -append \"root=/dev/sda rw\""
+            -drive file=${test_dir}/images/rootfs.ext2,index=0,if=scsi,format=raw
+            -append \"console=hvc0 root=/dev/sda rw\""
     elif [[ "${arch_name}" == "sh-sh4" ]]; then                         # sh4
         qemu_defconfig="qemu_sh4_r2d_defconfig"
         qemu_system_command="qemu-system-sh4
