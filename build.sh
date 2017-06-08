@@ -42,8 +42,8 @@ function set_qemu_config {
             -machine vexpress-a9
             -kernel ${test_dir}/images/zImage
             -dtb ${test_dir}/images/vexpress-v2p-ca9.dtb
-            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
-            -append \"root=/dev/sda rw\""
+            -drive file=${test_dir}/images/rootfs.ext2,if=sd,format=raw
+            -append \"console=ttyAMA0,115200 root=/dev/mmcblk0 rw\""
     elif [[ "${arch_name}" == "aarch64" ]]; then                        # aarch64
         qemu_defconfig="qemu_aarch64_virt_defconfig"
         # Qemu 2.8 has been tested and works, 2.5 does not.
