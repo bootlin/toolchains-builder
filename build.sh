@@ -101,6 +101,7 @@ function set_qemu_config {
         qemu_defconfig="qemu_mips32r6el_malta_defconfig"
         qemu_system_command="qemu-system-mipsel
             -machine malta
+            -cpu mips32r6-generic
             -kernel ${test_dir}/images/vmlinux
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/hda rw\""
@@ -122,6 +123,7 @@ function set_qemu_config {
         qemu_defconfig="qemu_mips64r6el_malta_defconfig"
         qemu_system_command="qemu-system-mips64el
             -machine malta
+            -cpu I6400
             -kernel ${test_dir}/images/vmlinux
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/hda rw\""
