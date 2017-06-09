@@ -394,20 +394,21 @@ EOF
     tar cjf `basename ${release_name}`.tar.bz2 `basename ${toolchain_dir}`
 
     # Upload everything
-    ssh ${ssh_server} "mkdir -p www/${target}/fragments"
-    ssh ${ssh_server} "mkdir -p www/${target}/toolchains"
-    ssh ${ssh_server} "mkdir -p www/${target}/manifests"
-    ssh ${ssh_server} "mkdir -p www/${target}/summaries"
-    ssh ${ssh_server} "mkdir -p www/${target}/build_test_logs"
-    ssh ${ssh_server} "mkdir -p www/${target}/boot_test_logs"
-    rsync ${testlogfile} ${ssh_server}:www/${target}/build_test_logs/                               # build test log file
-    rsync ${bootlogfile} ${ssh_server}:www/${target}/boot_test_logs/${release_name}.log             # boot test log file
-    rsync ${manifest_file} ${ssh_server}:www/${target}/manifests/${release_name}.txt                # manifest
-    rsync ${summary_file} ${ssh_server}:www/${target}/summaries/${release_name}.csv                 # summary
-    rsync "${release_name}.tar.bz2" ${ssh_server}:www/${target}/toolchains/                         # toolchain tarball
-    rsync "${fragment_file}" ${ssh_server}:www/${target}/fragments/${release_name}.frag             # BR fragment
-    rsync -r ${build_dir}/output/legal-info/host-licenses/ ${ssh_server}:www/${target}/licenses/    # licenses
-    rsync -r ${build_dir}/output/legal-info/host-sources/ ${ssh_server}:www/${target}/sources/      # sources
+    root_folder="www/downloads"
+    ssh ${ssh_server} "mkdir -p ${root_folder}/${target}/fragments"
+    ssh ${ssh_server} "mkdir -p ${root_folder}/${target}/toolchains"
+    ssh ${ssh_server} "mkdir -p ${root_folder}/${target}/manifests"
+    ssh ${ssh_server} "mkdir -p ${root_folder}/${target}/summaries"
+    ssh ${ssh_server} "mkdir -p ${root_folder}/${target}/build_test_logs"
+    ssh ${ssh_server} "mkdir -p ${root_folder}/${target}/boot_test_logs"
+    rsync ${testlogfile} ${ssh_server}:${root_folder}/${target}/build_test_logs/                               # build test log file
+    rsync ${bootlogfile} ${ssh_server}:${root_folder}/${target}/boot_test_logs/${release_name}.log             # boot test log file
+    rsync ${manifest_file} ${ssh_server}:${root_folder}/${target}/manifests/${release_name}.txt                # manifest
+    rsync ${summary_file} ${ssh_server}:${root_folder}/${target}/summaries/${release_name}.csv                 # summary
+    rsync "${release_name}.tar.bz2" ${ssh_server}:${root_folder}/${target}/toolchains/                         # toolchain tarball
+    rsync "${fragment_file}" ${ssh_server}:${root_folder}/${target}/fragments/${release_name}.frag             # BR fragment
+    rsync -r ${build_dir}/output/legal-info/host-licenses/ ${ssh_server}:${root_folder}/${target}/licenses/    # licenses
+    rsync -r ${build_dir}/output/legal-info/host-sources/ ${ssh_server}:${root_folder}/${target}/sources/      # sources
 }
 
 function generate {
