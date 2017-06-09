@@ -343,7 +343,7 @@ function package {
     cp ${build_dir}/output/target/usr/bin/gdbserver ${toolchain_dir}/*/sysroot/usr/bin/
 
     # Summary
-    tail -n +2 ${build_dir}/output/legal-info/manifest.csv >> ${summary_file}
+    tail -n +1 ${build_dir}/output/legal-info/manifest.csv >> ${summary_file}
     tail -n +2 ${build_dir}/output/legal-info/host-manifest.csv >> ${summary_file}
     # Make the manifest
     echo -e "${release_name}\n\n" >> ${manifest_file}
