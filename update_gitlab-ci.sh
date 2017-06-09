@@ -49,7 +49,7 @@ opt_arch="*"
 opt_libc="*"
 opt_version="*"
 opt_target="no_push"
-opt_brtree="2017.02.2"
+opt_brtree="2017.05"
 opt_number=""
 
 while getopts "a:l:v:t:b:n:dh" opt; do
