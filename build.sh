@@ -33,7 +33,7 @@ build_dir=${main_dir}/builds
 chroot_script="build_chroot.sh"
 buildroot_dir=${main_dir}/buildroot
 fragment_file=${build_dir}/br_fragment
-base_url="http:\/\/toolchains.free-electrons.com\/${target}\/toolchains"
+base_url="http:\/\/toolchains.free-electrons.com\/downloads\/${target}"
 
 function set_qemu_config {
     if [[ "${arch_name}" =~ ^"armv"."-".* ]]; then                      # armvX-*
@@ -328,14 +328,14 @@ function make_br_fragment {
 }
 
 function package {
-    manifest_file=${toolchain_dir}/manifest.txt
+    readme_file=${toolchain_dir}/README.txt
     summary_file=${toolchain_dir}/summary.csv
     echo "Packaging the toolchain as ${release_name}.tar.bz2"
     cd ${build_dir}
 
     # Update fragment file for release
     sed -i "s/PREINSTALLED/DOWNLOAD/" ${fragment_file}
-    sed -i "s/BR2_TOOLCHAIN_EXTERNAL_PATH=\".*\"/BR2_TOOLCHAIN_EXTERNAL_URL=\"${base_url}\/${release_name}.tar.bz2\"/" ${fragment_file}
+    sed -i "s/BR2_TOOLCHAIN_EXTERNAL_PATH=\".*\"/BR2_TOOLCHAIN_EXTERNAL_URL=\"${base_url}\/toolchains\/${release_name}.tar.bz2\"/" ${fragment_file}
     sed -i "/BR2_WGET/d" ${fragment_file}
     cp ${fragment_file} ${toolchain_dir}
 
@@ -345,13 +345,14 @@ function package {
     # Summary
     tail -n +1 ${build_dir}/output/legal-info/manifest.csv >> ${summary_file}
     tail -n +2 ${build_dir}/output/legal-info/host-manifest.csv >> ${summary_file}
-    # Make the manifest
-    echo -e "${release_name}\n\n" >> ${manifest_file}
-    cat ${build_dir}/output/legal-info/host-manifest.csv|sed 's/","/\t/g'|sed 's/"//g'|cut -f 1,2,3|column -t -s $'\t' >> ${manifest_file}
-    tail -n +2 ${build_dir}/output/legal-info/manifest.csv|sed 's/","/\t/g'|sed 's/"//g'|cut -f 1,2,3|column -t -s $'\t' >> ${manifest_file}
+
+    # Make the README
+    echo -e "${release_name}\n\n" >> ${readme_file}
+    cat ${build_dir}/output/legal-info/host-manifest.csv|sed 's/","/\t/g'|sed 's/"//g'|cut -f 1,2,3|column -t -s $'\t' >> ${readme_file}
+    tail -n +2 ${build_dir}/output/legal-info/manifest.csv|sed 's/","/\t/g'|sed 's/"//g'|cut -f 1,2,3|column -t -s $'\t' >> ${readme_file}
     if [ $return_value -eq 1 ]; then
         echo "THIS TOOLCHAIN MAY NOT WORK, OR THERE MAY BE A PROBLEM IN THE CONFIGURATION, PLEASE CHECK!"
-        cat - >> ${manifest_file} <<EOF
+        cat - >> ${readme_file} <<EOF
 
 This toolchain has been built, but the test system failed to build with it.
 This doesn't mean that this toolchain doesn't work, just that it hasn't been
@@ -360,7 +361,7 @@ FLAG: SYSTEM-BUILD-FAILED
 EOF
     elif [ $return_value -eq 2 ]; then
         echo "THIS TOOLCHAIN MAY BUILD BROKEN BINARIES, OR THERE MAY BE A PROBLEM IN THE CONFIGURATION, PLEASE CHECK!"
-        cat - >> ${manifest_file} <<EOF
+        cat - >> ${readme_file} <<EOF
 
 This toolchain has been built, but the test system built with it failed to boot.
 This doesn't mean that this toolchain doesn't work, just that it hasn't been
@@ -369,7 +370,7 @@ FLAG: NO-BOOT
 EOF
     elif [ $return_value -eq 3 ]; then
         echo "THIS TOOLCHAIN CAN NOT BE TESTED!"
-        cat - >> ${manifest_file} <<EOF
+        cat - >> ${readme_file} <<EOF
 
 This toolchain has been built, but the infrastructure does not contains enough
 informations about testing it.
@@ -379,7 +380,7 @@ FLAG: CAN-NOT-TEST
 EOF
         return_value=0
     else
-        cat - >> ${manifest_file} <<EOF
+        cat - >> ${readme_file} <<EOF
 
 This toolchain has been built, and the test system built with it has
 successfully booted.
@@ -389,6 +390,27 @@ FLAG: TEST-OK
 EOF
         return_value=0
     fi
+    cat - >> ${readme_file} <<EOF
+
+For those who would like to reproduce the toolchain, you can just follow these steps:
+
+    git clone https://github.com/buildroot/buildroot.git
+    cd buildroot
+    git checkout ${target}
+    curl http://free-electrons.com/~thomas/pub/0001-mpc-mpfr-gmp-build-statically-for-the-host.patch |patch -p1
+    curl http://free-electrons.com/~thomas/pub/0002-toolchain-attempt-to-fix-the-toolchain-wrapper.patch |patch -p1
+    curl "https://git.buildroot.org/buildroot/patch/?id=4d1c2c82e8945a5847d636458f3825c55529835b" |patch -p1
+    curl https://patchwork.ozlabs.org/patch/773926/raw/ |patch -p1
+    curl https://patchwork.ozlabs.org/patch/773928/raw/ |patch -p1
+    curl https://patchwork.ozlabs.org/patch/773930/raw/ |patch -p1
+    curl https://patchwork.ozlabs.org/patch/773925/raw/ |patch -p1
+    curl https://patchwork.ozlabs.org/patch/773927/raw/ |patch -p1
+    curl https://patchwork.ozlabs.org/patch/773929/raw/ |patch -p1
+
+    curl ${base_url}/build_fragments/${release_name}.defconfig > .config
+    make olddefconfig
+    make
+EOF
 
     # Make the tarball
     tar cjf `basename ${release_name}`.tar.bz2 `basename ${toolchain_dir}`
@@ -397,18 +419,20 @@ EOF
     root_folder="www/downloads"
     ssh ${ssh_server} "mkdir -p ${root_folder}/${target}/fragments"
     ssh ${ssh_server} "mkdir -p ${root_folder}/${target}/toolchains"
-    ssh ${ssh_server} "mkdir -p ${root_folder}/${target}/manifests"
+    ssh ${ssh_server} "mkdir -p ${root_folder}/${target}/readmes"
     ssh ${ssh_server} "mkdir -p ${root_folder}/${target}/summaries"
     ssh ${ssh_server} "mkdir -p ${root_folder}/${target}/build_test_logs"
     ssh ${ssh_server} "mkdir -p ${root_folder}/${target}/boot_test_logs"
+    ssh ${ssh_server} "mkdir -p ${root_folder}/${target}/build_fragments"
     rsync ${testlogfile} ${ssh_server}:${root_folder}/${target}/build_test_logs/                               # build test log file
     rsync ${bootlogfile} ${ssh_server}:${root_folder}/${target}/boot_test_logs/${release_name}.log             # boot test log file
-    rsync ${manifest_file} ${ssh_server}:${root_folder}/${target}/manifests/${release_name}.txt                # manifest
+    rsync ${readme_file} ${ssh_server}:${root_folder}/${target}/readmes/${release_name}.txt                    # README
     rsync ${summary_file} ${ssh_server}:${root_folder}/${target}/summaries/${release_name}.csv                 # summary
     rsync "${release_name}.tar.bz2" ${ssh_server}:${root_folder}/${target}/toolchains/                         # toolchain tarball
     rsync "${fragment_file}" ${ssh_server}:${root_folder}/${target}/fragments/${release_name}.frag             # BR fragment
     rsync -r ${build_dir}/output/legal-info/host-licenses/ ${ssh_server}:${root_folder}/${target}/licenses/    # licenses
     rsync -r ${build_dir}/output/legal-info/host-sources/ ${ssh_server}:${root_folder}/${target}/sources/      # sources
+    rsync -r ${build_dir}/output/defconfig ${ssh_server}:${root_folder}/${target}/build_fragments/${release_name}.defconfig             # build fragment
 }
 
 function generate {
