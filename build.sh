@@ -336,7 +336,7 @@ function package {
     # Update fragment file for release
     sed -i "s/PREINSTALLED/DOWNLOAD/" ${fragment_file}
     sed -i "s/BR2_TOOLCHAIN_EXTERNAL_PATH=\".*\"/BR2_TOOLCHAIN_EXTERNAL_URL=\"${base_url}\/${release_name}.tar.bz2\"/" ${fragment_file}
-    sed -i "s/BR2_WGET/d" ${fragment_file}
+    sed -i "/BR2_WGET/d" ${fragment_file}
     cp ${fragment_file} ${toolchain_dir}
 
     # Get gdb
