@@ -329,6 +329,7 @@ function make_br_fragment {
 
 function package {
     manifest_file=${toolchain_dir}/manifest.txt
+    summary_file=${toolchain_dir}/summary.csv
     echo "Packaging the toolchain as ${release_name}.tar.bz2"
     cd ${build_dir}
 
@@ -341,9 +342,13 @@ function package {
     # Get gdb
     cp ${build_dir}/output/target/usr/bin/gdbserver ${toolchain_dir}/*/sysroot/usr/bin/
 
+    # Summary
+    tail -n +2 ${build_dir}/output/legal-info/manifest.csv >> ${summary_file}
+    tail -n +2 ${build_dir}/output/legal-info/host-manifest.csv >> ${summary_file}
     # Make the manifest
     echo -e "${release_name}\n\n" >> ${manifest_file}
     cat ${build_dir}/output/legal-info/host-manifest.csv|sed 's/","/\t/g'|sed 's/"//g'|cut -f 1,2,3|column -t -s $'\t' >> ${manifest_file}
+    tail -n +2 ${build_dir}/output/legal-info/manifest.csv|sed 's/","/\t/g'|sed 's/"//g'|cut -f 1,2,3|column -t -s $'\t' >> ${manifest_file}
     if [ $return_value -eq 1 ]; then
         echo "THIS TOOLCHAIN MAY NOT WORK, OR THERE MAY BE A PROBLEM IN THE CONFIGURATION, PLEASE CHECK!"
         cat - >> ${manifest_file} <<EOF
@@ -392,11 +397,13 @@ EOF
     ssh ${ssh_server} "mkdir -p www/${target}/fragments"
     ssh ${ssh_server} "mkdir -p www/${target}/toolchains"
     ssh ${ssh_server} "mkdir -p www/${target}/manifests"
+    ssh ${ssh_server} "mkdir -p www/${target}/summaries"
     ssh ${ssh_server} "mkdir -p www/${target}/build_test_logs"
     ssh ${ssh_server} "mkdir -p www/${target}/boot_test_logs"
     rsync ${testlogfile} ${ssh_server}:www/${target}/build_test_logs/                               # build test log file
     rsync ${bootlogfile} ${ssh_server}:www/${target}/boot_test_logs/${release_name}.log             # boot test log file
     rsync ${manifest_file} ${ssh_server}:www/${target}/manifests/${release_name}.txt                # manifest
+    rsync ${summary_file} ${ssh_server}:www/${target}/summaries/${release_name}.csv                 # summary
     rsync "${release_name}.tar.bz2" ${ssh_server}:www/${target}/toolchains/                         # toolchain tarball
     rsync "${fragment_file}" ${ssh_server}:www/${target}/fragments/${release_name}.frag             # BR fragment
     rsync -r ${build_dir}/output/legal-info/host-licenses/ ${ssh_server}:www/${target}/licenses/    # licenses
