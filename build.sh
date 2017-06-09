@@ -33,7 +33,7 @@ build_dir=${main_dir}/builds
 chroot_script="build_chroot.sh"
 buildroot_dir=${main_dir}/buildroot
 fragment_file=${build_dir}/br_fragment
-base_url="https:\/\/toolchains.free-electrons.com\/${target}\/toolchains"
+base_url="http:\/\/toolchains.free-electrons.com\/${target}\/toolchains"
 
 function set_qemu_config {
     if [[ "${arch_name}" =~ ^"armv"."-".* ]]; then                      # armvX-*
@@ -335,6 +335,7 @@ function package {
     # Update fragment file for release
     sed -i "s/PREINSTALLED/DOWNLOAD/" ${fragment_file}
     sed -i "s/BR2_TOOLCHAIN_EXTERNAL_PATH=\".*\"/BR2_TOOLCHAIN_EXTERNAL_URL=\"${base_url}\/${release_name}.tar.bz2\"/" ${fragment_file}
+    sed -i "s/BR2_WGET/d" ${fragment_file}
     cp ${fragment_file} ${toolchain_dir}
 
     # Get gdb
