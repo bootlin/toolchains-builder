@@ -15,9 +15,12 @@ if git clone https://github.com/buildroot/buildroot.git; then
     curl http://free-electrons.com/~thomas/pub/0001-mpc-mpfr-gmp-build-statically-for-the-host.patch |patch -p1
     curl http://free-electrons.com/~thomas/pub/0002-toolchain-attempt-to-fix-the-toolchain-wrapper.patch |patch -p1
     curl "https://git.buildroot.org/buildroot/patch/?id=4d1c2c82e8945a5847d636458f3825c55529835b" |patch -p1
-    curl https://patchwork.ozlabs.org/patch/770835/raw/ |patch -p1
-    curl https://patchwork.ozlabs.org/patch/770834/raw/ |patch -p1
-    curl https://patchwork.ozlabs.org/patch/770836/raw/ |patch -p1
+    curl https://patchwork.ozlabs.org/patch/773926/raw/ |patch -p1
+    curl https://patchwork.ozlabs.org/patch/773928/raw/ |patch -p1
+    curl https://patchwork.ozlabs.org/patch/773930/raw/ |patch -p1
+    curl https://patchwork.ozlabs.org/patch/773925/raw/ |patch -p1
+    curl https://patchwork.ozlabs.org/patch/773927/raw/ |patch -p1
+    curl https://patchwork.ozlabs.org/patch/773929/raw/ |patch -p1
     cd ..
 fi
 
@@ -53,6 +56,9 @@ function build {
     # Generate the full configuration
     make -C ${TOOLCHAIN_BR_DIR} O=${builddir} olddefconfig > /dev/null 2>&1
 
+    # Generate fragment to ship in the README
+    make -C ${TOOLCHAIN_BR_DIR} O=${builddir} savedefconfig > /dev/null 2>&1
+
     # Build
     timeout 225m make -C ${TOOLCHAIN_BR_DIR} O=${builddir} > ${logfile} 2>&1
     if [ $? -ne 0 ] ; then
@@ -61,7 +67,6 @@ function build {
         echo "=================== BEGIN LOG FILE ======================"
         tail -n 200 ${logfile}
         echo "==================== END LOG FILE ======================="
-        make -C ${TOOLCHAIN_BR_DIR} O=${builddir} savedefconfig > /dev/null 2>&1
         echo "=================== BEGIN DEFCONFIG ======================"
         cat ${builddir}/defconfig
         echo "==================== END DEFCONFIG ======================="
