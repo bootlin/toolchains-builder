@@ -351,9 +351,9 @@ function package {
 
 For those who would like to reproduce the toolchain, you can just follow these steps:
 
-    git clone https://github.com/free-electrons/buildroot-toolchains.git
+    git clone https://github.com/free-electrons/buildroot-toolchains.git buildroot
     cd buildroot
-    git checkout ${target}
+    git checkout ${buildroot_tree}
 
     curl ${base_url}/build_fragments/${release_name}.defconfig > .config
     make olddefconfig
