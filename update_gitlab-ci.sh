@@ -49,7 +49,7 @@ opt_arch="*"
 opt_libc="*"
 opt_version="*"
 opt_target="no_push"
-opt_brtree="2017.05"
+opt_brtree="2017.05-toolchains-1"
 opt_number=""
 
 while getopts "a:l:v:t:b:n:dh" opt; do
@@ -104,7 +104,7 @@ function check_config {
 }
 
 # Get buildroot if it's not done to check the configurations
-git clone https://github.com/buildroot/buildroot.git ${br_path}
+git clone https://github.com/free-electrons/buildroot-toolchains.git ${br_path}
 cd ${br_path}
 git checkout ${opt_brtree}
 cd ${base_dir}

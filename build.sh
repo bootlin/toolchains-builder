@@ -16,13 +16,9 @@ if [ "$target" == "ci_debug" ]; then
     exit 0;
 fi
 
-if git clone https://github.com/buildroot/buildroot.git; then
-    # buildroot needs patchs
+if git clone https://github.com/free-electrons/buildroot-toolchains.git; then
     cd buildroot
     git checkout $buildroot_tree
-    curl http://free-electrons.com/~thomas/pub/0001-mpc-mpfr-gmp-build-statically-for-the-host.patch |patch -p1
-    curl http://free-electrons.com/~thomas/pub/0002-toolchain-attempt-to-fix-the-toolchain-wrapper.patch |patch -p1
-    curl "https://git.buildroot.org/buildroot/patch/?id=4d1c2c82e8945a5847d636458f3825c55529835b" |patch -p1
     cd ..
 fi
 

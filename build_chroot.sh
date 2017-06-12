@@ -8,19 +8,9 @@ apt-get install -y --force-yes -qq --no-install-recommends \
 sed -i 's/# \(en_US.UTF-8\)/\1/' /etc/locale.gen
 /usr/sbin/locale-gen
 
-if git clone https://github.com/buildroot/buildroot.git; then
-    # buildroot needs patchs
+if git clone https://github.com/free-electrons/buildroot-toolchains.git; then
     cd buildroot
     git checkout $2
-    curl http://free-electrons.com/~thomas/pub/0001-mpc-mpfr-gmp-build-statically-for-the-host.patch |patch -p1
-    curl http://free-electrons.com/~thomas/pub/0002-toolchain-attempt-to-fix-the-toolchain-wrapper.patch |patch -p1
-    curl "https://git.buildroot.org/buildroot/patch/?id=4d1c2c82e8945a5847d636458f3825c55529835b" |patch -p1
-    curl https://patchwork.ozlabs.org/patch/773926/raw/ |patch -p1
-    curl https://patchwork.ozlabs.org/patch/773928/raw/ |patch -p1
-    curl https://patchwork.ozlabs.org/patch/773930/raw/ |patch -p1
-    curl https://patchwork.ozlabs.org/patch/773925/raw/ |patch -p1
-    curl https://patchwork.ozlabs.org/patch/773927/raw/ |patch -p1
-    curl https://patchwork.ozlabs.org/patch/773929/raw/ |patch -p1
     cd ..
 fi
 
