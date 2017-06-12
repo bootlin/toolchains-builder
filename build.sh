@@ -405,6 +405,7 @@ EOF
     echo "Packaging the toolchain as ${release_name}.tar.bz2"
     cd ${build_dir}
     tar cjf `basename ${release_name}`.tar.bz2 `basename ${toolchain_dir}`
+    sha256sum ${release_name}.tar.bz2 > ${release_name}.sha256
 
     # Upload everything
     root_folder="www/downloads"
@@ -420,6 +421,7 @@ EOF
     rsync ${readme_file} ${ssh_server}:${root_folder}/${target}/readmes/${release_name}.txt                    # README
     rsync ${summary_file} ${ssh_server}:${root_folder}/${target}/summaries/${release_name}.csv                 # summary
     rsync "${release_name}.tar.bz2" ${ssh_server}:${root_folder}/${target}/toolchains/                         # toolchain tarball
+    rsync "${release_name}.sha256" ${ssh_server}:${root_folder}/${target}/toolchains/                          # toolchain checksum
     rsync "${fragment_file}" ${ssh_server}:${root_folder}/${target}/fragments/${release_name}.frag             # BR fragment
     rsync -r ${build_dir}/output/legal-info/host-licenses/ ${ssh_server}:${root_folder}/${target}/licenses/    # licenses
     rsync -r ${build_dir}/output/legal-info/host-sources/ ${ssh_server}:${root_folder}/${target}/sources/      # sources
