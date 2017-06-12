@@ -13,7 +13,8 @@ version_number="$4"
 ssh_server="gitlabci@toolchains.free-electrons.com"
 main_dir=$(pwd)
 frag_dir=${main_dir}/frags
-build_dir=${main_dir}/builds
+chroot_dir=${main_dir}/build
+build_dir=${chroot_dir}/tmp
 chroot_script="build_chroot.sh"
 buildroot_dir=${main_dir}/buildroot
 fragment_file=${build_dir}/br_fragment
@@ -273,15 +274,15 @@ function launch_build {
     echo "  Setup chroot and launch build"
     rm -rf ${build_dir}
     mkdir -p ${build_dir}
-    debootstrap --variant=buildd squeeze ${build_dir} http://archive.debian.org/debian/ 2>&1 1>/dev/null
-    mkdir ${build_dir}/proc
-    mount --bind /proc ${build_dir}/proc
+    debootstrap --variant=buildd squeeze ${chroot_dir} http://archive.debian.org/debian/ 2>&1 1>/dev/null
+    mkdir ${chroot_dir}/proc
+    mount --bind /proc ${chroot_dir}/proc
     cp ${chroot_script} ${build_dir}
     cp ${frag_dir}/${name}.config ${build_dir}
     cp chroot.conf /etc/schroot/schroot.conf
-    cp /etc/resolv.conf ${build_dir}/etc/resolv.conf
-    echo "  chrooting to ${build_dir}"
-    chroot ${build_dir} ./build_chroot.sh ${name} ${buildroot_tree}
+    cp /etc/resolv.conf ${chroot_dir}/etc/resolv.conf
+    echo "  chrooting to ${chroot_dir}"
+    chroot ${chroot_dir} /tmp/build_chroot.sh ${name} ${buildroot_tree}
 }
 
 function make_br_fragment {

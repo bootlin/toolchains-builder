@@ -8,6 +8,8 @@ apt-get install -y --force-yes -qq --no-install-recommends \
 sed -i 's/# \(en_US.UTF-8\)/\1/' /etc/locale.gen
 /usr/sbin/locale-gen
 
+cd /tmp
+
 TOOLCHAIN_DIR=$(pwd)
 TOOLCHAIN_BUILD_DIR=${TOOLCHAIN_DIR}
 TOOLCHAIN_BR_DIR=${TOOLCHAIN_DIR}/buildroot
