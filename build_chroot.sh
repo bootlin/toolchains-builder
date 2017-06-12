@@ -8,23 +8,23 @@ apt-get install -y --force-yes -qq --no-install-recommends \
 sed -i 's/# \(en_US.UTF-8\)/\1/' /etc/locale.gen
 /usr/sbin/locale-gen
 
-if git clone https://github.com/free-electrons/buildroot-toolchains.git; then
-    cd buildroot
-    git checkout $2
-    cd ..
-fi
-
 TOOLCHAIN_DIR=$(pwd)
 TOOLCHAIN_BUILD_DIR=${TOOLCHAIN_DIR}
 TOOLCHAIN_BR_DIR=${TOOLCHAIN_DIR}/buildroot
-
-git --git-dir=${TOOLCHAIN_BR_DIR}/.git describe > br_version
 
 name=$1
 toolchaindir=${TOOLCHAIN_BUILD_DIR}/${name}
 logfile=${TOOLCHAIN_BUILD_DIR}/${name}-build.log
 builddir=${TOOLCHAIN_BUILD_DIR}/output
 configfile=${builddir}/.config
+
+if git clone https://github.com/free-electrons/buildroot-toolchains.git ${TOOLCHAIN_BR_DIR}; then
+    cd ${TOOLCHAIN_BR_DIR}
+    git checkout $2
+    cd ${TOOLCHAIN_DIR}
+fi
+
+git --git-dir=${TOOLCHAIN_BR_DIR}/.git describe > br_version
 
 mkdir -p ${TOOLCHAIN_BUILD_DIR} &>/dev/null
 

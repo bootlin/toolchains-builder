@@ -10,18 +10,6 @@ target="$2"
 buildroot_tree="$3"
 version_number="$4"
 
-if [ "$target" == "ci_debug" ]; then
-    echo "ci_debug is set as target, you should see this line, but the build won't go further."
-    echo "Exiting properly."
-    exit 0;
-fi
-
-if git clone https://github.com/free-electrons/buildroot-toolchains.git; then
-    cd buildroot
-    git checkout $buildroot_tree
-    cd ..
-fi
-
 ssh_server="gitlabci@toolchains.free-electrons.com"
 main_dir=$(pwd)
 frag_dir=${main_dir}/frags
@@ -31,6 +19,18 @@ buildroot_dir=${main_dir}/buildroot
 fragment_file=${build_dir}/br_fragment
 base_url_sed="http:\/\/toolchains.free-electrons.com\/downloads\/${target}"
 base_url="http://toolchains.free-electrons.com/downloads/${target}"
+
+if [ "$target" == "ci_debug" ]; then
+    echo "ci_debug is set as target, you should see this line, but the build won't go further."
+    echo "Exiting properly."
+    exit 0;
+fi
+
+if git clone https://github.com/free-electrons/buildroot-toolchains.git ${buildroot_dir}; then
+    cd ${buildroot_dir}
+    git checkout $buildroot_tree
+    cd ${main_dir}
+fi
 
 function set_qemu_config {
     if [[ "${arch_name}" =~ ^"armv"."-".* ]]; then                      # armvX-*
