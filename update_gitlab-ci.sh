@@ -31,8 +31,8 @@ Usage: $0 [-a arch] [-l libc] [-v version] [-t target] [-n number] [-dh]
             This option defaults to no_push in order not to trigger builds
             by accident or misuse.
 
-    -n number   allows to specify a version number that will be appended to 
-    the buildroot version (default is empty string)
+    -n number   allows to specify a version number that will be appended to
+                the buildroot version (default is empty string)
 
     -b tree-ish checkout Buildroot to that tree-ish object (default is
                 tag 2017.02.2)
@@ -166,7 +166,7 @@ git add .
 git add -f .gitlab-ci.yml
 git commit -m "Build bot: trigger new builds"
 if [ "$opt_target" != "no_push" ]; then
-    git remote add gitlab git@gitlab.com:hyask/toolchains-builder.git
+    git remote add gitlab git@gitlab.com:free-electrons/toolchains-builder.git
     git push -u -f gitlab ${git_build_branch}
 fi
 
