@@ -10,40 +10,6 @@ common_config="./configs/common.config"
 gitlab_base=".gitlab-ci.yml.in"
 git_build_branch="builds"
 
-function show_help {
-    cat - <<EOF
-Usage: $0 [-a arch] [-l libc] [-v version] [-t target] [-n number] [-dh]
-
-    -h          show this help
-    -d          debug output
-
-    -t target   defines what to do:
-           no_push:     just prepare the config files and the commit in
-                        the build branch, but don't push (do not trigger the
-                        Gitlab CI). Useful for debugging.
-           ci_debug:    just launch the ci jobs, but does not really
-                        compiles the toolchains. Useful for CI debugging.
-           build_debug: launch the ci jobs and compiles the toolchains,
-                        but doesn't send them as releases.
-           release:     launch the ci jobs and compiles the toolchains,
-                        then send them as releases and trigger the web page
-                        update.
-            This option defaults to no_push in order not to trigger builds
-            by accident or misuse.
-
-    -n number   allows to specify a version number that will be appended to
-                the buildroot version (default is empty string)
-
-    -b tree-ish checkout Buildroot to that tree-ish object (default is
-                tag 2017.02.2)
-
-    -a arch     specify architecture to build (see \`ls configs/arch/*\`)
-    -l libc     specify libc to use (see \`ls configs/libc/*\`)
-    -v version  specify version to build (see \`ls configs/version/*\`)
-
-EOF
-}
-
 debug=0
 opt_arch="*"
 opt_libc="*"
@@ -51,6 +17,38 @@ opt_version="*"
 opt_target="no_push"
 opt_brtree="2017.05-toolchains-1"
 opt_number=""
+
+function show_help {
+    cat - <<EOF
+Usage: $0 -n number [-a arch] [-l libc] [-v version] [-t target] [-dh]
+
+    -h          show this help and exit
+    -d          debug output
+
+    -t target   defines what to do:
+           no_push:         just prepare the config files and the commit in
+                            the build branch, but don't push (do not trigger the
+                            Gitlab CI). Useful for debugging.
+           ci_debug:        just launch the ci jobs, but does not really
+                            compiles the toolchains. Useful for CI debugging.
+           <folder_name>:   launch the ci jobs and compiles the toolchains, then
+                            send them in the <folder_name>.
+                            The webpage searches for toolchains in 'releases'.
+           This option defaults to no_push in order not to trigger builds
+           by accident or misuse.
+
+    -n number   specify a version number that will be appended to the buildroot
+                version (mandatory)
+
+    -b tree-ish checkout Buildroot to that tree-ish object (default is
+                ${opt_brtree})
+
+    -a arch     specify architecture to build (see \`ls configs/arch/*\`)
+    -l libc     specify libc to use (see \`ls configs/libc/*\`)
+    -v version  specify version to build (see \`ls configs/version/*\`)
+
+EOF
+}
 
 while getopts "a:l:v:t:b:n:dh" opt; do
     case "$opt" in
