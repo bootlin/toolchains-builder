@@ -29,7 +29,8 @@ build_dir=${main_dir}/builds
 chroot_script="build_chroot.sh"
 buildroot_dir=${main_dir}/buildroot
 fragment_file=${build_dir}/br_fragment
-base_url="http:\/\/toolchains.free-electrons.com\/downloads\/${target}"
+base_url_sed="http:\/\/toolchains.free-electrons.com\/downloads\/${target}"
+base_url="http://toolchains.free-electrons.com/downloads/${target}"
 
 function set_qemu_config {
     if [[ "${arch_name}" =~ ^"armv"."-".* ]]; then                      # armvX-*
@@ -326,12 +327,11 @@ function make_br_fragment {
 function package {
     readme_file=${toolchain_dir}/README.txt
     summary_file=${toolchain_dir}/summary.csv
-    echo "Packaging the toolchain as ${release_name}.tar.bz2"
-    cd ${build_dir}
+    echo "Preparing the packaging of ${release_name}"
 
     # Update fragment file for release
     sed -i "s/PREINSTALLED/DOWNLOAD/" ${fragment_file}
-    sed -i "s/BR2_TOOLCHAIN_EXTERNAL_PATH=\".*\"/BR2_TOOLCHAIN_EXTERNAL_URL=\"${base_url}\/toolchains\/${release_name}.tar.bz2\"/" ${fragment_file}
+    sed -i "s/BR2_TOOLCHAIN_EXTERNAL_PATH=\".*\"/BR2_TOOLCHAIN_EXTERNAL_URL=\"${base_url_sed}\/toolchains\/${release_name}.tar.bz2\"/" ${fragment_file}
     sed -i "/BR2_WGET/d" ${fragment_file}
     cp ${fragment_file} ${toolchain_dir}
 
@@ -344,8 +344,21 @@ function package {
 
     # Make the README
     echo -e "${release_name}\n\n" >> ${readme_file}
+    cat ${main_dir}/readme_base.txt >> ${readme_file}
     cat ${build_dir}/output/legal-info/host-manifest.csv|sed 's/","/\t/g'|sed 's/"//g'|cut -f 1,2,3|column -t -s $'\t' >> ${readme_file}
     tail -n +2 ${build_dir}/output/legal-info/manifest.csv|sed 's/","/\t/g'|sed 's/"//g'|cut -f 1,2,3|column -t -s $'\t' >> ${readme_file}
+    cat - >> ${readme_file} <<EOF
+
+For those who would like to reproduce the toolchain, you can just follow these steps:
+
+    git clone https://github.com/free-electrons/buildroot-toolchains.git
+    cd buildroot
+    git checkout ${target}
+
+    curl ${base_url}/build_fragments/${release_name}.defconfig > .config
+    make olddefconfig
+    make
+EOF
     if [ $return_value -eq 1 ]; then
         echo "THIS TOOLCHAIN MAY NOT WORK, OR THERE MAY BE A PROBLEM IN THE CONFIGURATION, PLEASE CHECK!"
         cat - >> ${readme_file} <<EOF
@@ -386,29 +399,10 @@ FLAG: TEST-OK
 EOF
         return_value=0
     fi
-    cat - >> ${readme_file} <<EOF
-
-For those who would like to reproduce the toolchain, you can just follow these steps:
-
-    git clone https://github.com/buildroot/buildroot.git
-    cd buildroot
-    git checkout ${target}
-    curl http://free-electrons.com/~thomas/pub/0001-mpc-mpfr-gmp-build-statically-for-the-host.patch |patch -p1
-    curl http://free-electrons.com/~thomas/pub/0002-toolchain-attempt-to-fix-the-toolchain-wrapper.patch |patch -p1
-    curl "https://git.buildroot.org/buildroot/patch/?id=4d1c2c82e8945a5847d636458f3825c55529835b" |patch -p1
-    curl https://patchwork.ozlabs.org/patch/773926/raw/ |patch -p1
-    curl https://patchwork.ozlabs.org/patch/773928/raw/ |patch -p1
-    curl https://patchwork.ozlabs.org/patch/773930/raw/ |patch -p1
-    curl https://patchwork.ozlabs.org/patch/773925/raw/ |patch -p1
-    curl https://patchwork.ozlabs.org/patch/773927/raw/ |patch -p1
-    curl https://patchwork.ozlabs.org/patch/773929/raw/ |patch -p1
-
-    curl ${base_url}/build_fragments/${release_name}.defconfig > .config
-    make olddefconfig
-    make
-EOF
 
     # Make the tarball
+    echo "Packaging the toolchain as ${release_name}.tar.bz2"
+    cd ${build_dir}
     tar cjf `basename ${release_name}`.tar.bz2 `basename ${toolchain_dir}`
 
     # Upload everything
