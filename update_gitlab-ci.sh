@@ -18,6 +18,18 @@ opt_target="no_push"
 opt_brtree="2017.05-toolchains-1"
 opt_number=""
 
+function clean_up {
+    echo "Catching signal, cleaning up"
+    cd ${base_dir}
+    rm -rf ${frag_dir}
+    echo "Checkouting to original branch: ${git_current_branch}"
+    git checkout $git_current_branch
+    echo "Exiting with code 1"
+    exit 1
+}
+
+trap clean_up SIGHUP SIGINT SIGTERM
+
 function show_help {
     cat - <<EOF
 Usage: $0 -n number [-a arch] [-l libc] [-v version] [-t target] [-dh]
