@@ -426,6 +426,7 @@ EOF
     rsync -r ${build_dir}/output/legal-info/host-licenses/ ${ssh_server}:${root_folder}/${target}/licenses/    # licenses
     rsync -r ${build_dir}/output/legal-info/host-sources/ ${ssh_server}:${root_folder}/${target}/sources/      # sources
     rsync -r ${build_dir}/output/defconfig ${ssh_server}:${root_folder}/${target}/build_fragments/${release_name}.defconfig             # build fragment
+    ssh ${ssh_server} "touch ${root_folder}/NEED_REFRESH"
 }
 
 function generate {
