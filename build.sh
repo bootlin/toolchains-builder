@@ -131,13 +131,13 @@ function set_qemu_config {
             -kernel ${test_dir}/images/vmlinux
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
             -append \"root=/dev/hda rw\""
-    elif [[ "${arch_name}" == "m68k-68xxxx" ]]; then                    # m68k-68xxxx
-        qemu_defconfig="qemu_m68k_q800_defconfig"
-        qemu_system_command="qemu-system-m68k
-            -machine an5206
-            -kernel ${test_dir}/images/vmlinux
-            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
-            -append \"root=/dev/hda rw\""
+    # elif [[ "${arch_name}" == "m68k-68xxxx" ]]; then                    # m68k-68xxxx (support out of tree)
+    #    qemu_defconfig="qemu_m68k_q800_defconfig"
+    #    qemu_system_command="qemu-system-m68k
+    #        -machine an5206
+    #        -kernel ${test_dir}/images/vmlinux
+    #        -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
+    #        -append \"root=/dev/hda rw\""
     elif [[ "${arch_name}" == "m68k-coldfire" ]]; then                  # m68k-coldfire
         qemu_defconfig="qemu_m68k_mcf5208_defconfig"
         qemu_system_command="qemu-system-m68k
