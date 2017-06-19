@@ -304,6 +304,11 @@ function make_br_fragment {
     if [ "${locale}" == "y" ]; then
         echo "BR2_TOOLCHAIN_EXTERNAL_LOCALE=y" >> ${fragment_file}
     fi
+    if grep "BR2_TOOLCHAIN_HAS_CXX=y" ${configfile} > /dev/null 2>&1; then
+        echo "BR2_TOOLCHAIN_EXTERNAL_HAS_CXX=y" >> ${fragment_file}
+    else
+        echo "# BR2_TOOLCHAIN_EXTERNAL_CXX is not set" >> ${fragment_file}
+    fi
     if grep "BR2_TOOLCHAIN_HAS_SSP=y" ${configfile} > /dev/null 2>&1; then
         echo "BR2_TOOLCHAIN_EXTERNAL_HAS_SSP=y" >> ${fragment_file}
     else
