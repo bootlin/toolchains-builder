@@ -20,6 +20,7 @@ buildroot_dir=${main_dir}/buildroot
 fragment_file=${build_dir}/br_fragment
 base_url_sed="http:\/\/toolchains.free-electrons.com\/downloads\/${target}"
 base_url="http://toolchains.free-electrons.com/downloads/${target}"
+upload_root_folder="www/downloads"
 
 if [ "$target" == "ci_debug" ]; then
     echo "ci_debug is set as target, you should see this line, but the build won't go further."
@@ -408,25 +409,24 @@ EOF
     sha256sum ${release_name}.tar.bz2 > ${release_name}.sha256
 
     # Upload everything
-    root_folder="www/downloads"
-    ssh ${ssh_server} "mkdir -p ${root_folder}/${target}/fragments"
-    ssh ${ssh_server} "mkdir -p ${root_folder}/${target}/toolchains"
-    ssh ${ssh_server} "mkdir -p ${root_folder}/${target}/readmes"
-    ssh ${ssh_server} "mkdir -p ${root_folder}/${target}/summaries"
-    ssh ${ssh_server} "mkdir -p ${root_folder}/${target}/build_test_logs"
-    ssh ${ssh_server} "mkdir -p ${root_folder}/${target}/boot_test_logs"
-    ssh ${ssh_server} "mkdir -p ${root_folder}/${target}/build_fragments"
-    rsync ${testlogfile} ${ssh_server}:${root_folder}/${target}/build_test_logs/                               # build test log file
-    rsync ${bootlogfile} ${ssh_server}:${root_folder}/${target}/boot_test_logs/${release_name}.log             # boot test log file
-    rsync ${readme_file} ${ssh_server}:${root_folder}/${target}/readmes/${release_name}.txt                    # README
-    rsync ${summary_file} ${ssh_server}:${root_folder}/${target}/summaries/${release_name}.csv                 # summary
-    rsync "${release_name}.tar.bz2" ${ssh_server}:${root_folder}/${target}/toolchains/                         # toolchain tarball
-    rsync "${release_name}.sha256" ${ssh_server}:${root_folder}/${target}/toolchains/                          # toolchain checksum
-    rsync "${fragment_file}" ${ssh_server}:${root_folder}/${target}/fragments/${release_name}.frag             # BR fragment
-    rsync -r ${build_dir}/output/legal-info/host-licenses/ ${ssh_server}:${root_folder}/${target}/licenses/    # licenses
-    rsync -r ${build_dir}/output/legal-info/host-sources/ ${ssh_server}:${root_folder}/${target}/sources/      # sources
-    rsync -r ${build_dir}/output/defconfig ${ssh_server}:${root_folder}/${target}/build_fragments/${release_name}.defconfig             # build fragment
-    ssh ${ssh_server} "touch ${root_folder}/NEED_REFRESH"
+    ssh ${ssh_server} "mkdir -p ${upload_root_folder}/${target}/fragments"
+    ssh ${ssh_server} "mkdir -p ${upload_root_folder}/${target}/toolchains"
+    ssh ${ssh_server} "mkdir -p ${upload_root_folder}/${target}/readmes"
+    ssh ${ssh_server} "mkdir -p ${upload_root_folder}/${target}/summaries"
+    ssh ${ssh_server} "mkdir -p ${upload_root_folder}/${target}/build_test_logs"
+    ssh ${ssh_server} "mkdir -p ${upload_root_folder}/${target}/boot_test_logs"
+    ssh ${ssh_server} "mkdir -p ${upload_root_folder}/${target}/build_fragments"
+    rsync ${testlogfile} ${ssh_server}:${upload_root_folder}/${target}/build_test_logs/                               # build test log file
+    rsync ${bootlogfile} ${ssh_server}:${upload_root_folder}/${target}/boot_test_logs/${release_name}.log             # boot test log file
+    rsync ${readme_file} ${ssh_server}:${upload_root_folder}/${target}/readmes/${release_name}.txt                    # README
+    rsync ${summary_file} ${ssh_server}:${upload_root_folder}/${target}/summaries/${release_name}.csv                 # summary
+    rsync "${release_name}.tar.bz2" ${ssh_server}:${upload_root_folder}/${target}/toolchains/                         # toolchain tarball
+    rsync "${release_name}.sha256" ${ssh_server}:${upload_root_folder}/${target}/toolchains/                          # toolchain checksum
+    rsync "${fragment_file}" ${ssh_server}:${upload_root_folder}/${target}/fragments/${release_name}.frag             # BR fragment
+    rsync -r ${build_dir}/output/legal-info/host-licenses/ ${ssh_server}:${upload_root_folder}/${target}/licenses/    # licenses
+    rsync -r ${build_dir}/output/legal-info/host-sources/ ${ssh_server}:${upload_root_folder}/${target}/sources/      # sources
+    rsync -r ${build_dir}/output/defconfig ${ssh_server}:${upload_root_folder}/${target}/build_fragments/${release_name}.defconfig             # build fragment
+    ssh ${ssh_server} "touch ${upload_root_folder}/NEED_REFRESH"
 }
 
 function generate {
@@ -439,13 +439,13 @@ function generate {
     if ! launch_build; then
         echo "Toolchain build failed, not going further"
         echo "Uploading build log"
-        ssh ${ssh_server} "mkdir -p www/${target}/build_logs"
-        rsync ${logfile} ${ssh_server}:www/${target}/build_logs/
+        ssh ${ssh_server} "mkdir -p ${upload_root_folder}/${target}/build_logs"
+        rsync ${logfile} ${ssh_server}:${upload_root_folder}/${target}/build_logs/
         exit 1
     fi
     echo "Uploading build log"
-    ssh ${ssh_server} "mkdir -p www/${target}/build_logs"
-    rsync ${logfile} ${ssh_server}:www/${target}/build_logs/
+    ssh ${ssh_server} "mkdir -p ${upload_root_folder}/${target}/build_logs"
+    rsync ${logfile} ${ssh_server}:${upload_root_folder}/${target}/build_logs/
 
     arch_name=$(echo "${name}" |sed "s/--/\t/" |cut -f 1)
     release_name=${name}-$(cat ${build_dir}/br_version)
