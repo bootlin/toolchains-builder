@@ -429,6 +429,7 @@ EOF
     ssh ${ssh_server} "mkdir -p ${upload_root_folder}/${target}/build_test_logs"
     ssh ${ssh_server} "mkdir -p ${upload_root_folder}/${target}/boot_test_logs"
     ssh ${ssh_server} "mkdir -p ${upload_root_folder}/${target}/build_fragments"
+    ssh ${ssh_server} "mkdir -p ${upload_root_folder}/${target}/available_toolchains"
     rsync ${testlogfile} ${ssh_server}:${upload_root_folder}/${target}/build_test_logs/                               # build test log file
     rsync ${bootlogfile} ${ssh_server}:${upload_root_folder}/${target}/boot_test_logs/${release_name}.log             # boot test log file
     rsync ${readme_file} ${ssh_server}:${upload_root_folder}/${target}/readmes/${release_name}.txt                    # README
@@ -439,6 +440,7 @@ EOF
     rsync -r ${build_dir}/output/legal-info/host-licenses/ ${ssh_server}:${upload_root_folder}/${target}/licenses/    # licenses
     rsync -r ${build_dir}/output/legal-info/host-sources/ ${ssh_server}:${upload_root_folder}/${target}/sources/      # sources
     rsync -r ${build_dir}/output/defconfig ${ssh_server}:${upload_root_folder}/${target}/build_fragments/${release_name}.defconfig             # build fragment
+    ssh ${ssh_server} "touch ${upload_root_folder}/${target}/available_toolchains/${release_name}"                    # toolchain name for webpage listing
     ssh ${ssh_server} "touch ${upload_root_folder}/NEED_REFRESH"
 }
 
