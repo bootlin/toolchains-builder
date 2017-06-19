@@ -303,6 +303,8 @@ function make_br_fragment {
     echo "BR2_TOOLCHAIN_EXTERNAL_HEADERS_${linux_version}=y" >> ${fragment_file}
     if [ "${locale}" == "y" ]; then
         echo "BR2_TOOLCHAIN_EXTERNAL_LOCALE=y" >> ${fragment_file}
+    else
+        echo "# BR2_TOOLCHAIN_EXTERNAL_LOCALE is not set" >> ${fragment_file}
     fi
     if grep "BR2_TOOLCHAIN_HAS_CXX=y" ${configfile} > /dev/null 2>&1; then
         echo "BR2_TOOLCHAIN_EXTERNAL_HAS_CXX=y" >> ${fragment_file}
@@ -316,14 +318,20 @@ function make_br_fragment {
     fi
     if grep "BR2_PTHREAD_DEBUG is not set" ${configfile} > /dev/null 2>&1; then
         echo "BR2_TOOLCHAIN_EXTERNAL_HAS_THREADS_DEBUG=n" >> ${fragment_file}
+    else
+        echo "BR2_TOOLCHAIN_EXTERNAL_HAS_THREADS_DEBUG=y" >> ${fragment_file}
     fi
     if ! grep "BR2_TOOLCHAIN_HAS_THREADS_NPTL=y" ${configfile} > /dev/null 2>&1; then
         echo "# BR2_TOOLCHAIN_EXTERNAL_HAS_THREADS_NPTL is not set" >> ${fragment_file}
+    else
+        echo "BR2_TOOLCHAIN_EXTERNAL_HAS_THREADS_NPTL=y" >> ${fragment_file}
     fi
     if [ "${libc}" == "glibc" ]; then
         echo "BR2_TOOLCHAIN_EXTERNAL_CUSTOM_GLIBC=y" >> ${fragment_file}
     elif [ "${libc}" == "musl" ]; then
         echo "BR2_TOOLCHAIN_EXTERNAL_CUSTOM_MUSL=y" >> ${fragment_file}
+    else
+        echo "BR2_TOOLCHAIN_EXTERNAL_CUSTOM_UCLIBC=y" >> ${fragment_file}
     fi
 
     echo "BEGIN FRAGMENT"
