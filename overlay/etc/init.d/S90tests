@@ -2,9 +2,10 @@
 
 case "$1" in
     start)
-    echo "TROLL"
+    echo "Starting tests"
+    echo "TODO: add some more tests"
     sleep 2
-    echo "POUET"
+    echo "Ending tests"
     ;;
     *)
     echo "This is the toolchain test suite"
