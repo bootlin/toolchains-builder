@@ -73,8 +73,16 @@ function build {
     echo "  finished at $(date)"
 
     cp ${configfile} ${toolchaindir}/buildroot.config
-    mv ${toolchaindir}/usr/* ${toolchaindir}/
-    rmdir ${toolchaindir}/usr
+
+    # Different versions of buildroot don't always product the same thing with
+    # usr. Old version make usr to be a folder containing the toolchain, newer
+    # version just make it a symbolic link for compatibility.
+    if ! [ -L ${toolchaindir}/usr ]; then
+        mv ${toolchaindir}/usr/* ${toolchaindir}/
+        rmdir ${toolchaindir}/usr
+    else
+        rm ${toolchaindir}/usr
+    fi
     # Toolchain built
 }
 
