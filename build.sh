@@ -18,7 +18,7 @@ build_dir=${chroot_dir}/tmp
 chroot_script="build_chroot.sh"
 buildroot_dir=${main_dir}/buildroot
 fragment_file=${build_dir}/br_fragment
-base_url_sed="http:\/\/toolchains.free-electrons.com\/downloads\/${target}"
+base_url_sed="http:\/\/toolchains.free-electrons.com\/downloads\/${target}\/toolchains"
 base_url="http://toolchains.free-electrons.com/downloads/${target}"
 upload_root_folder="www/downloads"
 
@@ -346,7 +346,7 @@ function package {
 
     # Update fragment file for release
     sed -i "s/PREINSTALLED/DOWNLOAD/" ${fragment_file}
-    sed -i "s/BR2_TOOLCHAIN_EXTERNAL_PATH=\".*\"/BR2_TOOLCHAIN_EXTERNAL_URL=\"${base_url_sed}\/toolchains\/${release_name}.tar.bz2\"/" ${fragment_file}
+    sed -i "s/BR2_TOOLCHAIN_EXTERNAL_PATH=\".*\"/BR2_TOOLCHAIN_EXTERNAL_URL=\"${base_url_sed}\/${arch_name}\/tarballs\/${release_name}.tar.bz2\"/" ${fragment_file}
     sed -i "/BR2_WGET/d" ${fragment_file}
     cp ${fragment_file} ${toolchain_dir}
 
@@ -421,26 +421,28 @@ EOF
     tar cjf `basename ${release_name}`.tar.bz2 `basename ${toolchain_dir}`
     sha256sum ${release_name}.tar.bz2 > ${release_name}.sha256
 
+    upload_folder=${upload_root_folder}/${target}/toolchains/${arch_name}
+
     # Upload everything
-    ssh ${ssh_server} "mkdir -p ${upload_root_folder}/${target}/fragments"
-    ssh ${ssh_server} "mkdir -p ${upload_root_folder}/${target}/toolchains"
-    ssh ${ssh_server} "mkdir -p ${upload_root_folder}/${target}/readmes"
-    ssh ${ssh_server} "mkdir -p ${upload_root_folder}/${target}/summaries"
-    ssh ${ssh_server} "mkdir -p ${upload_root_folder}/${target}/build_test_logs"
-    ssh ${ssh_server} "mkdir -p ${upload_root_folder}/${target}/boot_test_logs"
-    ssh ${ssh_server} "mkdir -p ${upload_root_folder}/${target}/build_fragments"
-    ssh ${ssh_server} "mkdir -p ${upload_root_folder}/${target}/available_toolchains"
-    rsync ${testlogfile} ${ssh_server}:${upload_root_folder}/${target}/build_test_logs/                               # build test log file
-    rsync ${bootlogfile} ${ssh_server}:${upload_root_folder}/${target}/boot_test_logs/${release_name}.log             # boot test log file
-    rsync ${readme_file} ${ssh_server}:${upload_root_folder}/${target}/readmes/${release_name}.txt                    # README
-    rsync ${summary_file} ${ssh_server}:${upload_root_folder}/${target}/summaries/${release_name}.csv                 # summary
-    rsync "${release_name}.tar.bz2" ${ssh_server}:${upload_root_folder}/${target}/toolchains/                         # toolchain tarball
-    rsync "${release_name}.sha256" ${ssh_server}:${upload_root_folder}/${target}/toolchains/                          # toolchain checksum
-    rsync "${fragment_file}" ${ssh_server}:${upload_root_folder}/${target}/fragments/${release_name}.frag             # BR fragment
-    rsync -r ${build_dir}/output/legal-info/host-licenses/ ${ssh_server}:${upload_root_folder}/${target}/licenses/    # licenses
-    rsync -r ${build_dir}/output/legal-info/host-sources/ ${ssh_server}:${upload_root_folder}/${target}/sources/      # sources
-    rsync -r ${build_dir}/output/defconfig ${ssh_server}:${upload_root_folder}/${target}/build_fragments/${release_name}.defconfig             # build fragment
-    ssh ${ssh_server} "touch ${upload_root_folder}/${target}/available_toolchains/${release_name}"                    # toolchain name for webpage listing
+    ssh ${ssh_server} "mkdir -p ${upload_folder}/fragments"
+    ssh ${ssh_server} "mkdir -p ${upload_folder}/tarballs"
+    ssh ${ssh_server} "mkdir -p ${upload_folder}/readmes"
+    ssh ${ssh_server} "mkdir -p ${upload_folder}/summaries"
+    ssh ${ssh_server} "mkdir -p ${upload_folder}/build_test_logs"
+    ssh ${ssh_server} "mkdir -p ${upload_folder}/boot_test_logs"
+    ssh ${ssh_server} "mkdir -p ${upload_folder}/build_fragments"
+    ssh ${ssh_server} "mkdir -p ${upload_folder}/available_toolchains"
+    rsync ${testlogfile} ${ssh_server}:${upload_folder}/build_test_logs/                                            # build test log file
+    rsync ${bootlogfile} ${ssh_server}:${upload_folder}/boot_test_logs/${release_name}.log                          # boot test log file
+    rsync ${readme_file} ${ssh_server}:${upload_folder}/readmes/${release_name}.txt                                 # README
+    rsync ${summary_file} ${ssh_server}:${upload_folder}/summaries/${release_name}.csv                              # summary
+    rsync "${release_name}.tar.bz2" ${ssh_server}:${upload_folder}/tarballs/                                        # toolchain tarball
+    rsync "${release_name}.sha256" ${ssh_server}:${upload_folder}/tarballs/                                         # toolchain checksum
+    rsync "${fragment_file}" ${ssh_server}:${upload_folder}/fragments/${release_name}.frag                          # BR fragment
+    rsync -r ${build_dir}/output/defconfig ${ssh_server}:${upload_folder}/build_fragments/${release_name}.defconfig # build fragment
+    rsync -r ${build_dir}/output/legal-info/host-licenses/ ${ssh_server}:${upload_root_folder}/${target}/licenses/  # licenses
+    rsync -r ${build_dir}/output/legal-info/host-sources/ ${ssh_server}:${upload_root_folder}/${target}/sources/    # sources
+    ssh ${ssh_server} "touch ${upload_folder}/available_toolchains/${release_name}"                                 # toolchain name for webpage listing
     ssh ${ssh_server} "touch ${upload_root_folder}/NEED_REFRESH"
 }
 
