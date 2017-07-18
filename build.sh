@@ -370,7 +370,7 @@ For those who would like to reproduce the toolchain, you can just follow these s
     cd buildroot
     git checkout ${buildroot_tree}
 
-    curl ${base_url}/build_fragments/${release_name}.defconfig > .config
+    curl ${base_url}/toolchains/${arch_name}/build_fragments/${release_name}.defconfig > .config
     make olddefconfig
     make
 EOF
