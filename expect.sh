@@ -4,7 +4,7 @@
 set timeout 180
 
 log_file /tmp/expect_session.log
-spawn telnet localhost 4000
+eval spawn $env(QEMU_COMMAND)
 
 expect {
     eof {puts "Connection problem, exiting."; exit 1}

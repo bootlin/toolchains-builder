@@ -38,24 +38,30 @@ function set_qemu_config {
     if [[ "${arch_name}" =~ ^"armv"."-".* ]]; then                      # armvX-*
         qemu_defconfig="qemu_arm_vexpress_defconfig"
         qemu_system_command="qemu-system-arm
-            -machine vexpress-a9
+            -machine vexpress-a9 -smp 1 -m 256
             -kernel ${test_dir}/images/zImage
             -dtb ${test_dir}/images/vexpress-v2p-ca9.dtb
             -drive file=${test_dir}/images/rootfs.ext2,if=sd,format=raw
-            -append \"console=ttyAMA0,115200 root=/dev/mmcblk0 rw\""
+            -append \"console=ttyAMA0,115200 root=/dev/mmcblk0\"
+            -net nic,model=lan9118 -net user
+            -nographic"
     elif [[ "${arch_name}" == "armv7m" ]]; then                        # armv7m
         qemu_defconfig="qemu_arm_versatile_nommu_defconfig"
         qemu_system_command="qemu-system-arm
             -machine versatilepb
             -kernel ${test_dir}/images/zImage
-            -append \"console=ttyAMA0\""
+            -append \"console=ttyAMA0,115200\"
+            -net user -net nic,model=smc91c111
+            -nographic"
     elif [[ "${arch_name}" == "aarch64" ]]; then                        # aarch64
         qemu_defconfig="qemu_aarch64_virt_defconfig"
         # Qemu 2.8 has been tested and works, 2.5 does not.
         qemu_system_command="qemu-system-aarch64
-            -machine virt -cpu cortex-a53 -machine type=virt
+            -machine virt -cpu cortex-a57 -smp 1
             -kernel ${test_dir}/images/Image
-            -append \"console=ttyAMA0\""
+            -append \"console=ttyAMA0\"
+            -netdev user,id=eth0 -device virtio-net-device,netdev=eth0
+            -nographic"
     # elif [[ "${arch_name}" == "aarch64be" ]]; then                      # aarch64be (not supported by qemu yet)
     #     qemu_defconfig="qemu_aarch64_virt_defconfig"
     #     # Qemu 2.8 has been tested and works, 2.5 does not.
@@ -72,66 +78,76 @@ function set_qemu_config {
             -machine petalogix-s3adsp1800
             -kernel ${test_dir}/images/linux.bin
             -drive file=${test_dir}/images/rootfs.cpio,index=0,media=disk,format=raw
-            -append \"root=/dev/sda rw\""
+            -append \"root=/dev/sda rw\"
+            -nographic"
     elif [[ "${arch_name}" == "microblazeel" ]]; then                   # microblazeel
         qemu_defconfig="qemu_microblazeel_mmu_defconfig"
         qemu_system_command="qemu-system-microblazeel
             -machine petalogix-s3adsp1800
             -kernel ${test_dir}/images/linux.bin
             -drive file=${test_dir}/images/rootfs.cpio,index=0,media=disk,format=raw
-            -append \"root=/dev/sda rw\""
+            -append \"root=/dev/sda rw\"
+            -nographic"
     elif [[ "${arch_name}" == "mips32" ]]; then                         # mips32
         qemu_defconfig="qemu_mips32r2_malta_defconfig"
         qemu_system_command="qemu-system-mips
             -machine malta
             -kernel ${test_dir}/images/vmlinux
-            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
-            -append \"root=/dev/hda rw\""
+            -drive file=${test_dir}/images/rootfs.ext2,format=raw
+            -append \"root=/dev/hda rw\"
+            -net nic,model=pcnet -net user
+            -nographic"
     elif [[ "${arch_name}" == "mips32el" ]]; then                       # mips32el
         qemu_defconfig="qemu_mips32r2el_malta_defconfig"
         qemu_system_command="qemu-system-mipsel
             -machine malta
             -kernel ${test_dir}/images/vmlinux
-            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
-            -append \"root=/dev/hda rw\""
+            -drive file=${test_dir}/images/rootfs.ext2,format=raw
+            -append \"root=/dev/hda rw\"
+            -nographic"
     elif [[ "${arch_name}" == "mips32r5el" ]]; then                     # mips32r5el
         qemu_defconfig="qemu_mips32r2el_malta_defconfig"
         qemu_system_command="qemu-system-mipsel
             -machine malta
             -cpu P5600
             -kernel ${test_dir}/images/vmlinux
-            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
-            -append \"root=/dev/hda rw\""
+            -drive file=${test_dir}/images/rootfs.ext2,format=raw
+            -append \"root=/dev/hda rw\"
+            -nographic"
     elif [[ "${arch_name}" == "mips32r6el" ]]; then                     # mips32r6el
         qemu_defconfig="qemu_mips32r6el_malta_defconfig"
         qemu_system_command="qemu-system-mipsel
             -machine malta
             -cpu mips32r6-generic
             -kernel ${test_dir}/images/vmlinux
-            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
-            -append \"root=/dev/hda rw\""
+            -drive file=${test_dir}/images/rootfs.ext2,format=raw
+            -append \"root=/dev/hda rw\"
+            -nographic"
     elif [[ "${arch_name}" == "mips64" ]]; then                         # mips64
         qemu_defconfig="qemu_mips64_malta_defconfig"
         qemu_system_command="qemu-system-mips64
             -machine malta
             -kernel ${test_dir}/images/vmlinux
-            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
-            -append \"root=/dev/hda rw\""
+            -drive file=${test_dir}/images/rootfs.ext2,format=raw
+            -append \"root=/dev/hda rw\"
+            -nographic"
     elif [[ "${arch_name}" == "mips64el-n32" ]]; then                   # mips64el-n32
         qemu_defconfig="qemu_mips64el_malta_defconfig"
         qemu_system_command="qemu-system-mips64el
             -machine malta
             -kernel ${test_dir}/images/vmlinux
-            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
-            -append \"root=/dev/hda rw\""
+            -drive file=${test_dir}/images/rootfs.ext2,format=raw
+            -append \"root=/dev/hda rw\"
+            -nographic"
     elif [[ "${arch_name}" == "mips64r6el-n32" ]]; then                 # mips64r6el-n32
         qemu_defconfig="qemu_mips64r6el_malta_defconfig"
         qemu_system_command="qemu-system-mips64el
             -machine malta
             -cpu I6400
             -kernel ${test_dir}/images/vmlinux
-            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
-            -append \"root=/dev/hda rw\""
+            -drive file=${test_dir}/images/rootfs.ext2,format=raw
+            -append \"root=/dev/hda rw\"
+            -nographic"
     # elif [[ "${arch_name}" == "m68k-68xxxx" ]]; then                    # m68k-68xxxx (support out of tree)
     #    qemu_defconfig="qemu_m68k_q800_defconfig"
     #    qemu_system_command="qemu-system-m68k
@@ -145,7 +161,8 @@ function set_qemu_config {
             -machine mcf5208evb
             -kernel ${test_dir}/images/vmlinux
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
-            -append \"root=/dev/hda rw\""
+            -append \"root=/dev/hda rw\"
+            -nographic"
     # elif [[ "${arch_name}" == "nios2" ]]; then                          # nios2 (no support in 2.8, coming in 2.9)
     #     qemu_defconfig="qemu_nios2_10m50_defconfig"
     #     qemu_system_command="qemu-system-nios2
@@ -157,37 +174,47 @@ function set_qemu_config {
             -cpu POWER7
             -kernel ${test_dir}/images/vmlinux
             -drive file=${test_dir}/images/rootfs.ext2,index=0,if=scsi,format=raw
-            -append \"console=hvc0 root=/dev/sda rw\""
+            -append \"console=hvc0 root=/dev/sda rw\"
+            -display curses
+            -nographic"
     elif [[ "${arch_name}" == "sh-sh4" ]]; then                         # sh4
         qemu_defconfig="qemu_sh4_r2d_defconfig"
         qemu_system_command="qemu-system-sh4
             -machine r2d
             -kernel ${test_dir}/images/zImage
             -drive file=${test_dir}/images/rootfs.ext2,index=0,if=ide,format=raw
+            -append \"root=/dev/sda console=ttySC1,115200 noiotrap\"
+            -net nic,model=rtl8139 -net user
             -serial null
-            -append \"root=/dev/sda rw console=ttySC1,115200 noiotrap\""
+            -nographic"
     elif [[ "${arch_name}" == "sparc64" ]]; then                        # sparc64
         qemu_defconfig="qemu_sparc64_sun4u_defconfig"
         qemu_system_command="qemu-system-sparc64
             -machine sun4u
             -kernel ${test_dir}/images/vmlinux
-            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
-            -append \"root=/dev/sda rw console=ttyS0,115200\""
+            -drive file=${test_dir}/images/rootfs.ext2,format=raw
+            -append \"root=/dev/sda console=ttyS0,115200\"
+            -net nic,model=e1000 -net user
+            -nographic"
     elif [[ "${arch_name}" == "sparcv8" ]]; then                        # sparcv8
         qemu_defconfig="qemu_sparc_ss10_defconfig"
         qemu_system_command="qemu-system-sparc
             -machine SS-10
             -kernel ${test_dir}/images/zImage
-            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
-            -append \"root=/dev/sda rw console=ttyS0,115200\""
+            -drive file=${test_dir}/images/rootfs.ext2,format=raw
+            -append \"root=/dev/sda console=ttyS0,115200\"
+            -net nic,model=lance -net user
+            -nographic"
     elif [[ "${arch_name}" == "x86-core2" ]]; then                      # x86-core2
         qemu_defconfig="qemu_x86_defconfig"
         sed -i "s/tty1/ttyS0/" ${buildroot_dir}/configs/${qemu_defconfig}
         qemu_system_command="qemu-system-i386
             -machine pc
             -kernel ${test_dir}/images/bzImage
-            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
-            -append \"root=/dev/sda rw console=ttyS0\""
+            -drive file=${test_dir}/images/rootfs.ext2,format=raw
+            -append \"root=/dev/sda rw console=ttyS0\"
+            -net nic,model=virtio -net user
+            -nographic"
     elif [[ "${arch_name}" == "x86-i686" ]]; then                       # x86-i686
         qemu_defconfig="qemu_x86_defconfig"
         sed -i "s/tty1/ttyS0/" ${buildroot_dir}/configs/${qemu_defconfig}
@@ -195,7 +222,9 @@ function set_qemu_config {
             -machine pc
             -kernel ${test_dir}/images/bzImage
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
-            -append \"root=/dev/sda rw console=ttyS0\""
+            -append \"root=/dev/sda rw console=ttyS0\"
+            -net nic,model=virtio -net user
+            -nographic"
     elif [[ "${arch_name}" == "x86-64-core-i7" ]]; then                 # x86-64-core-i7
         qemu_defconfig="qemu_x86_64_defconfig"
         sed -i "s/tty1/ttyS0/" ${buildroot_dir}/configs/${qemu_defconfig}
@@ -203,14 +232,17 @@ function set_qemu_config {
             -machine pc
             -kernel ${test_dir}/images/bzImage
             -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
-            -append \"root=/dev/sda rw console=ttyS0\""
+            -append \"root=/dev/sda rw console=ttyS0\"
+            -net nic,model=virtio -net user
+            -nographic"
     elif [[ "${arch_name}" == "xtensa-lx60" ]]; then                    # xtensa-lx60
         qemu_defconfig="qemu_xtensa_lx60_defconfig"
         qemu_system_command="qemu-system-xtensa
             -machine lx60
             -cpu dc233c
+            -kernel ${test_dir}/images/Image.elf
             -monitor null
-            -kernel ${test_dir}/images/Image.elf"
+            -nographic"
     else
         qemu_defconfig=""
         qemu_system_command=""
@@ -219,24 +251,13 @@ function set_qemu_config {
 
 function boot_test {
     echo "  booting test system ... "
-    qemu_system_command="${qemu_system_command}
-            -serial telnet:127.0.0.1:4000,server,nowait,nodelay
-            -nographic"
+    export QEMU_COMMAND="$(echo "${qemu_system_command}"|tr -d '\n')"
     echo "  boot command: ${qemu_system_command}"
-    eval ${qemu_system_command} &
-    echo $! > /tmp/qemu-test.pid
-    sleep 2
-    if ! ps p $(cat /tmp/qemu-test.pid) &>/dev/null; then
-        echo "  Failed to launch qemu ... Not going further"
-        return 1
-    fi
     if ! expect expect.sh; then
         echo "  booting test system ... FAILED"
-        kill -9 $(cat /tmp/qemu-test.pid)
         return 1
     fi
     echo "  booting test system ... SUCCESS"
-    kill -9 $(cat /tmp/qemu-test.pid)
     return 0
 }
 
