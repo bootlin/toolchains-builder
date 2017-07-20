@@ -474,12 +474,6 @@ function generate {
     bootlogfile=/tmp/expect_session.log
     arch_name=$(echo "${name}" |sed "s/--/\t/" |cut -f 1)
     upload_folder=${upload_root_folder}/${target}/toolchains/${arch_name}
-    release_name=${name}-$(cat ${build_dir}/br_version)
-    [[ "$version_number" != "" ]] && release_name="${release_name}-$version_number"
-    toolchain_dir="${build_dir}/${name}"
-    configfile=${toolchain_dir}/buildroot.config
-    test_dir=${build_dir}/test-${name}
-    overlaydir=${test_dir}/overlay
 
     if ! launch_build; then
         echo "Toolchain build failed, not going further"
@@ -491,6 +485,13 @@ function generate {
     echo "Uploading build log"
     ssh ${ssh_server} "mkdir -p ${upload_folder}/build_logs"
     rsync ${logfile} ${ssh_server}:${upload_folder}/build_logs/
+
+    release_name=${name}-$(cat ${build_dir}/br_version)
+    [[ "$version_number" != "" ]] && release_name="${release_name}-$version_number"
+    toolchain_dir="${build_dir}/${name}"
+    configfile=${toolchain_dir}/buildroot.config
+    test_dir=${build_dir}/test-${name}
+    overlaydir=${test_dir}/overlay
 
     make_br_fragment
     set_qemu_config
