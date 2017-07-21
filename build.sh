@@ -123,7 +123,7 @@ function set_qemu_config {
             -drive file=${test_dir}/images/rootfs.ext2,format=raw
             -append \"root=/dev/hda rw\"
             -nographic"
-    elif [[ "${arch_name}" == "mips64" ]]; then                         # mips64
+    elif [[ "${arch_name}" == "mips64-n32" ]]; then                     # mips64-32
         qemu_defconfig="qemu_mips64_malta_defconfig"
         qemu_system_command="qemu-system-mips64
             -machine malta
@@ -183,9 +183,10 @@ function set_qemu_config {
             -machine r2d
             -kernel ${test_dir}/images/zImage
             -drive file=${test_dir}/images/rootfs.ext2,index=0,if=ide,format=raw
-            -append \"root=/dev/sda console=ttySC1,115200 noiotrap\"
+            -append \"root=/dev/sda rw console=ttySC1,115200 noiotrap\"
             -net nic,model=rtl8139 -net user
             -serial null
+            -serial stdio
             -nographic"
     elif [[ "${arch_name}" == "sparc64" ]]; then                        # sparc64
         qemu_defconfig="qemu_sparc64_sun4u_defconfig"
