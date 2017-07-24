@@ -1,9 +1,29 @@
 #!/bin/bash
 
+name=$1
+
 apt-get install -y --force-yes -qq --no-install-recommends \
     build-essential locales bc ca-certificates file rsync gcc-multilib \
     git bzr cvs mercurial subversion unzip wget cpio curl git-core \
     libc6-i386 2>&1 1>/dev/null
+
+set -x
+if grep "bleeding-edge" <<<"${name}"; then
+    echo "deb http://ftp.us.debian.org/debian/ jessie main non-free contrib" >> /etc/apt/sources.list
+    cat - >> /etc/apt/preferences <<EOF
+Package: *
+Pin: release a=squeeze
+Pin-Priority: 900
+
+Package: gcc*
+Pin: release a=jessie
+Pin-Priority: 910
+EOF
+    apt-get update
+    apt-get -y --force-yes -qq --no-install-recommends -t jessie install gcc-4.8
+    gcc --version
+fi
+set +x
 
 sed -i 's/# \(en_US.UTF-8\)/\1/' /etc/locale.gen
 /usr/sbin/locale-gen
@@ -14,7 +34,6 @@ TOOLCHAIN_DIR=$(pwd)
 TOOLCHAIN_BUILD_DIR=${TOOLCHAIN_DIR}
 TOOLCHAIN_BR_DIR=${TOOLCHAIN_DIR}/buildroot
 
-name=$1
 toolchaindir=${TOOLCHAIN_BUILD_DIR}/${name}
 logfile=${TOOLCHAIN_BUILD_DIR}/${name}-build.log
 builddir=${TOOLCHAIN_BUILD_DIR}/output
