@@ -283,6 +283,15 @@ function build_test {
         echo "olddefconfig failed"
         return 1
     fi
+    make -C ${buildroot_dir} O=${test_dir} savedefconfig > /dev/null 2>&1
+    if [ $? -ne 0 ] ; then
+        echo "savedefconfig failed"
+        return 1
+    fi
+    echo "=================== BEGIN TEST SYSTEM DEFCONFIG ======================"
+    cat ${test_dir}/defconfig
+    echo "=================== END TEST SYSTEM DEFCONFIG ======================"
+
     echo "  building test system"
     make -C ${buildroot_dir} O=${test_dir} > ${testlogfile} 2>&1
     if [ $? -ne 0 ] ; then
