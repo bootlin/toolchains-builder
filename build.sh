@@ -279,6 +279,10 @@ function build_test {
     echo "  starting test system build at $(date)"
     echo "  making old config"
     make -C ${buildroot_dir} O=${test_dir} olddefconfig > /dev/null 2>&1
+    if [ $? -ne 0 ] ; then
+        echo "olddefconfig failed"
+        return 1
+    fi
     echo "  building test system"
     make -C ${buildroot_dir} O=${test_dir} > ${testlogfile} 2>&1
     if [ $? -ne 0 ] ; then
