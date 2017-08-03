@@ -297,7 +297,6 @@ function launch_build {
     echo "  Setup chroot and launch build"
     rm -rf ${build_dir}
     mkdir -p ${build_dir}
-    set -x
     debootstrap --variant=buildd squeeze ${chroot_dir} http://archive.debian.org/debian/ 2>&1 1>/dev/null
     mkdir ${chroot_dir}/proc
     mount --bind /proc ${chroot_dir}/proc
@@ -306,8 +305,8 @@ function launch_build {
     cp chroot.conf /etc/schroot/schroot.conf
     cp /etc/resolv.conf ${chroot_dir}/etc/resolv.conf
     echo "  chrooting to ${chroot_dir}"
+    # This line MUST be the last one of this function to forward the errors
     chroot ${chroot_dir} /tmp/build_chroot.sh ${name} ${buildroot_tree}
-    set +x
 }
 
 function make_br_fragment {
