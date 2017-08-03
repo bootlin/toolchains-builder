@@ -28,11 +28,18 @@ if [ "$target" == "ci_debug" ]; then
     exit 0;
 fi
 
-if git clone https://github.com/free-electrons/buildroot-toolchains.git ${buildroot_dir}; then
-    cd ${buildroot_dir}
-    git checkout $buildroot_tree
-    cd ${main_dir}
+git clone https://github.com/free-electrons/buildroot-toolchains.git ${buildroot_dir}
+if [ $? -ne 0 ] ; then
+	exit 1
 fi
+
+cd ${buildroot_dir}
+git checkout $buildroot_tree
+if [ $? -ne 0 ] ; then
+	exit 1
+fi
+echo "Buildroot version: " $(git describe)
+cd ${main_dir}
 
 function set_qemu_config {
     if [[ "${arch_name}" =~ ^"armv"."-".* ]]; then                      # armvX-*
