@@ -35,6 +35,7 @@ fi
 cd ${TOOLCHAIN_DIR}
 
 git --git-dir=${TOOLCHAIN_BR_DIR}/.git describe > br_version
+echo "Buildroot version: " $(cat br_version)
 
 mkdir -p ${TOOLCHAIN_BUILD_DIR} &>/dev/null
 
