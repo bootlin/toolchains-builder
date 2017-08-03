@@ -7,23 +7,6 @@ apt-get install -y --force-yes -qq --no-install-recommends \
     git bzr cvs mercurial subversion unzip wget cpio curl git-core \
     libc6-i386 2>&1 1>/dev/null
 
-set -x
-if grep "bleeding-edge" <<<"${name}"; then
-    echo "deb http://ftp.us.debian.org/debian/ jessie main non-free contrib" >> /etc/apt/sources.list
-    cat - >> /etc/apt/preferences <<EOF
-Package: *
-Pin: release a=squeeze
-Pin-Priority: 900
-
-Package: gcc*
-Pin: release a=jessie
-Pin-Priority: 910
-EOF
-    apt-get update
-    apt-get -y --force-yes -qq --no-install-recommends -t jessie install gcc-4.8
-    gcc --version
-fi
-set +x
 
 sed -i 's/# \(en_US.UTF-8\)/\1/' /etc/locale.gen
 /usr/sbin/locale-gen

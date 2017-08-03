@@ -297,7 +297,13 @@ function launch_build {
     echo "  Setup chroot and launch build"
     rm -rf ${build_dir}
     mkdir -p ${build_dir}
-    debootstrap --variant=buildd squeeze ${chroot_dir} http://archive.debian.org/debian/ 2>&1 1>/dev/null
+
+    if grep "bleeding-edge" <<<"${name}"; then
+        debootstrap --variant=buildd jessie ${chroot_dir} http://ftp.us.debian.org/debian/ 2>&1 1>/dev/null
+    else
+        debootstrap --variant=buildd squeeze ${chroot_dir} http://archive.debian.org/debian/ 2>&1 1>/dev/null
+    fi
+
     mkdir ${chroot_dir}/proc
     mount --bind /proc ${chroot_dir}/proc
     cp ${chroot_script} ${build_dir}
