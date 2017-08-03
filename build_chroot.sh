@@ -100,6 +100,7 @@ function build {
         mv ${toolchaindir}/usr/* ${toolchaindir}/
         rmdir ${toolchaindir}/usr
     else
+        make sdk
         rm ${toolchaindir}/usr
     fi
     # Toolchain built
