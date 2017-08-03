@@ -73,7 +73,7 @@ function build {
     echo "==================== END DEFCONFIG ======================="
 
     # Build
-    timeout 225m make -C ${TOOLCHAIN_BR_DIR} O=${builddir} > ${logfile} 2>&1
+    timeout 225m make -C ${TOOLCHAIN_BR_DIR} O=${builddir} 2>&1 | tee ${logfile} | grep --colour=never ">>>"
     if [ $? -ne 0 ] ; then
         echo "  finished at $(date) ... FAILED"
         echo "  printing the end of the logs before exiting"
