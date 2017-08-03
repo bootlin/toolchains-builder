@@ -22,11 +22,17 @@ logfile=${TOOLCHAIN_BUILD_DIR}/${name}-build.log
 builddir=${TOOLCHAIN_BUILD_DIR}/output
 configfile=${builddir}/.config
 
-if git clone https://github.com/free-electrons/buildroot-toolchains.git ${TOOLCHAIN_BR_DIR}; then
-    cd ${TOOLCHAIN_BR_DIR}
-    git checkout $2
-    cd ${TOOLCHAIN_DIR}
+git clone https://github.com/free-electrons/buildroot-toolchains.git ${TOOLCHAIN_BR_DIR}
+if [ $? -ne 0 ] ; then
+	exit 1
 fi
+
+cd ${TOOLCHAIN_BR_DIR}
+git checkout $2
+if [ $? -ne 0 ] ; then
+	exit 1
+fi
+cd ${TOOLCHAIN_DIR}
 
 git --git-dir=${TOOLCHAIN_BR_DIR}/.git describe > br_version
 
@@ -49,9 +55,15 @@ function build {
 
     # Generate the full configuration
     make -C ${TOOLCHAIN_BR_DIR} O=${builddir} olddefconfig > /dev/null 2>&1
+    if [ $? -ne 0 ] ; then
+	    return 1
+    fi
 
     # Generate fragment to ship in the README
     make -C ${TOOLCHAIN_BR_DIR} O=${builddir} savedefconfig > /dev/null 2>&1
+    if [ $? -ne 0 ] ; then
+	    return 1
+    fi
 
     # Build
     timeout 225m make -C ${TOOLCHAIN_BR_DIR} O=${builddir} > ${logfile} 2>&1
@@ -72,6 +84,9 @@ function build {
     # Making legals
     echo "  making legal infos at $(date)"
     make -C ${TOOLCHAIN_BR_DIR} O=${builddir} legal-info > /dev/null 2>&1
+    if [ $? -ne 0 ] ; then
+	    return 1
+    fi
     echo "  finished at $(date)"
 
     cp ${configfile} ${toolchaindir}/buildroot.config
@@ -84,6 +99,9 @@ function build {
         rmdir ${toolchaindir}/usr
     else
         make sdk
+        if [ $? -ne 0 ] ; then
+		return 1
+        fi
         rm ${toolchaindir}/usr
     fi
     # Toolchain built
