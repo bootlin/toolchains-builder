@@ -114,9 +114,13 @@ function check_config {
 }
 
 # Get buildroot if it's not done to check the configurations
-git clone https://github.com/free-electrons/buildroot-toolchains.git ${br_path}
+if [ ! -d ${br_path} ] ; then
+       git clone https://github.com/free-electrons/buildroot-toolchains.git ${br_path}
+fi
+
 cd ${br_path}
-git checkout ${opt_brtree}
+git fetch origin
+git reset --hard origin/${opt_brtree}
 cd ${base_dir}
 
 git branch -D ${git_build_branch}
