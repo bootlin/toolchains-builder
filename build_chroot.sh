@@ -65,6 +65,10 @@ function build {
 	    return 1
     fi
 
+    echo "=================== BEGIN DEFCONFIG ======================"
+    cat ${builddir}/defconfig
+    echo "==================== END DEFCONFIG ======================="
+
     # Build
     timeout 225m make -C ${TOOLCHAIN_BR_DIR} O=${builddir} > ${logfile} 2>&1
     if [ $? -ne 0 ] ; then
@@ -73,9 +77,6 @@ function build {
         echo "=================== BEGIN LOG FILE ======================"
         tail -n 200 ${logfile}
         echo "==================== END LOG FILE ======================="
-        echo "=================== BEGIN DEFCONFIG ======================"
-        cat ${builddir}/defconfig
-        echo "==================== END DEFCONFIG ======================="
         return 1
     fi
 
