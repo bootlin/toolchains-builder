@@ -1,6 +1,7 @@
 #!/bin/bash
 
 name=$1
+brcommit=$2
 
 apt-get install -y --force-yes -qq --no-install-recommends \
     build-essential locales bc ca-certificates file rsync gcc-multilib \
@@ -28,7 +29,8 @@ if [ $? -ne 0 ] ; then
 fi
 
 cd ${TOOLCHAIN_BR_DIR}
-git checkout $2
+echo "Checking out commit: ${brcommit}"
+git checkout ${brcommit}
 if [ $? -ne 0 ] ; then
 	exit 1
 fi
