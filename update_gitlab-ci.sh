@@ -87,6 +87,7 @@ done
 
 if [ "${opt_number}" = "" ]; then
     echo "You MUST specify a version number with -n <number>"
+    show_help
     exit 1
 fi
 
