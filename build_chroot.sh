@@ -102,7 +102,7 @@ function build {
         mv ${toolchaindir}/usr/* ${toolchaindir}/
         rmdir ${toolchaindir}/usr
     else
-        make sdk
+        make -C ${TOOLCHAIN_BR_DIR} O=${builddir} sdk
         if [ $? -ne 0 ] ; then
 		return 1
         fi
