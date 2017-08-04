@@ -485,7 +485,7 @@ EOF
     rsync "${release_name}.tar.bz2" ${ssh_server}:${upload_folder}/tarballs/                                        # toolchain tarball
     rsync "${release_name}.sha256" ${ssh_server}:${upload_folder}/tarballs/                                         # toolchain checksum
     rsync "${fragment_file}" ${ssh_server}:${upload_folder}/fragments/${release_name}.frag                          # BR fragment
-    rsync ${test_dir}/defconfig ${ssh_server}:${upload_folder}/${release_name}_system_defconfig                     # test system defconfig
+    rsync ${test_dir}/defconfig ${ssh_server}:${upload_folder}/test_system_defconfigs/${release_name}.defconfig     # test system defconfig
     rsync -r ${build_dir}/output/defconfig ${ssh_server}:${upload_folder}/build_fragments/${release_name}.defconfig # build fragment
     rsync -r ${build_dir}/output/legal-info/host-licenses/ ${ssh_server}:${upload_root_folder}/${target}/licenses/  # licenses
     rsync -r ${build_dir}/output/legal-info/host-sources/ ${ssh_server}:${upload_root_folder}/${target}/sources/    # sources
