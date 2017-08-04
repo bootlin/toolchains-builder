@@ -1,5 +1,29 @@
 #!/bin/bash
 
+if [ $# -ne 4 ]; then
+    cat - <<EOF
+    Usage: $0 name target buildroot_treeish version_nb
+
+name:
+        This is the name of the toolchain you are compiling. The name should at
+        least begin with "architecture-name--whatever". The double dash is mandatory
+        for it is used a splitting token.
+
+target:
+        The folder in which to upload the toolchains. 'releases' is the
+        production one, so be careful.
+
+buildroot_treeish:
+        A git tree-ish object in which to checkout Buildroot for any of its uses
+        accross the process.
+
+version_nb:
+        A string appended to the toolchain name, useful not to override existing
+        ones in the same target.
+EOF
+    exit 1
+fi
+
 echo "Building $1"
 echo "Target: $2"
 echo "Buildroot tree: $3"

@@ -1,5 +1,20 @@
 #!/bin/bash
 
+if ! [ $# -eq 2 ]; then
+    cat - <<EOF
+    Usage: $0 toolchain_name buildroot-treeish
+
+toolchain_name:
+        This is a path to a toolchain fragment. '.config' will be appended to
+        that path, and it will be copied as is to Buildroot's '.config' file.
+
+buildroot-treeish:
+        The git tree-ish object in which to checkout Buildroot to before
+        building the toolchain.
+EOF
+    exit 1
+fi
+
 name=$1
 brcommit=$2
 
@@ -111,14 +126,9 @@ function build {
     # Toolchain built
 }
 
-if [ $# -eq 2 ]; then
-    echo "Generating ${name}..."
-    if ! build $1; then
-        echo "Error in toolchain build. Exiting"
-        exit 1
-    fi
-else
-    echo "Usage: $0 toolchain_name buildroot-tree"
+echo "Generating ${name}..."
+if ! build $1; then
+    echo "Error in toolchain build. Exiting"
     exit 1
 fi
 
