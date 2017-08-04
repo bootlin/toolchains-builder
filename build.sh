@@ -218,7 +218,7 @@ function set_qemu_config {
             -net nic,model=rtl8139 -net user
             -serial null
             -serial stdio
-            -nographic"
+            -display none"
     elif [[ "${arch_name}" == "sparc64" ]]; then                        # sparc64
         qemu_defconfig="qemu_sparc64_sun4u_defconfig"
         qemu_system_command="qemu-system-sparc64
