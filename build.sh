@@ -65,9 +65,9 @@ fi
 echo "Buildroot version: " $(git describe)
 cd ${main_dir}
 
-function set_qemu_config {
+function set_test_config {
     if [[ "${arch_name}" =~ ^"armv"."-".* ]]; then                      # armvX-*
-        qemu_defconfig="qemu_arm_vexpress_defconfig"
+        test_defconfig="qemu_arm_vexpress_defconfig"
         qemu_system_command="qemu-system-arm
             -machine vexpress-a9 -smp 1 -m 256
             -kernel ${test_dir}/images/zImage
@@ -77,7 +77,7 @@ function set_qemu_config {
             -net nic,model=lan9118 -net user
             -nographic"
     elif [[ "${arch_name}" == "armv7m" ]]; then                        # armv7m
-        qemu_defconfig="qemu_arm_versatile_nommu_defconfig"
+        test_defconfig="qemu_arm_versatile_nommu_defconfig"
         qemu_system_command="qemu-system-arm
             -machine versatilepb
             -kernel ${test_dir}/images/zImage
@@ -85,7 +85,7 @@ function set_qemu_config {
             -net user -net nic,model=smc91c111
             -nographic"
     elif [[ "${arch_name}" == "aarch64" ]]; then                        # aarch64
-        qemu_defconfig="qemu_aarch64_virt_defconfig"
+        test_defconfig="qemu_aarch64_virt_defconfig"
         # Qemu 2.8 has been tested and works, 2.5 does not.
         qemu_system_command="qemu-system-aarch64
             -machine virt -cpu cortex-a57 -smp 1
@@ -94,17 +94,17 @@ function set_qemu_config {
             -netdev user,id=eth0 -device virtio-net-device,netdev=eth0
             -nographic"
     # elif [[ "${arch_name}" == "aarch64be" ]]; then                      # aarch64be (not supported by qemu yet)
-    #     qemu_defconfig="qemu_aarch64_virt_defconfig"
+    #     test_defconfig="qemu_aarch64_virt_defconfig"
     #     # Qemu 2.8 has been tested and works, 2.5 does not.
     #     qemu_system_command="qemu-system-aarch64
     #         -machine virt -cpu cortex-a53 -machine type=virt
     #         -kernel ${test_dir}/images/Image
     #         -append \"console=ttyAMA0\""
     elif [[ "${arch_name}" == "bfin" ]]; then                           # bfin
-        qemu_defconfig="gdb_bfin_bf512_defconfig"
+        test_defconfig="gdb_bfin_bf512_defconfig"
         qemu_system_command=""
     elif [[ "${arch_name}" == "microblazebe" ]]; then                   # microblazebe
-        qemu_defconfig="qemu_microblazebe_mmu_defconfig"
+        test_defconfig="qemu_microblazebe_mmu_defconfig"
         qemu_system_command="qemu-system-microblaze
             -machine petalogix-s3adsp1800
             -kernel ${test_dir}/images/linux.bin
@@ -112,7 +112,7 @@ function set_qemu_config {
             -append \"root=/dev/sda rw\"
             -nographic"
     elif [[ "${arch_name}" == "microblazeel" ]]; then                   # microblazeel
-        qemu_defconfig="qemu_microblazeel_mmu_defconfig"
+        test_defconfig="qemu_microblazeel_mmu_defconfig"
         qemu_system_command="qemu-system-microblazeel
             -machine petalogix-s3adsp1800
             -kernel ${test_dir}/images/linux.bin
@@ -120,7 +120,7 @@ function set_qemu_config {
             -append \"root=/dev/sda rw\"
             -nographic"
     elif [[ "${arch_name}" == "mips32" ]]; then                         # mips32
-        qemu_defconfig="qemu_mips32r2_malta_defconfig"
+        test_defconfig="qemu_mips32r2_malta_defconfig"
         qemu_system_command="qemu-system-mips
             -machine malta
             -kernel ${test_dir}/images/vmlinux
@@ -129,7 +129,7 @@ function set_qemu_config {
             -net nic,model=pcnet -net user
             -nographic"
     elif [[ "${arch_name}" == "mips32el" ]]; then                       # mips32el
-        qemu_defconfig="qemu_mips32r2el_malta_defconfig"
+        test_defconfig="qemu_mips32r2el_malta_defconfig"
         qemu_system_command="qemu-system-mipsel
             -machine malta
             -kernel ${test_dir}/images/vmlinux
@@ -137,7 +137,7 @@ function set_qemu_config {
             -append \"root=/dev/hda rw\"
             -nographic"
     elif [[ "${arch_name}" == "mips32r5el" ]]; then                     # mips32r5el
-        qemu_defconfig="qemu_mips32r2el_malta_defconfig"
+        test_defconfig="qemu_mips32r2el_malta_defconfig"
         qemu_system_command="qemu-system-mipsel
             -machine malta
             -cpu P5600
@@ -146,7 +146,7 @@ function set_qemu_config {
             -append \"root=/dev/hda rw\"
             -nographic"
     elif [[ "${arch_name}" == "mips32r6el" ]]; then                     # mips32r6el
-        qemu_defconfig="qemu_mips32r6el_malta_defconfig"
+        test_defconfig="qemu_mips32r6el_malta_defconfig"
         qemu_system_command="qemu-system-mipsel
             -machine malta
             -cpu mips32r6-generic
@@ -155,7 +155,7 @@ function set_qemu_config {
             -append \"root=/dev/hda rw\"
             -nographic"
     elif [[ "${arch_name}" == "mips64-n32" ]]; then                     # mips64-32
-        qemu_defconfig="qemu_mips64_malta_defconfig"
+        test_defconfig="qemu_mips64_malta_defconfig"
         qemu_system_command="qemu-system-mips64
             -machine malta
             -kernel ${test_dir}/images/vmlinux
@@ -163,7 +163,7 @@ function set_qemu_config {
             -append \"root=/dev/hda rw\"
             -nographic"
     elif [[ "${arch_name}" == "mips64el-n32" ]]; then                   # mips64el-n32
-        qemu_defconfig="qemu_mips64el_malta_defconfig"
+        test_defconfig="qemu_mips64el_malta_defconfig"
         qemu_system_command="qemu-system-mips64el
             -machine malta
             -kernel ${test_dir}/images/vmlinux
@@ -171,7 +171,7 @@ function set_qemu_config {
             -append \"root=/dev/hda rw\"
             -nographic"
     elif [[ "${arch_name}" == "mips64r6el-n32" ]]; then                 # mips64r6el-n32
-        qemu_defconfig="qemu_mips64r6el_malta_defconfig"
+        test_defconfig="qemu_mips64r6el_malta_defconfig"
         qemu_system_command="qemu-system-mips64el
             -machine malta
             -cpu I6400
@@ -180,14 +180,14 @@ function set_qemu_config {
             -append \"root=/dev/hda rw\"
             -nographic"
     # elif [[ "${arch_name}" == "m68k-68xxxx" ]]; then                    # m68k-68xxxx (support out of tree)
-    #    qemu_defconfig="qemu_m68k_q800_defconfig"
+    #    test_defconfig="qemu_m68k_q800_defconfig"
     #    qemu_system_command="qemu-system-m68k
     #        -machine an5206
     #        -kernel ${test_dir}/images/vmlinux
     #        -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
     #        -append \"root=/dev/hda rw\""
     elif [[ "${arch_name}" == "m68k-coldfire" ]]; then                  # m68k-coldfire
-        qemu_defconfig="qemu_m68k_mcf5208_defconfig"
+        test_defconfig="qemu_m68k_mcf5208_defconfig"
         qemu_system_command="qemu-system-m68k
             -machine mcf5208evb
             -kernel ${test_dir}/images/vmlinux
@@ -195,11 +195,11 @@ function set_qemu_config {
             -append \"root=/dev/hda rw\"
             -nographic"
     # elif [[ "${arch_name}" == "nios2" ]]; then                          # nios2 (no support in 2.8, coming in 2.9)
-    #     qemu_defconfig="qemu_nios2_10m50_defconfig"
+    #     test_defconfig="qemu_nios2_10m50_defconfig"
     #     qemu_system_command="qemu-system-nios2
     #         -kernel ${test_dir}/images/vmlinux"
     elif [[ "${arch_name}" == "powerpc64-power8" ]]; then               # powerpc64-power8
-        qemu_defconfig="qemu_ppc64_pseries_defconfig"
+        test_defconfig="qemu_ppc64_pseries_defconfig"
         qemu_system_command="qemu-system-ppc64
             -machine pseries
             -cpu POWER7
@@ -209,7 +209,7 @@ function set_qemu_config {
             -display curses
             -nographic"
     elif [[ "${arch_name}" == "sh-sh4" ]]; then                         # sh4
-        qemu_defconfig="qemu_sh4_r2d_defconfig"
+        test_defconfig="qemu_sh4_r2d_defconfig"
         qemu_system_command="qemu-system-sh4
             -machine r2d
             -kernel ${test_dir}/images/zImage
@@ -220,7 +220,7 @@ function set_qemu_config {
             -serial stdio
             -display none"
     elif [[ "${arch_name}" == "sparc64" ]]; then                        # sparc64
-        qemu_defconfig="qemu_sparc64_sun4u_defconfig"
+        test_defconfig="qemu_sparc64_sun4u_defconfig"
         qemu_system_command="qemu-system-sparc64
             -machine sun4u
             -kernel ${test_dir}/images/vmlinux
@@ -229,7 +229,7 @@ function set_qemu_config {
             -net nic,model=e1000 -net user
             -nographic"
     elif [[ "${arch_name}" == "sparcv8" ]]; then                        # sparcv8
-        qemu_defconfig="qemu_sparc_ss10_defconfig"
+        test_defconfig="qemu_sparc_ss10_defconfig"
         qemu_system_command="qemu-system-sparc
             -machine SS-10
             -kernel ${test_dir}/images/zImage
@@ -238,8 +238,8 @@ function set_qemu_config {
             -net nic,model=lance -net user
             -nographic"
     elif [[ "${arch_name}" == "x86-core2" ]]; then                      # x86-core2
-        qemu_defconfig="qemu_x86_defconfig"
-        sed -i "s/tty1/ttyS0/" ${buildroot_dir}/configs/${qemu_defconfig}
+        test_defconfig="qemu_x86_defconfig"
+        sed -i "s/tty1/ttyS0/" ${buildroot_dir}/configs/${test_defconfig}
         qemu_system_command="qemu-system-i386
             -machine pc
             -kernel ${test_dir}/images/bzImage
@@ -248,8 +248,8 @@ function set_qemu_config {
             -net nic,model=virtio -net user
             -nographic"
     elif [[ "${arch_name}" == "x86-i686" ]]; then                       # x86-i686
-        qemu_defconfig="qemu_x86_defconfig"
-        sed -i "s/tty1/ttyS0/" ${buildroot_dir}/configs/${qemu_defconfig}
+        test_defconfig="qemu_x86_defconfig"
+        sed -i "s/tty1/ttyS0/" ${buildroot_dir}/configs/${test_defconfig}
         qemu_system_command="qemu-system-i386
             -machine pc
             -kernel ${test_dir}/images/bzImage
@@ -258,8 +258,8 @@ function set_qemu_config {
             -net nic,model=virtio -net user
             -nographic"
     elif [[ "${arch_name}" == "x86-64-core-i7" ]]; then                 # x86-64-core-i7
-        qemu_defconfig="qemu_x86_64_defconfig"
-        sed -i "s/tty1/ttyS0/" ${buildroot_dir}/configs/${qemu_defconfig}
+        test_defconfig="qemu_x86_64_defconfig"
+        sed -i "s/tty1/ttyS0/" ${buildroot_dir}/configs/${test_defconfig}
         qemu_system_command="qemu-system-x86_64
             -machine pc
             -kernel ${test_dir}/images/bzImage
@@ -268,7 +268,7 @@ function set_qemu_config {
             -net nic,model=virtio -net user
             -nographic"
     elif [[ "${arch_name}" == "xtensa-lx60" ]]; then                    # xtensa-lx60
-        qemu_defconfig="qemu_xtensa_lx60_defconfig"
+        test_defconfig="qemu_xtensa_lx60_defconfig"
         qemu_system_command="qemu-system-xtensa
             -machine lx60
             -cpu dc233c
@@ -276,7 +276,7 @@ function set_qemu_config {
             -monitor null
             -nographic"
     else
-        qemu_defconfig=""
+        test_defconfig=""
         qemu_system_command=""
     fi
 }
@@ -302,7 +302,7 @@ function build_test {
     # Generate the full qemu system configuration
     testconfigfile=${test_dir}/.config
     echo "  generating configuration"
-    cp ${buildroot_dir}/configs/${qemu_defconfig} ${testconfigfile}
+    cp ${buildroot_dir}/configs/${test_defconfig} ${testconfigfile}
     echo "BR2_ROOTFS_OVERLAY=\"${test_dir}/overlay\"" >> ${testconfigfile}
     cat ${fragment_file} >> ${testconfigfile}
 
@@ -545,12 +545,12 @@ function generate {
     overlaydir=${test_dir}/overlay
 
     make_br_fragment
-    set_qemu_config
+    set_test_config
 
     return_value=0
     # Test the toolchain
     echo "Building a test system using ${name}..."
-    if [ "${qemu_defconfig}" != "" ]; then
+    if [ "${test_defconfig}" != "" ]; then
         if build_test; then
             if [ "${qemu_system_command}" != "" ]; then
                 echo "Booting the test system in qemu..."
