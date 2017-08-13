@@ -185,9 +185,8 @@ function set_test_config {
         test_defconfig="qemu_m68k_mcf5208_defconfig"
         qemu_system_command="qemu-system-m68k
             -machine mcf5208evb
+            -cpu m5208
             -kernel ${test_dir}/images/vmlinux
-            -drive file=${test_dir}/images/rootfs.ext2,index=0,media=disk,format=raw
-            -append \"root=/dev/hda rw\"
             -nographic"
     # elif [[ "${arch_name}" == "nios2" ]]; then                          # nios2 (no support in 2.8, coming in 2.9)
     #     test_defconfig="qemu_nios2_10m50_defconfig"
