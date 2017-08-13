@@ -77,13 +77,8 @@ function set_test_config {
             -net nic,model=lan9118 -net user
             -nographic"
     elif [[ "${arch_name}" == "armv7m" ]]; then                        # armv7m
-        test_defconfig="qemu_arm_versatile_nommu_defconfig"
-        qemu_system_command="qemu-system-arm
-            -machine versatilepb
-            -kernel ${test_dir}/images/zImage
-            -append \"console=ttyAMA0,115200\"
-            -net user -net nic,model=smc91c111
-            -nographic"
+        test_defconfig="stm32f469_disco_defconfig"
+        qemu_system_command=""
     elif [[ "${arch_name}" == "aarch64" ]]; then                        # aarch64
         test_defconfig="qemu_aarch64_virt_defconfig"
         # Qemu 2.8 has been tested and works, 2.5 does not.
