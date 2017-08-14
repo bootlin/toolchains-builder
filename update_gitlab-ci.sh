@@ -136,21 +136,24 @@ function add_to_ci {
     libc_name=$(basename ${libc} .config)
     version_name=$(basename ${version} .config)
     name="${arch_name}-${libc_name}-${version_name}"
+    extras=""
+    optionals=""
     config_file=${frag_dir}/${name}
-    printf "  Generating .gitlab-ci.yml for $name ... "
+    printf "| %20s | %7s | %14s |" ${arch_name} ${libc_name} ${version_name}
     cat ${arch} ${libc} ${version} ${common_config} > ${config_file}
     for extra in $(ls -1 ${base_dir}/configs/extra/); do
         extra_m=${extra%.config}
         if [[ $name = $extra_m ]]; then
-            printf "extra found ... "
+           extras="${extras} ${extra}"
             cat "${base_dir}/configs/extra/$extra" >> ${config_file}
         fi
     done
+    printf " %30s |" "${extras}"
     if check_config; then
         for optional in $(ls -1 ${base_dir}/configs/optionals/); do
             optional_m=${optional%.config}
             if [[ $name = $optional_m ]]; then
-                printf "optional found ... "
+               optionals="${optionals} ${optional}"
                 cat "${base_dir}/configs/optionals/$optional" >> ${config_file}
             fi
         done
@@ -162,12 +165,15 @@ ${release_name}:
 
 EOF
         mv .gitlab-ci.yml.tmp .gitlab-ci.yml
-        echo "OK"
+       printf " %50s | OK\n" "${optionals}"
     else
-        echo "FAIL: This combination does not work"
+       printf " %50s | NOK\n" # ${optionals}
         rm ${config_file}
     fi
 }
+
+printf "| %20s | %7s | %14s | %30s | %50s | status\n" "arch" "libc" "version" "extras" "optionals"
+echo
 
 for arch in $(ls ./configs/arch/${opt_arch}.config); do
     for libc in $(ls ./configs/libc/${opt_libc}.config); do
