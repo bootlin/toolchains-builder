@@ -342,7 +342,7 @@ function launch_build {
             debootstrap --variant=buildd squeeze ${chroot_dir} http://archive.debian.org/debian/ || return 1
     fi
 
-    mkdir ${chroot_dir}/proc || return 1
+    mkdir -p ${chroot_dir}/proc || return 1
     mount --bind /proc ${chroot_dir}/proc || return 1
     cp ${chroot_script} ${build_dir} || return 1
     cp ${frag_dir}/${name}.config ${build_dir} || return 1
