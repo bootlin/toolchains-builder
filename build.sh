@@ -174,8 +174,8 @@ function set_test_config {
             -drive file=${test_dir}/images/rootfs.ext2,format=raw
             -append \"root=/dev/hda rw\"
             -nographic"
-    # elif [[ "${arch_name}" == "m68k-68xxxx" ]]; then                    # m68k-68xxxx (support out of tree)
-    #    test_defconfig="qemu_m68k_q800_defconfig"
+    elif [[ "${arch_name}" == "m68k-68xxx" ]]; then                    # m68k-68xxxx (support in Qemu out of tree)
+         test_defconfig="qemu_m68k_q800_defconfig"
     #    qemu_system_command="qemu-system-m68k
     #        -machine an5206
     #        -kernel ${test_dir}/images/vmlinux
