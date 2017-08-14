@@ -22,7 +22,10 @@ apt-get install -y --force-yes -qq --no-install-recommends \
     build-essential locales bc ca-certificates file rsync gcc-multilib \
     git bzr cvs mercurial subversion unzip wget cpio curl git-core \
     libc6-i386 2>&1 1>/dev/null
-
+if [ $? -ne 0 ] ; then
+	echo "Package installation failed, aborting"
+	exit 1
+fi
 
 sed -i 's/# \(en_US.UTF-8\)/\1/' /etc/locale.gen
 /usr/sbin/locale-gen
