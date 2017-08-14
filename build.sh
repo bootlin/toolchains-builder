@@ -333,24 +333,25 @@ function build_test {
 
 function launch_build {
     echo "  Setup chroot and launch build"
-    rm -rf ${build_dir}
-    mkdir -p ${build_dir}
+    rm -rf ${build_dir} || return 1
+    mkdir -p ${build_dir} || return 1
 
     if grep "bleeding-edge" <<<"${name}"; then
-        debootstrap --variant=buildd jessie ${chroot_dir} http://ftp.us.debian.org/debian/ 2>&1 1>/dev/null
+            debootstrap --variant=buildd jessie ${chroot_dir} http://ftp.us.debian.org/debian/ || return 1
     else
-        debootstrap --variant=buildd squeeze ${chroot_dir} http://archive.debian.org/debian/ 2>&1 1>/dev/null
+            debootstrap --variant=buildd squeeze ${chroot_dir} http://archive.debian.org/debian/ || return 1
     fi
 
-    mkdir ${chroot_dir}/proc
-    mount --bind /proc ${chroot_dir}/proc
-    cp ${chroot_script} ${build_dir}
-    cp ${frag_dir}/${name}.config ${build_dir}
-    cp chroot.conf /etc/schroot/schroot.conf
-    cp /etc/resolv.conf ${chroot_dir}/etc/resolv.conf
+    mkdir ${chroot_dir}/proc || return 1
+    mount --bind /proc ${chroot_dir}/proc || return 1
+    cp ${chroot_script} ${build_dir} || return 1
+    cp ${frag_dir}/${name}.config ${build_dir} || return 1
+    cp chroot.conf /etc/schroot/schroot.conf || return 1
+    cp /etc/resolv.conf ${chroot_dir}/etc/resolv.conf || return 1
     echo "  chrooting to ${chroot_dir}"
-    # This line MUST be the last one of this function to forward the errors
+
     chroot ${chroot_dir} /tmp/build_chroot.sh ${name} ${buildroot_tree}
+    return $?
 }
 
 function make_br_fragment {
