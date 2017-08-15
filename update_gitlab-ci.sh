@@ -121,7 +121,7 @@ fi
 
 cd ${br_path}
 git fetch origin
-git reset --hard origin/${opt_brtree}
+git reset --hard ${opt_brtree}
 cd ${base_dir}
 
 git branch -D ${git_build_branch}
