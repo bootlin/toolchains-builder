@@ -516,24 +516,25 @@ function generate {
     echo "Generating ${name}..."
 
     logfile=${build_dir}/${name}-build.log
-    testlogfile=${build_dir}/${name}-test.log
     bootlogfile=/tmp/expect_session.log
     arch_name=$(echo "${name}" |sed "s/--/\t/" |cut -f 1)
     upload_folder=${upload_root_folder}/${target}/toolchains/${arch_name}
 
-    if ! launch_build; then
-        echo "Toolchain build failed, not going further"
-        echo "Uploading build log"
-        ssh ${ssh_server} "mkdir -p ${upload_folder}/build_logs"
-        rsync ${logfile} ${ssh_server}:${upload_folder}/build_logs/
-        exit 1
-    fi
-    echo "Uploading build log"
-    ssh ${ssh_server} "mkdir -p ${upload_folder}/build_logs"
-    rsync ${logfile} ${ssh_server}:${upload_folder}/build_logs/
+    launch_build
+    build_status=$?
 
     release_name=${name}-$(cat ${build_dir}/br_version)
     [[ "$version_number" != "" ]] && release_name="${release_name}-$version_number"
+
+    echo "Uploading build log"
+    ssh ${ssh_server} "mkdir -p ${upload_folder}/build_logs"
+    scp ${logfile} ${ssh_server}:${upload_folder}/build_logs/${release_name}-build.log
+
+    if test $build_status -ne 0 ; then
+        echo "Toolchain build failed, not going further"
+        exit 1
+    fi
+
     toolchain_dir="${build_dir}/${name}"
     configfile=${toolchain_dir}/buildroot.config
     test_dir=${build_dir}/test-${name}
@@ -546,6 +547,8 @@ function generate {
     # Test the toolchain
     echo "Building a test system using ${name}..."
     if [ "${test_defconfig}" != "" ]; then
+        testlogfile=${build_dir}/${release_name}-test.log
+
         if build_test; then
             if [ "${qemu_system_command}" != "" ]; then
                 echo "Booting the test system in qemu..."
