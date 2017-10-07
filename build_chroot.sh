@@ -75,14 +75,16 @@ function build {
     echo "  starting at $(date)"
 
     # Generate the full configuration
-    make -C ${TOOLCHAIN_BR_DIR} O=${builddir} olddefconfig > /dev/null 2>&1
+    make -C ${TOOLCHAIN_BR_DIR} O=${builddir} olddefconfig > ${logfile} 2>&1
     if [ $? -ne 0 ] ; then
+	    echo "  failure during olddefconfig"
 	    return 1
     fi
 
     # Generate fragment to ship in the README
-    make -C ${TOOLCHAIN_BR_DIR} O=${builddir} savedefconfig > /dev/null 2>&1
+    make -C ${TOOLCHAIN_BR_DIR} O=${builddir} savedefconfig > ${logfile} 2>&1
     if [ $? -ne 0 ] ; then
+	    echo "  failure during savedefconfig"
 	    return 1
     fi
 
