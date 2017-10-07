@@ -172,16 +172,34 @@ EOF
     fi
 }
 
-printf "| %20s | %7s | %14s | %30s | %50s | status\n" "arch" "libc" "version" "extras" "optionals"
-echo
+function add_special {
+	special_name=$(basename ${special} .config)
+	cp ${special} ${frag_dir}/
+	cat .gitlab-ci.yml - > .gitlab-ci.yml.tmp <<EOF
+${special_name}:
+  script:
+    - ./build.sh ${special_name} ${opt_target} ${opt_brtree} ${opt_number}
 
-for arch in $(ls ./configs/arch/${opt_arch}.config); do
-    for libc in $(ls ./configs/libc/${opt_libc}.config); do
-        for version in $(ls ./configs/version/${opt_version}.config); do
-            add_to_ci
-        done
-    done
-done
+EOF
+	mv .gitlab-ci.yml.tmp .gitlab-ci.yml
+}
+
+if test "${opt_version}" = "special" ; then
+	for special in $(ls ./configs/special/*.config); do
+		add_special
+	done
+else
+	printf "| %20s | %7s | %14s | %30s | %50s | status\n" "arch" "libc" "version" "extras" "optionals"
+	echo
+
+	for arch in $(ls ./configs/arch/${opt_arch}.config); do
+		for libc in $(ls ./configs/libc/${opt_libc}.config); do
+			for version in $(ls ./configs/version/${opt_version}.config); do
+				add_to_ci
+			done
+		done
+	done
+fi
 
 git add .
 git add -f .gitlab-ci.yml
