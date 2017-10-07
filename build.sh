@@ -62,7 +62,7 @@ git checkout $buildroot_tree
 if [ $? -ne 0 ] ; then
 	exit 1
 fi
-echo "Buildroot version: " $(git describe)
+echo "Buildroot version: " $(git describe --tags)
 cd ${main_dir}
 
 function set_test_config {
