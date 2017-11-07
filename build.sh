@@ -82,12 +82,22 @@ function set_test_config {
     elif [[ "${arch_name}" == "aarch64" ]]; then                        # aarch64
         test_defconfig="qemu_aarch64_virt_defconfig"
         # Qemu 2.8 has been tested and works, 2.5 does not.
-        qemu_system_command="qemu-system-aarch64
-            -machine virt -cpu cortex-a57 -smp 1
-            -kernel ${test_dir}/images/Image
-            -append \"console=ttyAMA0\"
-            -netdev user,id=eth0 -device virtio-net-device,netdev=eth0
-            -nographic"
+        if [[ "${name}" =~ "--bleeding-edge-" ]]; then
+                qemu_system_command="qemu-system-aarch64
+                            -machine virt -cpu cortex-a57 -smp 1
+                            -kernel ${test_dir}/images/Image
+                            -append \"root=/dev/vda console=ttyAMA0\"
+                            -netdev user,id=eth0 -device virtio-net-device,netdev=eth0
+                            -drive file=output/images/rootfs.ext4,if=none,format=raw,id=hd0 -device virtio-blk-device,drive=hd0
+                            -nographic"
+        else
+                qemu_system_command="qemu-system-aarch64
+                            -machine virt -cpu cortex-a57 -smp 1
+                            -kernel ${test_dir}/images/Image
+                            -append \"console=ttyAMA0\"
+                            -netdev user,id=eth0 -device virtio-net-device,netdev=eth0
+                            -nographic"
+        fi
     # elif [[ "${arch_name}" == "aarch64be" ]]; then                      # aarch64be (not supported by qemu yet)
     #     test_defconfig="qemu_aarch64_virt_defconfig"
     #     # Qemu 2.8 has been tested and works, 2.5 does not.
