@@ -96,22 +96,42 @@ if [ $debug -eq 0 ]; then exec 2>/dev/null; fi
 
 function check_config {
     cp ${config_file} ${br_path}/.config
-    cd ${br_path}
-    make olddefconfig 2>&1 1>/dev/null
-    sort .config > /tmp/sorted.config
-    sort ${config_file} > /tmp/sortedfragmentfile
-    if [ $(comm -23 /tmp/sortedfragmentfile /tmp/sorted.config |wc -l) -gt 0 ]; then
-        if [ $debug -eq 1 ]; then
-            echo ""
-            comm -23 /tmp/sortedfragmentfile /tmp/sorted.config
-        fi
-        cd ${base_dir}
-        return 1
-    fi
-    libc_name=$(grep "^BR2_TOOLCHAIN_BUILDROOT_LIBC=\".*\"" .config | sed 's/BR2_TOOLCHAIN_BUILDROOT_LIBC="\(.*\)"/\1/')
+    make -C ${br_path} olddefconfig 2>&1 1>/dev/null
+
+    libc_name=$(grep "^BR2_TOOLCHAIN_BUILDROOT_LIBC=\".*\"" ${br_path}/.config |
+                    sed 's/BR2_TOOLCHAIN_BUILDROOT_LIBC="\(.*\)"/\1/')
     release_name="${arch_name}--${libc_name}--${version_name}"
-    cd ${base_dir}
-    return 0
+
+    sort ${br_path}/.config > /tmp/sorted.config
+    sort ${config_file} > /tmp/sortedfragmentfile
+    rejects_file=$(mktemp)
+    comm -23 /tmp/sortedfragmentfile /tmp/sorted.config > ${rejects_file}
+
+    # If the reject file is empty, the configuration is valid
+    if [ $(cat ${rejects_file} | wc -l) -eq 0 ]; then
+        rm ${rejects_file}
+        return 0
+    fi
+
+    # Check if the reject matches an exception file. If so, the
+    # configuration is considered valid.
+    for exception in $(ls -1 configs/exceptions/); do
+        exception_m=${exception%.config}
+        if [[ $name = $exception_m ]]; then
+            if cmp -s configs/exceptions/${exception} ${rejects_file}; then
+                rm ${rejects_file}
+                return 0
+            fi
+        fi
+    done
+
+    if [ $debug -eq 1 ]; then
+        echo ""
+        cat ${rejects_file}
+    fi
+
+    rm ${rejects_file}
+    return 1
 }
 
 # Get buildroot if it's not done to check the configurations
