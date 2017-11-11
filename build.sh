@@ -38,7 +38,7 @@ ssh_server="gitlabci@toolchains.free-electrons.com"
 main_dir=$(pwd)
 frag_dir=${main_dir}/frags
 chroot_dir=${main_dir}/build
-build_dir=${chroot_dir}/tmp
+build_dir=${chroot_dir}/opt
 chroot_script="build_chroot.sh"
 buildroot_dir=${main_dir}/buildroot
 fragment_file=${build_dir}/br_fragment
@@ -57,7 +57,8 @@ cd ${buildroot_dir}
 git remote add buildroot-toolchains https://github.com/free-electrons/buildroot-toolchains.git || exit 1
 git fetch buildroot-toolchains || exit 1
 git checkout buildroot-toolchains/$buildroot_tree || exit 1
-echo "Buildroot version: " $(git describe --tags)
+br_version=$(git describe --tags)
+echo "Buildroot version: " ${br_version}
 cd ${main_dir}
 
 function set_test_config {
@@ -83,7 +84,7 @@ function set_test_config {
                             -kernel ${test_dir}/images/Image
                             -append \"root=/dev/vda console=ttyAMA0\"
                             -netdev user,id=eth0 -device virtio-net-device,netdev=eth0
-                            -drive file=output/images/rootfs.ext4,if=none,format=raw,id=hd0 -device virtio-blk-device,drive=hd0
+                            -drive file=${test_dir}/images/rootfs.ext4,if=none,format=raw,id=hd0 -device virtio-blk-device,drive=hd0
                             -nographic"
         else
                 qemu_system_command="qemu-system-aarch64
@@ -340,6 +341,7 @@ function launch_build {
     echo "  Setup chroot and launch build"
     rm -rf ${build_dir} || return 1
     mkdir -p ${build_dir} || return 1
+    mkdir -p ${build_dir}/buildroot || return 1
 
     if grep "bleeding-edge" <<<"${name}"; then
             debootstrap --variant=buildd jessie ${chroot_dir} http://ftp.us.debian.org/debian/ || return 1
@@ -349,13 +351,14 @@ function launch_build {
 
     mkdir -p ${chroot_dir}/proc || return 1
     mount --bind /proc ${chroot_dir}/proc || return 1
+    mount --bind ${buildroot_dir} ${build_dir}/buildroot || return 1
     cp ${chroot_script} ${build_dir} || return 1
     cp ${frag_dir}/${name}.config ${build_dir} || return 1
     cp chroot.conf /etc/schroot/schroot.conf || return 1
     cp /etc/resolv.conf ${chroot_dir}/etc/resolv.conf || return 1
     echo "  chrooting to ${chroot_dir}"
 
-    chroot ${chroot_dir} /tmp/build_chroot.sh ${name} ${buildroot_tree}
+    chroot ${chroot_dir} /opt/build_chroot.sh ${name}
     return $?
 }
 
@@ -528,7 +531,7 @@ function generate {
     launch_build
     build_status=$?
 
-    release_name=${name}-$(cat ${build_dir}/br_version)
+    release_name=${name}-${br_version}
     [[ "$version_number" != "" ]] && release_name="${release_name}-$version_number"
 
     echo "Uploading build log"
