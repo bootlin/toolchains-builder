@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [ $# -ne 4 ]; then
+if [ $# -ne 3 ]; then
     cat - <<EOF
-    Usage: $0 name target buildroot_treeish version_nb
+    Usage: $0 name target buildroot_treeish
 
 name:
         This is the name of the toolchain you are compiling. The name should at
@@ -578,7 +578,7 @@ function generate {
     return $return_value
 }
 
-if [ $# -ge 3 ]; then
+if [ $# -ge 2 ]; then
     if ! generate ${name}; then
         echo "Something went wrong. Exiting with code 1"
         exit 1
