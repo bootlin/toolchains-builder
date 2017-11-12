@@ -16,10 +16,6 @@ target:
 buildroot_treeish:
         A git tree-ish object in which to checkout Buildroot for any of its uses
         accross the process.
-
-version_nb:
-        A string appended to the toolchain name, useful not to override existing
-        ones in the same target.
 EOF
     exit 1
 fi
@@ -32,7 +28,6 @@ echo "Version number: $4"
 name="$1"
 target="$2"
 buildroot_tree="$3"
-version_number="$4"
 
 ssh_server="gitlabci@toolchains.free-electrons.com"
 main_dir=$(pwd)
@@ -532,7 +527,6 @@ function generate {
     build_status=$?
 
     release_name=${name}-${br_version}
-    [[ "$version_number" != "" ]] && release_name="${release_name}-$version_number"
 
     echo "Uploading build log"
     ssh ${ssh_server} "mkdir -p ${upload_folder}/build_logs"
@@ -590,7 +584,7 @@ if [ $# -ge 3 ]; then
         exit 1
     fi
 else
-    echo "Usage: $0 configname.config target buildroot-tree [version_number]"
+    echo "Usage: $0 configname.config target buildroot-tree"
     exit 1
 fi
 

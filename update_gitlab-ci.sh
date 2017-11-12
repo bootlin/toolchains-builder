@@ -16,7 +16,6 @@ opt_libc="*"
 opt_version="*"
 opt_target="no_push"
 opt_brtree="2017.05-toolchains-1"
-opt_number=""
 
 function clean_up {
     echo "Catching signal, cleaning up"
@@ -49,9 +48,6 @@ Usage: $0 -n number [-a arch] [-l libc] [-v version] [-t target] [-dh]
            This option defaults to no_push in order not to trigger builds
            by accident or misuse.
 
-    -n number   specify a version number that will be appended to the buildroot
-                version (mandatory)
-
     -b tree-ish checkout Buildroot to that tree-ish object (default is
                 ${opt_brtree})
 
@@ -76,21 +72,12 @@ while getopts "a:l:v:t:b:n:dh" opt; do
         ;;
     t) opt_target=$OPTARG
         ;;
-    n) opt_number=$OPTARG
-        ;;
     *|h|\?)
         show_help
         exit 0
         ;;
     esac
 done
-
-if [ "${opt_number}" = "" ]; then
-    echo "You MUST specify a version number with -n <number>"
-    show_help
-    exit 1
-fi
-
 
 if [ $debug -eq 0 ]; then exec 2>/dev/null; fi
 
@@ -181,7 +168,7 @@ function add_to_ci {
         cat .gitlab-ci.yml - > .gitlab-ci.yml.tmp <<EOF
 ${release_name}:
   script:
-    - ./build.sh ${release_name} ${opt_target} ${opt_brtree} ${opt_number}
+    - ./build.sh ${release_name} ${opt_target} ${opt_brtree}
 
 EOF
         mv .gitlab-ci.yml.tmp .gitlab-ci.yml
@@ -198,7 +185,7 @@ function add_special {
 	cat .gitlab-ci.yml - > .gitlab-ci.yml.tmp <<EOF
 ${special_name}:
   script:
-    - ./build.sh ${special_name} ${opt_target} ${opt_brtree} ${opt_number}
+    - ./build.sh ${special_name} ${opt_target} ${opt_brtree}
 
 EOF
 	mv .gitlab-ci.yml.tmp .gitlab-ci.yml
