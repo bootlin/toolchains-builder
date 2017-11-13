@@ -414,17 +414,14 @@ EOF
     tar cjf `basename ${release_name}`.tar.bz2 `basename ${toolchain_dir}`
     sha256sum ${release_name}.tar.bz2 > ${release_name}.sha256
 
-
-    # Upload everything
-    ssh ${ssh_server} "mkdir -p ${upload_folder}/fragments"
-    ssh ${ssh_server} "mkdir -p ${upload_folder}/tarballs"
-    ssh ${ssh_server} "mkdir -p ${upload_folder}/readmes"
-    ssh ${ssh_server} "mkdir -p ${upload_folder}/summaries"
-    ssh ${ssh_server} "mkdir -p ${upload_folder}/build_test_logs"
-    ssh ${ssh_server} "mkdir -p ${upload_folder}/boot_test_logs"
-    ssh ${ssh_server} "mkdir -p ${upload_folder}/build_fragments"
-    ssh ${ssh_server} "mkdir -p ${upload_folder}/test_system_defconfigs"
-    ssh ${ssh_server} "mkdir -p ${upload_folder}/available_toolchains"
+    # Create directories on the server, where the different artefacts
+    # will be uploaded.
+    for d in fragments tarballs readmes summaries \
+                       build_test_logs boot_test_logs \
+                       build_fragments test_system_defconfigs \
+                       available_toolchains; do
+        ssh ${ssh_server} "mkdir -p ${upload_folder}/${d}"
+    done
 
     # Upload log of qemu defconfig build, as well as the qemu
     # defconfig itself
