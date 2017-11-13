@@ -57,83 +57,111 @@ echo "Buildroot version: " ${br_version}
 cd ${main_dir}
 
 function set_test_config {
-    if [[ "${arch_name}" =~ ^"armv"."-".* ]]; then                      # armvX-*
+    case "${arch_name}" in
+    armv5-* | armv6-* | armv7-*)
         test_defconfig="qemu_arm_vexpress_defconfig"
         test_board_dir="arm-vexpress"
-    elif [[ "${arch_name}" == "armv7m" ]]; then                        # armv7m
+	;;
+    armv7m)
         test_defconfig="stm32f469_disco_defconfig"
-    elif [[ "${arch_name}" == "aarch64" ]]; then                        # aarch64
+	;;
+    aarch64)
         test_defconfig="qemu_aarch64_virt_defconfig"
         test_board_dir="aarch64-virt"
-    elif [[ "${arch_name}" == "bfin" ]]; then                           # bfin
+	;;
+    bfin)
         test_defconfig="gdb_bfin_bf512_defconfig"
-    elif [[ "${arch_name}" == "microblazebe" ]]; then                   # microblazebe
+	;;
+    microblazebe)
         test_defconfig="qemu_microblazebe_mmu_defconfig"
         test_board_dir="microblazebe-mmu"
-    elif [[ "${arch_name}" == "microblazeel" ]]; then                   # microblazeel
+	;;
+    microblazeel)
         test_defconfig="qemu_microblazeel_mmu_defconfig"
         test_board_dir="microblazeel-mmu"
-    elif [[ "${arch_name}" == "mips32" ]]; then                         # mips32
+	;;
+    mips32)
         test_defconfig="qemu_mips32r2_malta_defconfig"
         test_board_dir="mips32r2-malta"
-    elif [[ "${arch_name}" == "mips32el" ]]; then                       # mips32el
+	;;
+    mips32el)
         test_defconfig="qemu_mips32r2el_malta_defconfig"
         test_board_dir="mips32r2el-malta"
-    elif [[ "${arch_name}" == "mips32r5el" ]]; then                     # mips32r5el
+	;;
+    mips32r5el)
         test_defconfig="qemu_mips32r2el_malta_defconfig"
         test_board_dir="mips32r2el-malta"
         test_qemu_args="-cpu P5600"
-    elif [[ "${arch_name}" == "mips32r6el" ]]; then                     # mips32r6el
+	;;
+    mips32r6el)
         test_defconfig="qemu_mips32r6el_malta_defconfig"
         test_board_dir="mips32r6el-malta"
-    elif [[ "${arch_name}" == "mips64-n32" ]]; then                     # mips64-32
+	;;
+    mips64-n32)
         test_defconfig="qemu_mips64_malta_defconfig"
         test_board_dir="mips64-malta"
-    elif [[ "${arch_name}" == "mips64el-n32" ]]; then                   # mips64el-n32
+	;;
+    mips64el-n32)
         test_defconfig="qemu_mips64el_malta_defconfig"
         test_board_dir="mips64el-malta"
-    elif [[ "${arch_name}" == "mips64r6el-n32" ]]; then                 # mips64r6el-n32
+	;;
+    mips64r6el-n32)
         test_defconfig="qemu_mips64r6el_malta_defconfig"
         test_board_dir="mips64r6el-malta"
-    elif [[ "${arch_name}" == "m68k-68xxx" ]]; then                    # m68k-68xxxx (support in Qemu out of tree)
-         test_defconfig="qemu_m68k_q800_defconfig"
-    elif [[ "${arch_name}" == "m68k-coldfire" ]]; then                  # m68k-coldfire (cannot boot in qemu, need 2.9)
-        test_defconfig="qemu_m68k_mcf5208_defconfig"
-    elif [[ "${arch_name}" == "nios2" ]]; then                          # nios2 (cannot boot in qemu, need 2.9)
-          test_defconfig="qemu_nios2_10m50_defconfig"
-    elif [[ "${arch_name}" == "powerpc64-power8" ]]; then               # powerpc64-power8
+	;;
+    m68k-68xxx)
+        test_defconfig="qemu_m68k_q800_defconfig"
+	# cannot boot under qemu, support out of tree
+	;;
+    m68k-coldfire)
+	test_defconfig="qemu_m68k_mcf5208_defconfig"
+	# cannot boot under qemu, 2.9 needed
+	;;
+    nios2)
+        test_defconfig="qemu_nios2_10m50_defconfig"
+	# cannot boot under qemu, 2.9 needed
+	;;
+    powerpc64-power8)
         test_defconfig="qemu_ppc64_pseries_defconfig"
         test_board_dir="ppc64-pseries"
         test_qemu_args="-cpu POWER8"
-    elif [[ "${arch_name}" == "sh-sh4" ]]; then                         # sh4
+	;;
+    sh-sh4)
         test_defconfig="qemu_sh4_r2d_defconfig"
         test_board_dir="sh4-r2d"
-    elif [[ "${arch_name}" == "sparc64" ]]; then                        # sparc64
+	;;
+    sparc64)
         test_defconfig="qemu_sparc64_sun4u_defconfig"
         test_board_dir="sparc64-sun4u"
-    elif [[ "${arch_name}" == "sparcv8" ]]; then                        # sparcv8
+	;;
+    sparcv8)
         test_defconfig="qemu_sparc_ss10_defconfig"
         test_board_dir="sparc-ss10"
-    elif [[ "${arch_name}" == "x86-core2" ]]; then                      # x86-core2
+	;;
+    x86-core2)
         test_defconfig="qemu_x86_defconfig"
         sed -i "s/tty1/ttyS0/" ${buildroot_dir}/configs/${test_defconfig}
         test_board_dir="x86"
         test_qemu_append="rw console=ttyS0"
-    elif [[ "${arch_name}" == "x86-i686" ]]; then                       # x86-i686
+	;;
+    x86-i686)
         test_defconfig="qemu_x86_defconfig"
         sed -i "s/tty1/ttyS0/" ${buildroot_dir}/configs/${test_defconfig}
         test_board_dir="x86"
         test_qemu_append="rw console=ttyS0"
-    elif [[ "${arch_name}" == "x86-64-core-i7" ]]; then                 # x86-64-core-i7
+	;;
+    x86-64-core-i7)
         test_defconfig="qemu_x86_64_defconfig"
         sed -i "s/tty1/ttyS0/" ${buildroot_dir}/configs/${test_defconfig}
         test_board_dir="x86_64"
         test_qemu_append="rw console=ttyS0"
-    elif [[ "${arch_name}" == "xtensa-lx60" ]]; then                    # xtensa-lx60
+	;;
+    xtensa-lx60)
         test_defconfig="qemu_xtensa_lx60_defconfig"
         test_board_dir="xtensa-lx60"
         test_qemu_args="-monitor null"
-    fi
+	;;
+    esac
 
     if [[ "${test_board_dir}" == "" ]]; then
         test_qemu_cmd=""
