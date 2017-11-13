@@ -425,14 +425,23 @@ EOF
     ssh ${ssh_server} "mkdir -p ${upload_folder}/build_fragments"
     ssh ${ssh_server} "mkdir -p ${upload_folder}/test_system_defconfigs"
     ssh ${ssh_server} "mkdir -p ${upload_folder}/available_toolchains"
-    rsync ${testlogfile} ${ssh_server}:${upload_folder}/build_test_logs/                                            # build test log file
-    rsync ${bootlogfile} ${ssh_server}:${upload_folder}/boot_test_logs/${release_name}.log                          # boot test log file
+
+    # Upload log of qemu defconfig build, as well as the qemu
+    # defconfig itself
+    if [ "${test_defconfig}" != "" ]; then
+        rsync ${testlogfile} ${ssh_server}:${upload_folder}/build_test_logs/
+        rsync ${test_dir}/defconfig ${ssh_server}:${upload_folder}/test_system_defconfigs/${release_name}.defconfig
+    fi
+    # Upload log of qemu boot
+    if [ "${test_qemu_cmd}" != "" ]; then
+        rsync ${bootlogfile} ${ssh_server}:${upload_folder}/boot_test_logs/${release_name}.log
+    fi
+
     rsync ${readme_file} ${ssh_server}:${upload_folder}/readmes/${release_name}.txt                                 # README
     rsync ${summary_file} ${ssh_server}:${upload_folder}/summaries/${release_name}.csv                              # summary
     rsync "${release_name}.tar.bz2" ${ssh_server}:${upload_folder}/tarballs/                                        # toolchain tarball
     rsync "${release_name}.sha256" ${ssh_server}:${upload_folder}/tarballs/                                         # toolchain checksum
     rsync "${fragment_file}" ${ssh_server}:${upload_folder}/fragments/${release_name}.frag                          # BR fragment
-    rsync ${test_dir}/defconfig ${ssh_server}:${upload_folder}/test_system_defconfigs/${release_name}.defconfig     # test system defconfig
     rsync -r ${build_dir}/output/defconfig ${ssh_server}:${upload_folder}/build_fragments/${release_name}.defconfig # build fragment
     rsync -r ${build_dir}/output/legal-info/host-licenses/ ${ssh_server}:${upload_root_folder}/${target}/licenses/  # licenses
     rsync -r ${build_dir}/output/legal-info/host-sources/ ${ssh_server}:${upload_root_folder}/${target}/sources/    # sources
