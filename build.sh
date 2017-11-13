@@ -365,7 +365,11 @@ function make_br_fragment {
     libc=$(grep "^BR2_TOOLCHAIN_BUILDROOT_LIBC=\".*\"" ${configfile} | sed 's/BR2_TOOLCHAIN_BUILDROOT_LIBC="\(.*\)"/\1/')
 
     echo "BR2_WGET=\"wget --passive-ftp -nd -t 3 --no-check-certificate\"" >> ${fragment_file} # XXX
-    cat ${main_dir}/configs/arch/${arch_name}.config >> ${fragment_file}
+    if [[ "${version_name}" =~ "special-" ]]; then
+	cat ${main_dir}/configs/special/${name}.config | grep -v "^BR2_TOOLCHAIN_BUILDROOT" | grep -v "^BR2_KERNEL_HEADERS" >> ${fragment_file}
+    else
+	cat ${main_dir}/configs/arch/${arch_name}.config >> ${fragment_file}
+    fi
     echo "BR2_TOOLCHAIN_EXTERNAL=y" >> ${fragment_file}
     echo "BR2_TOOLCHAIN_EXTERNAL_CUSTOM=y" >> ${fragment_file}
     echo "BR2_TOOLCHAIN_EXTERNAL_PREINSTALLED=y" >> ${fragment_file}
@@ -391,6 +395,11 @@ function make_br_fragment {
         echo "BR2_TOOLCHAIN_EXTERNAL_HAS_THREADS_DEBUG=n" >> ${fragment_file}
     else
         echo "BR2_TOOLCHAIN_EXTERNAL_HAS_THREADS_DEBUG=y" >> ${fragment_file}
+    fi
+    if ! grep "BR2_TOOLCHAIN_HAS_THREADS=y" ${configfile} > /dev/null 2>&1; then
+	echo "# BR2_TOOLCHAIN_EXTERNAL_HAS_THREADS is not set" >> ${fragment_file}
+    else
+	echo "BR2_TOOLCHAIN_EXTERNAL_HAS_THREADS=y" >> ${fragment_file}
     fi
     if ! grep "BR2_TOOLCHAIN_HAS_THREADS_NPTL=y" ${configfile} > /dev/null 2>&1; then
         echo "# BR2_TOOLCHAIN_EXTERNAL_HAS_THREADS_NPTL is not set" >> ${fragment_file}
