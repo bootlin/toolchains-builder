@@ -73,7 +73,7 @@ function set_test_config {
     elif [[ "${arch_name}" == "aarch64" ]]; then                        # aarch64
         test_defconfig="qemu_aarch64_virt_defconfig"
         # Qemu 2.8 has been tested and works, 2.5 does not.
-        if [[ "${name}" =~ "--bleeding-edge" ]]; then
+        if [[ "${version_name}" = "bleeding-edge" ]]; then
                 qemu_system_command="qemu-system-aarch64
                             -machine virt -cpu cortex-a57 -smp 1
                             -kernel ${test_dir}/images/Image
@@ -521,6 +521,7 @@ function generate {
     logfile=${build_dir}/${name}-build.log
     bootlogfile=/tmp/expect_session.log
     arch_name=$(echo "${name}" |sed "s/--/\t/" |cut -f 1)
+    version_name=$(echo "${name}" |sed "s/--/\t/" |cut -f 3)
     upload_folder=${upload_root_folder}/${target}/toolchains/${arch_name}
 
     launch_build
