@@ -419,7 +419,7 @@ EOF
     for d in fragments tarballs readmes summaries \
                        build_test_logs boot_test_logs \
                        build_fragments test_system_defconfigs \
-                       available_toolchains; do
+                       available_toolchains test-system; do
         ssh ${ssh_server} "mkdir -p ${upload_folder}/${d}"
     done
 
@@ -433,6 +433,10 @@ EOF
     if [ "${test_qemu_cmd}" != "" ]; then
         rsync ${bootlogfile} ${ssh_server}:${upload_folder}/boot_test_logs/${release_name}.log
     fi
+
+    for i in ${test_dir}/images/* ; do
+	rsync $i ${ssh_server}:${upload_folder}/test-system/${release_name}-$(basename $i)
+    done
 
     rsync ${readme_file} ${ssh_server}:${upload_folder}/readmes/${release_name}.txt                                 # README
     rsync ${summary_file} ${ssh_server}:${upload_folder}/summaries/${release_name}.csv                              # summary
