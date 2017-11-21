@@ -51,7 +51,7 @@ git clone https://github.com/buildroot/buildroot.git ${buildroot_dir} || exit 1
 cd ${buildroot_dir}
 git remote add buildroot-toolchains https://github.com/free-electrons/buildroot-toolchains.git || exit 1
 git fetch buildroot-toolchains || exit 1
-git checkout buildroot-toolchains/$buildroot_tree || exit 1
+git checkout $buildroot_tree || exit 1
 br_version=$(git describe --tags)
 echo "Buildroot version: " ${br_version}
 cd ${main_dir}
