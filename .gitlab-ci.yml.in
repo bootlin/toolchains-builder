@@ -1,4 +1,4 @@
-image: ubuntu:zesty
+image: ubuntu:artful
 
 before_script:
   - dpkg --add-architecture i386
