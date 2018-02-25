@@ -16,6 +16,7 @@ opt_libc="*"
 opt_variant="*"
 opt_target="no_push"
 opt_brtree="2017.05-toolchains-1"
+opt_version=""
 
 function clean_up {
     echo "Catching signal, cleaning up"
@@ -31,7 +32,7 @@ trap clean_up SIGHUP SIGINT SIGTERM
 
 function show_help {
     cat - <<EOF
-Usage: $0 -n number [-a arch] [-l libc] [-v variant] [-t target] [-dh]
+Usage: $0 -n version [-a arch] [-l libc] [-v variant] [-t target] [-dh]
 
     -h          show this help and exit
     -d          debug output
@@ -50,6 +51,7 @@ Usage: $0 -n number [-a arch] [-l libc] [-v variant] [-t target] [-dh]
 
     -b tree-ish checkout Buildroot to that tree-ish object (default is
                 ${opt_brtree})
+    -n version  version string appended to tarball name
 
     -a arch     specify architecture to build (see \`ls configs/arch/*\`)
     -l libc     specify libc to use (see \`ls configs/libc/*\`)
@@ -72,6 +74,8 @@ while getopts "a:l:v:t:b:n:dh" opt; do
         ;;
     t) opt_target=$OPTARG
         ;;
+    n) opt_version=$OPTARG
+        ;;
     *|h|\?)
         show_help
         exit 0
@@ -80,6 +84,11 @@ while getopts "a:l:v:t:b:n:dh" opt; do
 done
 
 if [ $debug -eq 0 ]; then exec 2>/dev/null; fi
+
+if [ -z $opt_version ] ; then
+	echo "ERROR: -n option is mandatory"
+	exit 1
+fi
 
 function check_config {
     cp ${config_file} ${br_path}/.config
@@ -168,7 +177,7 @@ function add_to_ci {
         cat .gitlab-ci.yml - > .gitlab-ci.yml.tmp <<EOF
 ${release_name}:
   script:
-    - ./build.sh ${release_name} ${opt_target} ${opt_brtree}
+    - ./build.sh ${release_name} ${opt_target} ${opt_brtree} ${opt_version}
 
 EOF
         mv .gitlab-ci.yml.tmp .gitlab-ci.yml
@@ -185,7 +194,7 @@ function add_special {
 	cat .gitlab-ci.yml - > .gitlab-ci.yml.tmp <<EOF
 ${special_name}:
   script:
-    - ./build.sh ${special_name} ${opt_target} ${opt_brtree}
+    - ./build.sh ${special_name} ${opt_target} ${opt_brtree} ${opt_version}
 
 EOF
 	mv .gitlab-ci.yml.tmp .gitlab-ci.yml

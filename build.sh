@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ $# -ne 3 ]; then
+if [ $# -ne 4 ]; then
     cat - <<EOF
     Usage: $0 name target buildroot_treeish
 
@@ -16,6 +16,9 @@ target:
 buildroot_treeish:
         A git tree-ish object in which to checkout Buildroot for any of its uses
         accross the process.
+
+version:
+	Version identifier.
 EOF
     exit 1
 fi
@@ -23,11 +26,12 @@ fi
 echo "Building $1"
 echo "Target: $2"
 echo "Buildroot tree: $3"
-echo "Version number: $4"
+echo "Version identifier: $4"
 
 name="$1"
 target="$2"
 buildroot_tree="$3"
+version="$4"
 
 ssh_server="gitlabci@toolchains.free-electrons.com"
 main_dir=$(pwd)
@@ -269,7 +273,7 @@ function launch_build {
     cp /etc/resolv.conf ${chroot_dir}/etc/resolv.conf || return 1
     echo "  chrooting to ${chroot_dir}"
 
-    chroot ${chroot_dir} /opt/build_chroot.sh ${name}
+    chroot ${chroot_dir} /opt/build_chroot.sh ${name} ${version}
     return $?
 }
 
@@ -462,7 +466,7 @@ function generate {
     launch_build
     build_status=$?
 
-    release_name=${name}-${br_version}
+    release_name=${name}-${version}
 
     echo "Uploading build log"
     ssh ${ssh_server} "mkdir -p ${upload_folder}/build_logs"
@@ -473,7 +477,7 @@ function generate {
         exit 1
     fi
 
-    toolchain_dir="${build_dir}/${name}"
+    toolchain_dir="${build_dir}/${release_name}"
     configfile=${toolchain_dir}/buildroot.config
     test_dir=${build_dir}/test-${name}
     overlaydir=${test_dir}/overlay

@@ -94,16 +94,17 @@ function build_toolchain {
     fi
 }
 
-if ! [ $# -eq 1 ]; then
+if ! [ $# -eq 2 ]; then
     show_help
     exit 1
 fi
 
 name=$1
+version=$2
 
 buildroot_dir=/opt/buildroot
 output_dir=/opt/output
-toolchain_dir=/opt/${name}
+toolchain_dir=/opt/${name}-${version}
 logfile=/opt/${name}-build.log
 
 mkdir -p ${output_dir} ${toolchain_dir}
