@@ -13,7 +13,7 @@ git_build_branch="builds"
 debug=0
 opt_arch="*"
 opt_libc="*"
-opt_version="*"
+opt_variant="*"
 opt_target="no_push"
 opt_brtree="2017.05-toolchains-1"
 
@@ -31,7 +31,7 @@ trap clean_up SIGHUP SIGINT SIGTERM
 
 function show_help {
     cat - <<EOF
-Usage: $0 -n number [-a arch] [-l libc] [-v version] [-t target] [-dh]
+Usage: $0 -n number [-a arch] [-l libc] [-v variant] [-t target] [-dh]
 
     -h          show this help and exit
     -d          debug output
@@ -53,7 +53,7 @@ Usage: $0 -n number [-a arch] [-l libc] [-v version] [-t target] [-dh]
 
     -a arch     specify architecture to build (see \`ls configs/arch/*\`)
     -l libc     specify libc to use (see \`ls configs/libc/*\`)
-    -v version  specify version to build (see \`ls configs/version/*\`)
+    -v variant  specify variant to build (see \`ls configs/version/*\`)
 
 EOF
 }
@@ -66,7 +66,7 @@ while getopts "a:l:v:t:b:n:dh" opt; do
         ;;
     l) opt_libc=$OPTARG
         ;;
-    v) opt_version=$OPTARG
+    v) opt_variant=$OPTARG
         ;;
     b) opt_brtree=$OPTARG
         ;;
@@ -87,7 +87,7 @@ function check_config {
 
     libc_name=$(grep "^BR2_TOOLCHAIN_BUILDROOT_LIBC=\".*\"" ${br_path}/.config |
                     sed 's/BR2_TOOLCHAIN_BUILDROOT_LIBC="\(.*\)"/\1/')
-    release_name="${arch_name}--${libc_name}--${version_name}"
+    release_name="${arch_name}--${libc_name}--${variant_name}"
 
     sort ${br_path}/.config > /tmp/sorted.config
     sort ${config_file} > /tmp/sortedfragmentfile
@@ -141,13 +141,13 @@ mkdir ${frag_dir}
 function add_to_ci {
     arch_name=$(basename ${arch} .config)
     libc_name=$(basename ${libc} .config)
-    version_name=$(basename ${version} .config)
-    name="${arch_name}-${libc_name}-${version_name}"
+    variant_name=$(basename ${variant} .config)
+    name="${arch_name}-${libc_name}-${variant_name}"
     extras=""
     optionals=""
     config_file=${frag_dir}/${name}
-    printf "| %20s | %7s | %14s |" ${arch_name} ${libc_name} ${version_name}
-    cat ${arch} ${libc} ${version} ${common_config} > ${config_file}
+    printf "| %20s | %7s | %14s |" ${arch_name} ${libc_name} ${variant_name}
+    cat ${arch} ${libc} ${variant} ${common_config} > ${config_file}
     for extra in $(ls -1 ${base_dir}/configs/extra/); do
         extra_m=${extra%.config}
         if [[ $name = $extra_m ]]; then
@@ -191,17 +191,17 @@ EOF
 	mv .gitlab-ci.yml.tmp .gitlab-ci.yml
 }
 
-if test "${opt_version}" = "special" ; then
+if test "${opt_variant}" = "special" ; then
 	for special in $(ls ./configs/special/*.config); do
 		add_special
 	done
 else
-	printf "| %20s | %7s | %14s | %30s | %50s | status\n" "arch" "libc" "version" "extras" "optionals"
+	printf "| %20s | %7s | %14s | %30s | %50s | status\n" "arch" "libc" "variant" "extras" "optionals"
 	echo
 
 	for arch in $(ls ./configs/arch/${opt_arch}.config); do
 		for libc in $(ls ./configs/libc/${opt_libc}.config); do
-			for version in $(ls ./configs/version/${opt_version}.config); do
+			for variant in $(ls ./configs/version/${opt_variant}.config); do
 				add_to_ci
 			done
 		done
