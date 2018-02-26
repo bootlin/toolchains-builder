@@ -140,7 +140,8 @@ function set_test_config {
 	;;
     sparcv8)
         test_defconfig="qemu_sparc_ss10_defconfig"
-        test_board_dir="sparc-ss10"
+        # Qemu >= 2.10 doesn't boot this defconfig anymore
+        # test_board_dir="sparc-ss10"
 	;;
     x86-core2)
         test_defconfig="qemu_x86_defconfig"
