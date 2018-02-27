@@ -8,7 +8,7 @@ frag_dir=${base_dir}/frags
 git_current_branch=$(git symbolic-ref -q --short HEAD)
 common_config="./configs/common.config"
 gitlab_base=".gitlab-ci.yml.in"
-git_build_branch="builds"
+git_build_branch="builds-$(date +%s)"
 
 debug=0
 opt_arch="*"
