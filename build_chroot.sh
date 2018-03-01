@@ -73,7 +73,7 @@ function build_toolchain {
 
     # Making legals
     echo "  making legal infos at $(date)"
-    make -C ${buildroot_dir} O=${output_dir} legal-info > /dev/null 2>&1
+    make -C ${buildroot_dir} O=${output_dir} legal-info 2>&1 | tee ${logfile}
     if [ $? -ne 0 ] ; then
 	    return 1
     fi
