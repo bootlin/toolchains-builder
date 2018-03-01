@@ -13,6 +13,8 @@
 #  - Toolchain in /opt/${toolchain name}
 #  - Buildroot output in /opt/output
 
+set -o pipefail
+
 function show_help {
     cat - <<EOF
     Usage: $0 toolchain_name
