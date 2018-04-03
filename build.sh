@@ -135,6 +135,10 @@ function set_test_config {
         test_defconfig="qemu_ppc64le_pseries_defconfig"
         test_board_dir="ppc64le-pseries"
 	;;
+    powerpc64-e5500)
+        test_defconfig="qemu_ppc64_e5500_defconfig"
+        test_board_dir="ppc64-e5500"
+	;;
     sh-sh4)
         test_defconfig="qemu_sh4_r2d_defconfig"
         test_board_dir="sh4-r2d"
