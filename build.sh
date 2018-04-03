@@ -282,9 +282,9 @@ function launch_build {
 
     if [ ! -e ${chroot_dir}/.strapped ]; then
         if grep "bleeding-edge" <<<"${name}"; then
-            debootstrap --variant=buildd jessie ${chroot_dir} http://ftp.us.debian.org/debian/ || return 1
+            debootstrap --variant=buildd stretch ${chroot_dir} http://ftp.us.debian.org/debian/ || return 1
         else
-            debootstrap --variant=buildd squeeze ${chroot_dir} http://archive.debian.org/debian/ || return 1
+            debootstrap --variant=buildd jessie ${chroot_dir} http://ftp.us.debian.org/debian/ || return 1
         fi
     fi
     touch ${chroot_dir}/.strapped
