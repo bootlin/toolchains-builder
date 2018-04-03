@@ -26,6 +26,9 @@ EOF
 }
 
 function prepare_system {
+    # dpkg fixup lets this script be recoverable if the chroot is reused and
+    # previously the script was broke into before completing the .deb installs
+    dpkg --configure -a
     apt-get install -y --force-yes -qq --no-install-recommends \
 	    build-essential locales bc ca-certificates file rsync gcc-multilib \
 	    git bzr cvs mercurial subversion unzip wget cpio curl git-core \
