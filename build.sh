@@ -65,6 +65,10 @@ br_version=$(git describe --tags)
 echo "Buildroot version: " ${br_version}
 cd ${main_dir}
 
+function cleanup_mount {
+    mountpoint -q $1 && umount $1
+}
+
 function set_test_config {
     case "${arch_name}" in
     armv5-* | armv6-* | armv7-*)
@@ -264,6 +268,8 @@ function build_test {
 
 function launch_build {
     echo "  Setup chroot and launch build"
+    cleanup_mount ${chroot_dir}/proc
+    cleanup_mount ${build_dir}/buildroot
     rm -rf ${build_dir} || return 1
     mkdir -p ${build_dir} || return 1
     mkdir -p ${build_dir}/buildroot || return 1
