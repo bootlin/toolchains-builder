@@ -51,10 +51,15 @@ if [ "$target" == "ci_debug" ]; then
     exit 0;
 fi
 
-git clone https://github.com/buildroot/buildroot.git ${buildroot_dir} || exit 1
-cd ${buildroot_dir}
-git remote add buildroot-toolchains https://github.com/free-electrons/buildroot-toolchains.git || exit 1
-git fetch buildroot-toolchains || exit 1
+if [ ! -d "${buildroot_dir}" ]; then
+	git clone https://github.com/buildroot/buildroot.git ${buildroot_dir} || exit 1
+	cd ${buildroot_dir}
+	git remote add buildroot-toolchains https://github.com/free-electrons/buildroot-toolchains.git || exit 1
+	git fetch buildroot-toolchains || exit 1
+else
+	cd ${buildroot_dir}
+	git fetch --all
+fi
 git checkout $buildroot_tree || exit 1
 br_version=$(git describe --tags)
 echo "Buildroot version: " ${br_version}
