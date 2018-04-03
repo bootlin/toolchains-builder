@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [ $# -ne 4 ]; then
+if [ $# -lt 4 ]; then
     cat - <<EOF
-    Usage: $0 name target buildroot_treeish
+    Usage: $0 name target buildroot_treeish version build_type(optional)
 
 name:
         This is the name of the toolchain you are compiling. The name should at
@@ -20,7 +20,7 @@ buildroot_treeish:
 version:
 	Version identifier.
 
-build type:
+build_type: (optional)
 	local - disables uploading of material to the web server
 EOF
     exit 1
