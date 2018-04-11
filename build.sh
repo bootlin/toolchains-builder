@@ -33,7 +33,7 @@ target="$2"
 buildroot_tree="$3"
 version="$4"
 
-ssh_server="gitlabci@toolchains.free-electrons.com"
+ssh_server="gitlabci@toolchains.bootlin.com"
 main_dir=$(pwd)
 frag_dir=${main_dir}/frags
 chroot_dir=${main_dir}/build
@@ -41,8 +41,8 @@ build_dir=${chroot_dir}/opt
 chroot_script="build_chroot.sh"
 buildroot_dir=${main_dir}/buildroot
 fragment_file=${build_dir}/br_fragment
-base_url_sed="http:\/\/toolchains.free-electrons.com\/downloads\/${target}\/toolchains"
-base_url="http://toolchains.free-electrons.com/downloads/${target}"
+base_url_sed="http:\/\/toolchains.bootlin.com\/downloads\/${target}\/toolchains"
+base_url="http://toolchains.bootlin.com/downloads/${target}"
 upload_root_folder="www/downloads"
 
 if [ "$target" == "ci_debug" ]; then
