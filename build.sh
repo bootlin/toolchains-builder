@@ -456,6 +456,8 @@ EOF
     rsync -r ${build_dir}/output/defconfig ${ssh_server}:${upload_folder}/build_fragments/${release_name}.defconfig # build fragment
     rsync -r ${build_dir}/output/legal-info/host-licenses/ ${ssh_server}:${upload_root_folder}/${target}/licenses/  # licenses
     rsync -r ${build_dir}/output/legal-info/host-sources/ ${ssh_server}:${upload_root_folder}/${target}/sources/    # sources
+    rsync -r ${build_dir}/output/legal-info/licenses/ ${ssh_server}:${upload_root_folder}/${target}/licenses/  	    # licenses
+    rsync -r ${build_dir}/output/legal-info/sources/ ${ssh_server}:${upload_root_folder}/${target}/sources/         # sources
     ssh ${ssh_server} "touch ${upload_folder}/available_toolchains/${release_name}"                                 # toolchain name for webpage listing
     ssh ${ssh_server} "touch ${upload_root_folder}/NEED_REFRESH"
 }
