@@ -29,3 +29,19 @@ probably this script your looking for.
 
 
 All these scripts can be called without arguments to get their usage informations.
+
+
+# Hosted Toolchains Build Process
+
+The automated process for the toolchains hosted at [Bootlin](https://toolchains.bootlin.com/)
+begins with git clones of [bootlin toolchains-builder](https://github.com/bootlin/toolchains-builder)
+and [bootlin buildroot-toolchains](https://github.com/bootlin/buildroot-toolchains). Once the
+repositories are cloned, the tags specified by the CI configuration are checked out and the CI
+starts the builds. After the build is completed, a qemu test is run to verify the toolchains. The
+toolchains are then archived, the sha256 are posted alongside the tarballs of the toolchains, and
+build logs are published.
+
+The chain of trust can be verified with multiple steps. The sha256 of the tarball can be compared
+with the listed sha256. The timestamps of the tarball and sha256 file can be compared. The build
+log can be compared with the summary.csv that is included in the tarball to verify the buildroot
+version used.
