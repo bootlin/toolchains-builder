@@ -29,7 +29,7 @@ function prepare_system {
     apt-get install -y --force-yes -qq --no-install-recommends \
 	    build-essential locales bc ca-certificates file rsync gcc-multilib \
 	    git bzr cvs mercurial subversion unzip wget cpio curl git-core \
-	    libc6-i386 python-argparse 2>&1 1>/dev/null || return 1
+	    libc6-i386 python3 python-argparse 2>&1 1>/dev/null || return 1
     sed -i 's/# \(en_US.UTF-8\)/\1/' /etc/locale.gen
     /usr/sbin/locale-gen || return 1
 }
