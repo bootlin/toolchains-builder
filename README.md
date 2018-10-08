@@ -1,6 +1,6 @@
 # Toolchains builder
 
-The goal of this project is to automatize the build of a wide range of toolchains using [Buildroot](https://buildroot.org).
+The goal of this project is to automate the build of a wide range of toolchains using [Buildroot](https://buildroot.org).
 
 Since making a per-toolchain configuration is not viable, some scripts have been made to allow a more flexible configuration.
 You can find all the config fragments in the [configs](configs) folder.
@@ -28,4 +28,4 @@ testing it or packaging anything. If you simply want to reproduce the build for 
 probably this script your looking for.
 
 
-All these scripts can be called without arguments to get their usage informations.
+All these scripts can be called without arguments to get their usage information.
