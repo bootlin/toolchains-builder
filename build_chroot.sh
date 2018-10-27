@@ -60,7 +60,8 @@ function build_toolchain {
     echo "==================== END DEFCONFIG ======================="
 
     # Build
-    timeout 225m make -C ${buildroot_dir} O=${output_dir} 2>&1 | tee ${logfile} | grep --colour=never ">>>"
+    # FORCE_UNSAFE_CONFIGURE=1 to allow to build host-tar as root
+    timeout 225m make FORCE_UNSAFE_CONFIGURE=1 -C ${buildroot_dir} O=${output_dir} 2>&1 | tee ${logfile} | grep --colour=never ">>>"
     if [ $? -ne 0 ] ; then
         echo "  finished at $(date) ... FAILED"
         echo "=================== BEGIN LOG FILE ======================"
