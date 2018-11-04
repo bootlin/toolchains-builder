@@ -245,7 +245,8 @@ function build_test {
     echo "=================== END TEST SYSTEM DEFCONFIG ======================"
 
     echo "  building test system"
-    make -C ${buildroot_dir} O=${test_dir} > ${testlogfile} 2>&1
+    # FORCE_UNSAFE_CONFIGURE=1 to allow to build host-tar as root
+    make FORCE_UNSAFE_CONFIGURE=1 -C ${buildroot_dir} O=${test_dir} > ${testlogfile} 2>&1
     if [ $? -ne 0 ] ; then
         echo "  finished test system build at $(date) ... FAILED"
         echo "  printing the end of the logs before exiting"
