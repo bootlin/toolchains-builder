@@ -132,7 +132,7 @@ function check_config {
 
 # Get buildroot if it's not done to check the configurations
 if [ ! -d ${br_path} ] ; then
-       git clone https://github.com/free-electrons/buildroot-toolchains.git ${br_path}
+       git clone https://github.com/bootlin/buildroot-toolchains.git ${br_path}
 fi
 
 cd ${br_path}
@@ -221,7 +221,7 @@ git add .
 git add -f .gitlab-ci.yml
 git commit -m "Build bot: trigger new builds"
 if [ "$opt_target" != "no_push" ]; then
-    git remote add gitlab git@gitlab.com:free-electrons/toolchains-builder.git
+    git remote add gitlab git@gitlab.com:bootlin/toolchains-builder.git
     git push -u -f gitlab ${git_build_branch}
 fi
 

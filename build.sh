@@ -53,7 +53,7 @@ fi
 
 git clone https://github.com/buildroot/buildroot.git ${buildroot_dir} || exit 1
 cd ${buildroot_dir}
-git remote add buildroot-toolchains https://github.com/free-electrons/buildroot-toolchains.git || exit 1
+git remote add buildroot-toolchains https://github.com/bootlin/buildroot-toolchains.git || exit 1
 git fetch buildroot-toolchains || exit 1
 git fetch --tags buildroot-toolchains || exit 1
 git checkout $buildroot_tree || exit 1
@@ -369,7 +369,7 @@ function package {
 
 For those who would like to reproduce the toolchain, you can just follow these steps:
 
-    git clone https://github.com/free-electrons/buildroot-toolchains.git buildroot
+    git clone https://github.com/bootlin/buildroot-toolchains.git buildroot
     cd buildroot
     git checkout ${buildroot_tree}
 
