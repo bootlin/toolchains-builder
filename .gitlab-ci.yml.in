@@ -7,7 +7,7 @@ before_script:
     build-essential locales bc ca-certificates file rsync gcc-multilib
     git bzr cvs mercurial subversion libc6:i386 unzip wget cpio curl
     qemu-system-* openbios-sparc* debootstrap schroot expect telnet
-    openssh-client rsync bsdmainutils 2>&1 1>/dev/null
+    openssh-client rsync bsdmainutils
     # To be able to generate a toolchain with locales, enable one UTF-8 locale
   - sed -i 's/# \(en_US.UTF-8\)/\1/' /etc/locale.gen
   - /usr/sbin/locale-gen
