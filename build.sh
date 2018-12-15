@@ -309,7 +309,7 @@ function make_br_fragment {
         echo "# BR2_TOOLCHAIN_EXTERNAL_LOCALE is not set" >> ${fragment_file}
     fi
     if grep "BR2_TOOLCHAIN_BUILDROOT_CXX=y" ${configfile} > /dev/null 2>&1; then
-        echo "BR2_TOOLCHAIN_EXTERNAL_HAS_CXX=y" >> ${fragment_file}
+        echo "BR2_TOOLCHAIN_EXTERNAL_CXX=y" >> ${fragment_file}
     else
         echo "# BR2_TOOLCHAIN_EXTERNAL_CXX is not set" >> ${fragment_file}
     fi
