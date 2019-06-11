@@ -313,6 +313,11 @@ function make_br_fragment {
     else
         echo "# BR2_TOOLCHAIN_EXTERNAL_CXX is not set" >> ${fragment_file}
     fi
+    if grep "BR2_TOOLCHAIN_BUILDROOT_FORTRAN=y" ${configfile} > /dev/null 2>&1; then
+        echo "BR2_TOOLCHAIN_EXTERNAL_FORTRAN=y" >> ${fragment_file}
+    else
+        echo "# BR2_TOOLCHAIN_EXTERNAL_FORTRAN is not set" >> ${fragment_file}
+    fi
     if grep "BR2_TOOLCHAIN_HAS_SSP=y" ${configfile} > /dev/null 2>&1; then
         echo "BR2_TOOLCHAIN_EXTERNAL_HAS_SSP=y" >> ${fragment_file}
     else
