@@ -1,4 +1,4 @@
-image: ubuntu:artful
+image: ubuntu:disco
 
 before_script:
   - dpkg --add-architecture i386
