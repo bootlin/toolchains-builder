@@ -137,6 +137,11 @@ function set_test_config {
         test_defconfig="qemu_ppc64le_pseries_defconfig"
         test_board_dir="ppc64le-pseries"
 	;;
+    riscv64)
+        test_defconfig="qemu_riscv64_virt_defconfig"
+        # Needs qemu >= 2.12
+        test_board_dir="riscv64-virt"
+        ;;
     sh-sh4)
         test_defconfig="qemu_sh4_r2d_defconfig"
         test_board_dir="sh4-r2d"
