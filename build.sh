@@ -124,7 +124,8 @@ function set_test_config {
 	;;
     nios2)
         test_defconfig="qemu_nios2_10m50_defconfig"
-	# cannot boot under qemu, 2.9 needed
+	# Needs qemu >= 2.9
+	test_board_dir="nios2-10m50"
 	;;
     powerpc64-power8)
         test_defconfig="qemu_ppc64_pseries_defconfig"
