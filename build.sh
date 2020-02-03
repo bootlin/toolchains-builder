@@ -120,7 +120,8 @@ function set_test_config {
 	;;
     m68k-coldfire)
 	test_defconfig="qemu_m68k_mcf5208_defconfig"
-	# cannot boot under qemu, 2.9 needed
+	# Needs qemu >= 2.9
+	test_board_dir="m68k-mcf5208"
 	;;
     nios2)
         test_defconfig="qemu_nios2_10m50_defconfig"
