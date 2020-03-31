@@ -265,11 +265,7 @@ function launch_build {
     mkdir -p ${build_dir} || return 1
     mkdir -p ${build_dir}/buildroot || return 1
 
-    if grep "bleeding-edge" <<<"${name}"; then
-            debootstrap --variant=buildd jessie ${chroot_dir} http://ftp.us.debian.org/debian/ || return 1
-    else
-            debootstrap --variant=buildd squeeze ${chroot_dir} http://archive.debian.org/debian/ || return 1
-    fi
+    debootstrap --variant=buildd jessie ${chroot_dir} http://ftp.us.debian.org/debian/ || return 1
 
     mkdir -p ${chroot_dir}/proc || return 1
     mount --bind /proc ${chroot_dir}/proc || return 1
