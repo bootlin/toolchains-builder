@@ -138,7 +138,7 @@ git fetch origin || exit 1
 git reset --hard origin/${opt_brtree} || exit 1
 cd ${base_dir} || exit 1
 
-git branch -D ${git_build_branch}
+git branch -D ${git_build_branch} 2> /dev/null
 git checkout -b ${git_build_branch} || exit 1
 
 cp ${gitlab_base} .gitlab-ci.yml
