@@ -83,8 +83,6 @@ while getopts "a:l:v:t:b:n:dh" opt; do
     esac
 done
 
-if [ $debug -eq 0 ]; then exec 2>/dev/null; fi
-
 if [ -z $opt_version ] ; then
 	echo "ERROR: -n option is mandatory"
 	exit 1
