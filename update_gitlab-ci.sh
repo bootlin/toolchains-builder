@@ -135,7 +135,7 @@ fi
 
 cd ${br_path} || exit 1
 git fetch origin || exit 1
-git reset --hard ${opt_brtree} || exit 1
+git reset --hard origin/${opt_brtree} || exit 1
 cd ${base_dir} || exit 1
 
 git branch -D ${git_build_branch}
