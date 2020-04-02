@@ -133,13 +133,13 @@ if [ ! -d ${br_path} ] ; then
        git clone https://github.com/bootlin/buildroot-toolchains.git ${br_path}
 fi
 
-cd ${br_path}
-git fetch origin
-git reset --hard ${opt_brtree}
-cd ${base_dir}
+cd ${br_path} || exit 1
+git fetch origin || exit 1
+git reset --hard ${opt_brtree} || exit 1
+cd ${base_dir} || exit 1
 
 git branch -D ${git_build_branch}
-git checkout -b ${git_build_branch}
+git checkout -b ${git_build_branch} || exit 1
 
 cp ${gitlab_base} .gitlab-ci.yml
 
