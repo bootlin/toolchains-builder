@@ -217,7 +217,7 @@ else
 	done
 fi
 
-git add .
+git add frags/
 git add -f .gitlab-ci.yml
 git commit -m "Build bot: trigger new builds"
 if [ "$opt_target" != "no_push" ]; then
