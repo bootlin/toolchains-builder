@@ -26,6 +26,7 @@ EOF
 }
 
 function prepare_system {
+    mount -t proc none /proc || return 1
     apt-get install -y --force-yes -qq --no-install-recommends \
 	    build-essential locales bc ca-certificates file rsync gcc-multilib \
 	    git bzr cvs mercurial subversion unzip wget cpio curl git-core \

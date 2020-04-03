@@ -268,7 +268,6 @@ function launch_build {
     debootstrap --variant=buildd jessie ${chroot_dir} http://ftp.us.debian.org/debian/ || return 1
 
     mkdir -p ${chroot_dir}/proc || return 1
-    mount --bind /proc ${chroot_dir}/proc || return 1
     mount --bind ${buildroot_dir} ${build_dir}/buildroot || return 1
     cp ${chroot_script} ${build_dir} || return 1
     cp ${frag_dir}/${name}.config ${build_dir} || return 1
