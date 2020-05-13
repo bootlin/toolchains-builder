@@ -281,7 +281,7 @@ function launch_build {
 
 function make_br_fragment {
     echo "  Making BR fragment to use the toolchain"
-    gcc_version=$(grep "^BR2_GCC_VERSION_" ${configfile} | sed 's/BR2_GCC_VERSION_\(.*\)_X=.*/\1/')
+    gcc_version=$(grep '^BR2_TOOLCHAIN_GCC_AT_LEAST=' ${configfile} | sed -e 's/BR2_TOOLCHAIN_GCC_AT_LEAST="\([^"]*\)"/\1/;s/\./_/')
     linux_version=$(grep "^BR2_KERNEL_HEADERS_" ${configfile} | sed 's/BR2_KERNEL_HEADERS_\(.*\)=./\1/')
     locale=$(grep "^BR2_TOOLCHAIN_BUILDROOT_LOCALE" ${configfile} | sed 's/BR2_TOOLCHAIN_BUILDROOT_LOCALE=\(.\)/\1/')
     libc=$(grep "^BR2_TOOLCHAIN_BUILDROOT_LIBC=\".*\"" ${configfile} | sed 's/BR2_TOOLCHAIN_BUILDROOT_LIBC="\(.*\)"/\1/')
