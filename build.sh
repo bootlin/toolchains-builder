@@ -185,6 +185,9 @@ function set_test_config {
     # Extract Qemu command from readme.txt
     test_qemu_cmd=$(grep qemu-system ${buildroot_dir}/board/qemu/${test_board_dir}/readme.txt)
 
+    # Drop trailing comment
+    test_qemu_cmd=$(echo ${test_qemu_cmd} | sed "s%#.*%%")
+
     # Replace the output/ folder by the correct path
     test_qemu_cmd=$(echo ${test_qemu_cmd} | sed "s%output/%${test_dir}/%g")
 
