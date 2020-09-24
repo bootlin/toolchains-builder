@@ -3,6 +3,7 @@ image: ubuntu:focal
 before_script:
   - dpkg --add-architecture i386
   - apt-get -qq update
+  - apt-get -qq -y upgrade
   - DEBIAN_FRONTEND=noninteractive apt-get -y -qq --no-install-recommends
     install build-essential locales bc ca-certificates file rsync
     gcc-multilib git bzr cvs mercurial subversion libc6:i386 unzip
