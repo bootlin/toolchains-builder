@@ -168,6 +168,7 @@ function set_test_config {
         sed -i "s/tty1/ttyS0/" ${buildroot_dir}/configs/${test_defconfig}
         test_board_dir="x86_64"
         test_qemu_append="rw console=ttyS0"
+        test_qemu_args="-cpu Nehalem"
 	;;
     xtensa-lx60)
         test_defconfig="qemu_xtensa_lx60_defconfig"
