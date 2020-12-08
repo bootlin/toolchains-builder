@@ -326,7 +326,7 @@ function make_br_fragment {
         echo "# BR2_TOOLCHAIN_EXTERNAL_HAS_SSP is not set" >> ${fragment_file}
     fi
     if grep "BR2_PTHREAD_DEBUG is not set" ${configfile} > /dev/null 2>&1; then
-        echo "BR2_TOOLCHAIN_EXTERNAL_HAS_THREADS_DEBUG=n" >> ${fragment_file}
+        echo "# BR2_TOOLCHAIN_EXTERNAL_HAS_THREADS_DEBUG is not set" >> ${fragment_file}
     else
         echo "BR2_TOOLCHAIN_EXTERNAL_HAS_THREADS_DEBUG=y" >> ${fragment_file}
     fi
