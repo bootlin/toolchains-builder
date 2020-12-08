@@ -340,6 +340,11 @@ function make_br_fragment {
     else
         echo "BR2_TOOLCHAIN_EXTERNAL_HAS_THREADS_NPTL=y" >> ${fragment_file}
     fi
+    if grep "BR2_TOOLCHAIN_HAS_NATIVE_RPC=y" ${configfile} > /dev/null 2>&1; then
+        echo "BR2_TOOLCHAIN_EXTERNAL_INET_RPC=y" >> ${fragment_file}
+    else
+        echo "# BR2_TOOLCHAIN_EXTERNAL_INET_RPC is not set" >> ${fragment_file}
+    fi
     if [ "${libc}" == "glibc" ]; then
         echo "BR2_TOOLCHAIN_EXTERNAL_CUSTOM_GLIBC=y" >> ${fragment_file}
     elif [ "${libc}" == "musl" ]; then
