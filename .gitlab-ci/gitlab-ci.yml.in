@@ -1,0 +1,67 @@
+.toolchain_build:
+    stage: toolchain_build
+    image: kubu93/toolchain-builder:20210227.0043
+    before_script:
+        - DEFCONFIG_FRAG_NAME=$(echo ${CI_JOB_NAME} | sed -e 's,_build$,,g')
+    script:
+        - echo "Start building toolchain for ${DEFCONFIG_FRAG_NAME}"
+        - |
+            ./build-toolchain.sh ${DEFCONFIG_FRAG_NAME} ${TOOLCHAIN_BUILDER_TARGET} ${TOOLCHAIN_BUILDER_BRTREE} ${TOOLCHAIN_BUILDER_VERSION} 2>&1 || {
+                echo 'Failed build last output'
+                tail -200 build/*-build.log
+                exit 1
+            }
+    artifacts:
+        when: always
+        expire_in: 2 weeks
+        paths:
+            - build/*.config
+            - build/*-build.log
+            - build/*.tar.bz2
+            - build/*.sha256
+            - build/README.txt
+            - build/summary.csv
+            - build/output/.config
+            - build/output/defconfig
+            - build/output/legal-info/
+            - build/br_fragment
+
+.toolchain_test:
+    stage: toolchain_test
+    image: buildroot/base:20200814.2228
+    before_script:
+        - DEFCONFIG_FRAG_NAME=$(echo ${CI_JOB_NAME} | sed -e 's,_test$,,g')
+    script:
+        - echo "Start testing toolchain for ${DEFCONFIG_FRAG_NAME}"
+        - |
+            ./test-toolchain.sh ${DEFCONFIG_FRAG_NAME} ${TOOLCHAIN_BUILDER_TARGET} ${TOOLCHAIN_BUILDER_BRTREE} ${TOOLCHAIN_BUILDER_VERSION} 2>&1 || {
+                echo 'Failed test last output'
+                tail -200 test/*-test-build.log
+                tail -200 test/*-test-boot.log
+                exit 1
+            }
+    artifacts:
+        when: always
+        expire_in: 2 weeks
+        paths:
+            - test/*.config
+            - test/*.tar.bz2
+            - test/*.sha256
+            - test/*-test-result.txt
+            - test/*-test-build.log
+            - test/*-test-boot.log
+            - test/output/.config
+            - test/output/images
+
+.toolchain_upload:
+    stage: toolchain_upload
+    image: tpetazzoni/toolchain-upload:20211224.1113
+    before_script:
+        - DEFCONFIG_FRAG_NAME=$(echo ${CI_JOB_NAME} | sed -e 's,_upload,,g')
+        - eval $(ssh-agent -s)
+        - ssh-add <(echo "$SSH_PRIVATE_KEY")
+        - mkdir -p ~/.ssh
+        - '[[ -f /.dockerenv ]] && echo "$SSH_SERVER_HOSTKEYS" > ~/.ssh/known_hosts'
+    script:
+      - echo "Uploading toolchain for ${DEFCONFIG_FRAG_NAME}"
+      - ./upload-toolchain.sh ${DEFCONFIG_FRAG_NAME} ${TOOLCHAIN_BUILDER_TARGET} ${TOOLCHAIN_BUILDER_BRTREE} ${TOOLCHAIN_BUILDER_VERSION}

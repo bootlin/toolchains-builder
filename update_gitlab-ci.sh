@@ -7,7 +7,6 @@ frag_dir=${base_dir}/frags
 
 git_current_branch=$(git symbolic-ref -q --short HEAD)
 common_config="./configs/common.config"
-gitlab_base=".gitlab-ci.yml.in"
 git_build_branch="builds-$(date +%Y-%m-%d--%H-%M-%S)"
 
 debug=0
@@ -141,8 +140,6 @@ cd ${base_dir} || exit 1
 git branch -D ${git_build_branch} 2> /dev/null
 git checkout -b ${git_build_branch} || exit 1
 
-cp ${gitlab_base} .gitlab-ci.yml
-
 mkdir ${frag_dir}
 
 function add_to_ci {
@@ -172,13 +169,7 @@ function add_to_ci {
             fi
         done
         mv ${config_file} ${frag_dir}/${release_name}.config
-        cat .gitlab-ci.yml - > .gitlab-ci.yml.tmp <<EOF
-${release_name}:
-  script:
-    - ./build.sh ${release_name} ${opt_target} ${opt_brtree} ${opt_version}
 
-EOF
-        mv .gitlab-ci.yml.tmp .gitlab-ci.yml
        printf " %50s | OK\n" "${optionals}"
     else
        printf " %50s | NOK\n" # ${optionals}
@@ -189,14 +180,17 @@ EOF
 function add_special {
 	special_name=$(basename ${special} .config)
 	cp ${special} ${frag_dir}/
-	cat .gitlab-ci.yml - > .gitlab-ci.yml.tmp <<EOF
-${special_name}:
-  script:
-    - ./build.sh ${special_name} ${opt_target} ${opt_brtree} ${opt_version}
+}
+
+cat .gitlab-ci.yml - > .gitlab-ci.yml.tmp <<EOF
+
+variables:
+    TOOLCHAIN_BUILDER_TARGET: "${opt_target}"
+    TOOLCHAIN_BUILDER_BRTREE: "${opt_brtree}"
+    TOOLCHAIN_BUILDER_VERSION: "${opt_version}"
 
 EOF
-	mv .gitlab-ci.yml.tmp .gitlab-ci.yml
-}
+mv .gitlab-ci.yml.tmp .gitlab-ci.yml
 
 if test "${opt_variant}" = "special" ; then
 	for special in $(ls ./configs/special/*.config); do

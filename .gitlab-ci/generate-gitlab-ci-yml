@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -e
+set -o pipefail
+
+main() {
+    local template="${1}"
+
+    preamble "${template}"
+    gen_tests
+}
+
+preamble() {
+    local template="${1}"
+
+    cat - "${template}" <<-_EOF_
+	# This file is generated; do not edit!
+	# Builds appear on https://gitlab.com/kubu93/toolchains-builder/pipelines
+
+	stages:
+	  - toolchain_build
+	  - toolchain_test
+	  - toolchain_upload
+
+	variables:
+	  TOOLCHAIN_BUILDER_TARGET: "${TOOLCHAIN_BUILDER_TARGET}"
+	  TOOLCHAIN_BUILDER_BRTREE: "${TOOLCHAIN_BUILDER_BRTREE}"
+	  TOOLCHAIN_BUILDER_VERSION: "${TOOLCHAIN_BUILDER_VERSION}"
+
+_EOF_
+}
+
+gen_tests() {
+    local -a toolchain_jobs
+    local cfg
+
+    toolchain_jobs=( $(cd frags; LC_ALL=C ls -1 *.config | sed 's/\.config$//') )
+
+    for cfg in "${toolchain_jobs[@]}"; do
+        printf '%s_build: { extends: .toolchain_build }\n' "${cfg}"
+        printf '%s_test: { extends: .toolchain_test, needs: ["%s_build"] }\n' \
+                "${cfg}" "${cfg}"
+        printf '%s_upload: { extends: .toolchain_upload, needs: ["%s_build", "%s_test"] }\n' \
+                "${cfg}" "${cfg}" "${cfg}"
+    done
+}
+
+main "${@}"

@@ -1,5 +1,8 @@
-Toolchains are hosted here: http://toolchains.bootlin.com/
+This is a toolchain provided by the https://toolchains.bootlin.com/
+service. This toolchain was built using Buildroot.
 
-All the licenses can be found here: http://toolchains.bootlin.com/downloads/releases/licenses/
-All the sources can be found here: http://toolchains.bootlin.com/downloads/releases/sources/
+The complete source code for all components of the toolchain can be
+found at http://toolchains.bootlin.com/downloads/releases/sources/.
 
+The complete license text of all components of the toolchain can be
+found at http://toolchains.bootlin.com/downloads/releases/licenses/.
