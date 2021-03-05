@@ -10,7 +10,7 @@ before_script:
     wget cpio curl qemu-system-arm qemu-system-mips qemu-system-misc
     qemu-system-ppc qemu-system-s390x qemu-system-sparc qemu-system-x86
     openbios-sparc* debootstrap schroot expect telnet openssh-client
-    rsync bsdmainutils
+    rsync bsdmainutils python3 python3-pexpect
     # To be able to generate a toolchain with locales, enable one UTF-8 locale
   - sed -i 's/# \(en_US.UTF-8\)/\1/' /etc/locale.gen
   - /usr/sbin/locale-gen
