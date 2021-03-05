@@ -122,6 +122,10 @@ function set_test_config {
 	# Needs qemu >= 2.9
 	test_board_dir="nios2-10m50"
 	;;
+    openrisc)
+        test_defconfig="qemu_or1k_defconfig"
+        test_board_dir="or1k"
+        ;;
     powerpc64-power8)
         test_defconfig="qemu_ppc64_pseries_defconfig"
         test_board_dir="ppc64-pseries"
