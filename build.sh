@@ -186,11 +186,9 @@ function set_test_config {
         return
     fi
 
-    # Extract Qemu command from readme.txt
-    test_qemu_cmd=$(grep qemu-system ${buildroot_dir}/board/qemu/${test_board_dir}/readme.txt)
-
-    # Drop trailing comment
-    test_qemu_cmd=$(echo ${test_qemu_cmd} | sed "s%#.*%%")
+    # Search for "# qemu_*_defconfig" tag in all readme.txt files.
+    # Qemu command line on multilines using back slash are accepted.
+    test_qemu_cmd=$(sed -r ':a; /\\$/N; s/\\\n//; s/\t/ /; ta; /# '${test_defconfig}'$/!d; s/#.*//' ${buildroot_dir}/board/qemu/${test_board_dir}/readme.txt)
 
     # Replace the output/ folder by the correct path
     test_qemu_cmd=$(echo ${test_qemu_cmd} | sed "s%output/%${test_dir}/%g")
