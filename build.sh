@@ -135,6 +135,10 @@ function set_test_config {
         test_defconfig="qemu_ppc64_e5500_defconfig"
         test_board_dir="ppc64-e5500"
 	;;
+    riscv64)
+        test_defconfig="qemu_riscv64_virt_defconfig"
+        test_board_dir="riscv64-virt"
+        ;;
     s390x-z13)
         test_defconfig="qemu_s390x_defconfig"
         test_board_dir="s390x"
