@@ -212,10 +212,26 @@ function set_test_config {
 }
 
 function boot_test {
+
+    mkdir -p ${test_dir}/images
+
+cat <<-_EOF_ > "${test_dir}/images/start-qemu.sh"
+	#!/bin/sh
+	(
+	BINARIES_DIR="\${0%/*}/"
+	cd \${BINARIES_DIR}
+
+	export PATH="${test_dir}/host/bin:\${PATH}"
+	exec ${test_qemu_cmd}
+	)
+_EOF_
+
+    chmod +x "${test_dir}/images/start-qemu.sh"
+
     echo "  booting test system ... "
-    export QEMU_COMMAND="$(echo "${test_qemu_cmd}"|tr -d '\n')"
     echo "  boot command: ${test_qemu_cmd}"
-    if ! expect expect.sh; then
+    cd ${build_dir}
+    if ! ${buildroot_dir}/support/scripts/boot-qemu-image.py ${test_defconfig} ; then
         echo "  booting test system ... FAILED"
         return 1
     fi
@@ -502,7 +518,8 @@ function generate {
 
     toolchain_dir="${build_dir}/${release_name}"
     configfile=${toolchain_dir}/buildroot.config
-    test_dir=${build_dir}/test-${name}
+    # Use "output" directory name to use boot-qemu-image.py
+    test_dir=${build_dir}/output
     overlaydir=${test_dir}/overlay
 
     make_br_fragment
