@@ -71,9 +71,6 @@ function set_test_config {
         test_defconfig="qemu_aarch64_virt_defconfig"
         test_board_dir="aarch64-virt"
 	;;
-    bfin)
-        test_defconfig="gdb_bfin_bf512_defconfig"
-	;;
     microblazebe)
         test_defconfig="qemu_microblazebe_mmu_defconfig"
         test_board_dir="microblazebe-mmu"
