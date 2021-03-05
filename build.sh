@@ -113,7 +113,7 @@ function set_test_config {
 	;;
     m68k-68xxx)
         test_defconfig="qemu_m68k_q800_defconfig"
-	# cannot boot under qemu, support out of tree
+	test_board_dir="m68k-q800"
 	;;
     m68k-coldfire)
 	test_defconfig="qemu_m68k_mcf5208_defconfig"
