@@ -1,6 +1,23 @@
 #!/bin/bash
 
-if [ $# -ne 4 ]; then
+name="$1"
+target="$2"
+buildroot_tree="$3"
+version="$4"
+
+ssh_server="gitlabci@toolchains.bootlin.com"
+main_dir=$(pwd)
+frag_dir=${main_dir}/frags
+chroot_dir=${main_dir}/build
+build_dir=${chroot_dir}/opt
+chroot_script="build_chroot.sh"
+buildroot_dir=${main_dir}/buildroot
+fragment_file=${build_dir}/br_fragment
+base_url_sed="http:\/\/toolchains.bootlin.com\/downloads\/${target}\/toolchains"
+base_url="http://toolchains.bootlin.com/downloads/${target}"
+upload_root_folder="www/downloads"
+
+function show_help {
     cat - <<EOF
     Usage: $0 name target buildroot_treeish
 
@@ -20,43 +37,7 @@ buildroot_treeish:
 version:
 	Version identifier.
 EOF
-    exit 1
-fi
-
-echo "Building $1"
-echo "Target: $2"
-echo "Buildroot tree: $3"
-echo "Version identifier: $4"
-
-name="$1"
-target="$2"
-buildroot_tree="$3"
-version="$4"
-
-ssh_server="gitlabci@toolchains.bootlin.com"
-main_dir=$(pwd)
-frag_dir=${main_dir}/frags
-chroot_dir=${main_dir}/build
-build_dir=${chroot_dir}/opt
-chroot_script="build_chroot.sh"
-buildroot_dir=${main_dir}/buildroot
-fragment_file=${build_dir}/br_fragment
-base_url_sed="http:\/\/toolchains.bootlin.com\/downloads\/${target}\/toolchains"
-base_url="http://toolchains.bootlin.com/downloads/${target}"
-upload_root_folder="www/downloads"
-
-if [ "$target" == "ci_debug" ]; then
-    echo "ci_debug is set as target, you should see this line, but the build won't go further."
-    echo "Exiting properly."
-    exit 0;
-fi
-
-git clone https://github.com/bootlin/buildroot-toolchains.git ${buildroot_dir} || exit 1
-cd ${buildroot_dir}
-git checkout $buildroot_tree || exit 1
-br_version=$(git describe --tags)
-echo "Buildroot version: " ${br_version}
-cd ${main_dir}
+}
 
 function set_test_config {
     case "${arch_name}" in
@@ -562,14 +543,34 @@ function generate {
     return $return_value
 }
 
-if [ $# -ge 2 ]; then
-    if ! generate ${name}; then
-        echo "Something went wrong. Exiting with code 1"
-        exit 1
-    fi
-else
-    echo "Usage: $0 configname.config target buildroot-tree"
-    exit 1
+function prepare {
+	git clone https://github.com/bootlin/buildroot-toolchains.git ${buildroot_dir} || exit 1
+	cd ${buildroot_dir}
+	git checkout $buildroot_tree || exit 1
+	br_version=$(git describe --tags)
+	echo "Buildroot version: " ${br_version}
+	cd ${main_dir}
+}
+
+if [ $# -ne 4 ]; then
+	show_help
+	exit 1
 fi
 
+echo "Building ${name}"
+echo "Target: ${target}"
+echo "Buildroot tree: ${buildroot_tree}"
+echo "Version identifier: ${version}"
 
+if [ "$target" == "ci_debug" ]; then
+    echo "ci_debug is set as target, you should see this line, but the build won't go further."
+    echo "Exiting properly."
+    exit 0;
+fi
+
+prepare || exit 1
+
+if ! generate ${name}; then
+    echo "Something went wrong. Exiting with code 1"
+    exit 1
+fi
