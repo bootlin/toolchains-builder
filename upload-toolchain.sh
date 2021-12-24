@@ -20,6 +20,8 @@ test_dir=${main_dir}/test
 test_build_dir=${test_dir}/output
 release_name=${name}-${version}
 
+arch_name=$(echo "${name}" |sed "s/--/\t/" |cut -f 1)
+
 ssh_server="gitlabci@toolchains.bootlin.com"
 upload_root_folder="www/downloads"
 upload_folder=${upload_root_folder}/${target}/toolchains/${arch_name}
