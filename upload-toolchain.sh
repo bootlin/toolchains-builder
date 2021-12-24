@@ -36,7 +36,7 @@ function main {
 	ssh ${ssh_server} mkdir -p ${upload_folder}/${d}
     done
 
-    local testbuildlogfile=${test_build_dir}/${release_name}-test.log
+    local testbuildlogfile=${test_dir}/${release_name}-test.log
 
     # If there was a test build, upload its log and configuration file
     if test -f ${testbuildlogfile}; then
@@ -46,7 +46,7 @@ function main {
 	      ${ssh_server}:${upload_folder}/test_system_defconfigs/${release_name}.defconfig
     fi
 
-    local testbootlogfile=${test_build_dir}/${release_name}-test-boot.log
+    local testbootlogfile=${test_dir}/${release_name}-test-boot.log
 
     if test -f ${testbootlogfile}; then
 	echo "Upload test boot log file"
