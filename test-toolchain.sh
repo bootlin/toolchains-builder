@@ -330,7 +330,7 @@ function main {
     if [ "${test_defconfig}" = "" ]; then
 	    echo "No test defconfig for this toolchain, cannot test"
 	    echo "CAN-NOT-TEST" > ${test_dir}/${release_name}-test-result.txt
-	    exit 1
+	    exit 0
     fi
 
     echo "Building a test system using ${name}..."
@@ -350,7 +350,7 @@ function main {
     if [ "${test_qemu_cmd}" = "" ]; then
 	    echo "No qemu command to test this toolchain"
 	    echo "CAN-NOT-TEST" > ${test_dir}/${release_name}-test-result.txt
-	    exit 1
+	    exit 0
     fi
 
     echo "Booting the test system in qemu..."
@@ -371,4 +371,3 @@ if [ $# -ne 4 ]; then
 fi
 
 main
-
