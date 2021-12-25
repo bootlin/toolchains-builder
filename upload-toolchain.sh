@@ -52,12 +52,11 @@ function main {
 	echo "Upload test boot log file"
 	rsync ${testbootlogfile} \
 	      ${ssh_server}:${upload_folder}/boot_test_logs/${release_name}.log
+	echo "Upload image files"
+	for i in ${test_build_dir}/images/* ; do
+	    rsync $i ${ssh_server}:${upload_folder}/test-system/${release_name}-$(basename $i)
+	done
     fi
-
-    for i in ${test_build_dir}/images/* ; do
-	echo "Upload test image $i"
-	rsync $i ${ssh_server}:${upload_folder}/test-system/${release_name}-$(basename $i)
-    done
 
     # README file
     rsync ${build_dir}/README.txt \
