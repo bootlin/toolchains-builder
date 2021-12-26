@@ -36,7 +36,7 @@ function main {
 	ssh ${ssh_server} mkdir -p ${upload_folder}/${d}
     done
 
-    local testbuildlogfile=${test_dir}/${release_name}-test.log
+    local testbuildlogfile=${test_dir}/${release_name}-test-build.log
 
     # If there was a test build, upload its log and configuration file
     if test -f ${testbuildlogfile}; then
