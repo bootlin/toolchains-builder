@@ -30,6 +30,7 @@ function main {
     # Create directories on the server, where the different artefacts
     # will be uploaded.
     for d in fragments tarballs readmes summaries \
+		       build_logs \
                        build_test_logs boot_test_logs \
                        build_fragments test_system_defconfigs \
                        available_toolchains test-system; do
@@ -58,6 +59,9 @@ function main {
 	done
     fi
 
+    # Build log file
+    rsync ${build_dir}/${release_name}-build.log \
+	  ${ssh_server}:${upload_folder}/build_logs/
     # README file
     rsync ${build_dir}/README.txt \
 	  ${ssh_server}:${upload_folder}/readmes/${release_name}.txt
