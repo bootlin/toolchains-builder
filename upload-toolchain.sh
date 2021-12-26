@@ -33,6 +33,7 @@ function main {
 		       build_logs \
                        build_test_logs boot_test_logs \
                        build_fragments test_system_defconfigs \
+                       test_results \
                        available_toolchains test-system; do
 	ssh ${ssh_server} mkdir -p ${upload_folder}/${d}
     done
@@ -92,6 +93,9 @@ function main {
     # Source code for target packages
     rsync -r ${build_dir}/output/legal-info/sources/ \
 	  ${ssh_server}:${upload_root_folder}/${target}/sources/
+    # Test result
+    rsync -r ${test_dir}/${release_name}-test-result.txt \
+	  ${ssh_server}:${upload_folder}/test_results/
     # Make the toolchain as available
     ssh ${ssh_server} touch ${upload_folder}/available_toolchains/${release_name}
     # And ask the webpage to refresh
