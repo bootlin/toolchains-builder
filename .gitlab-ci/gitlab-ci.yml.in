@@ -52,6 +52,7 @@
             - test/*-test-boot.log
             - test/output/.config
             - test/output/images
+            - test/output/defconfig
 
 .toolchain_upload:
     stage: toolchain_upload
