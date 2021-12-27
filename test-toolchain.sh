@@ -32,65 +32,65 @@ function set_test_config {
     armv5-* | armv6-* | armv7-*)
         test_defconfig="qemu_arm_vexpress_defconfig"
         test_board_dir="arm-vexpress"
-		;;
+	;;
     armv7m)
         test_defconfig="stm32f469_disco_defconfig"
-		;;
+	;;
     aarch64)
         test_defconfig="qemu_aarch64_virt_defconfig"
         test_board_dir="aarch64-virt"
-		;;
+	;;
     microblazebe)
         test_defconfig="qemu_microblazebe_mmu_defconfig"
         test_board_dir="microblazebe-mmu"
-		;;
+	;;
     microblazeel)
         test_defconfig="qemu_microblazeel_mmu_defconfig"
         test_board_dir="microblazeel-mmu"
-		;;
+	;;
     mips32)
         test_defconfig="qemu_mips32r2_malta_defconfig"
         test_board_dir="mips32r2-malta"
-		;;
+	;;
     mips32el)
         test_defconfig="qemu_mips32r2el_malta_defconfig"
         test_board_dir="mips32r2el-malta"
-		;;
+	;;
     mips32r5el)
         test_defconfig="qemu_mips32r2el_malta_defconfig"
         test_board_dir="mips32r2el-malta"
         test_qemu_args="-cpu P5600"
-		;;
+	;;
     mips32r6el)
         test_defconfig="qemu_mips32r6el_malta_defconfig"
         test_board_dir="mips32r6el-malta"
-		;;
+	;;
     mips64-n32)
         test_defconfig="qemu_mips64_malta_defconfig"
         test_board_dir="mips64-malta"
-		;;
+	;;
     mips64el-n32)
         test_defconfig="qemu_mips64el_malta_defconfig"
         test_board_dir="mips64el-malta"
-		;;
+	;;
     mips64r6el-n32)
         test_defconfig="qemu_mips64r6el_malta_defconfig"
         test_board_dir="mips64r6el-malta"
-		;;
+	;;
     m68k-68xxx)
         test_defconfig="qemu_m68k_q800_defconfig"
-		test_board_dir="m68k-q800"
-		;;
+	test_board_dir="m68k-q800"
+	;;
     m68k-coldfire)
-		test_defconfig="qemu_m68k_mcf5208_defconfig"
-		# Needs qemu >= 2.9
-		test_board_dir="m68k-mcf5208"
-		;;
+	test_defconfig="qemu_m68k_mcf5208_defconfig"
+	# Needs qemu >= 2.9
+	test_board_dir="m68k-mcf5208"
+	;;
     nios2)
         test_defconfig="qemu_nios2_10m50_defconfig"
-		# Needs qemu >= 2.9
-		test_board_dir="nios2-10m50"
-		;;
+	# Needs qemu >= 2.9
+	test_board_dir="nios2-10m50"
+	;;
     openrisc)
         test_defconfig="qemu_or1k_defconfig"
         test_board_dir="or1k"
@@ -99,15 +99,15 @@ function set_test_config {
         test_defconfig="qemu_ppc64_pseries_defconfig"
         test_board_dir="ppc64-pseries"
         test_qemu_args="-cpu POWER8"
-		;;
+	;;
     powerpc64le-power8)
         test_defconfig="qemu_ppc64le_pseries_defconfig"
         test_board_dir="ppc64le-pseries"
-		;;
+	;;
     powerpc64-e5500)
         test_defconfig="qemu_ppc64_e5500_defconfig"
         test_board_dir="ppc64-e5500"
-		;;
+	;;
     riscv64)
         test_defconfig="qemu_riscv64_virt_defconfig"
         test_board_dir="riscv64-virt"
@@ -119,39 +119,39 @@ function set_test_config {
     sh-sh4)
         test_defconfig="qemu_sh4_r2d_defconfig"
         test_board_dir="sh4-r2d"
-		;;
+	;;
     sparc64)
         test_defconfig="qemu_sparc64_sun4u_defconfig"
         test_board_dir="sparc64-sun4u"
-		;;
+	;;
     sparcv8)
         test_defconfig="qemu_sparc_ss10_defconfig"
         test_board_dir="sparc-ss10"
-		;;
+	;;
     x86-core2)
         test_defconfig="qemu_x86_defconfig"
         sed -i "s/tty1/ttyS0/" ${buildroot_dir}/configs/${test_defconfig}
         test_board_dir="x86"
         test_qemu_append="rw console=ttyS0"
-		;;
+	;;
     x86-i686)
         test_defconfig="qemu_x86_defconfig"
         sed -i "s/tty1/ttyS0/" ${buildroot_dir}/configs/${test_defconfig}
         test_board_dir="x86"
         test_qemu_append="rw console=ttyS0"
-		;;
+	;;
     x86-64-core-i7)
         test_defconfig="qemu_x86_64_defconfig"
         sed -i "s/tty1/ttyS0/" ${buildroot_dir}/configs/${test_defconfig}
         test_board_dir="x86_64"
         test_qemu_append="rw console=ttyS0"
         test_qemu_args="-cpu Nehalem"
-		;;
+	;;
     xtensa-lx60)
         test_defconfig="qemu_xtensa_lx60_defconfig"
         test_board_dir="xtensa-lx60"
         test_qemu_args="-monitor null"
-		;;
+	;;
     esac
 
     if [[ "${test_board_dir}" == "" ]]; then
