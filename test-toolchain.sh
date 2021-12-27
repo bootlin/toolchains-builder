@@ -108,7 +108,7 @@ function set_test_config {
         test_defconfig="qemu_ppc64_e5500_defconfig"
         test_board_dir="ppc64-e5500"
 	;;
-    riscv64)
+    riscv64-lp64d)
         test_defconfig="qemu_riscv64_virt_defconfig"
         test_board_dir="riscv64-virt"
         ;;
