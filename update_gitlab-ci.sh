@@ -8,8 +8,6 @@ base_dir=$(pwd)
 br_path=${base_dir}/buildroot
 frag_dir=${base_dir}/frags
 
-git_current_branch=$(git symbolic-ref -q --short HEAD)
-
 debug=0
 opt_arch="*"
 opt_libc="*"
@@ -22,8 +20,6 @@ function clean_up {
     echo "Catching signal, cleaning up"
     cd ${base_dir}
     rm -rf ${frag_dir}
-    echo "Checkouting to original branch: ${git_current_branch}"
-    git checkout $git_current_branch
     echo "Exiting with code 1"
     exit 1
 }
@@ -138,55 +134,20 @@ function gen_fragment {
     fi
 }
 
-function prepare_git_branch {
-    local branch="$1"
-    git branch -D ${branch} || true
-    git checkout -b ${branch}
-
-    mkdir -p ${frag_dir}
-}
-
-function submit_git_branch {
-    local branch="$1"
-    cat .gitlab-ci.yml - > .gitlab-ci.yml.tmp <<EOF
-variables:
-    TOOLCHAIN_BUILDER_TARGET: "${opt_target}"
-    TOOLCHAIN_BUILDER_BRTREE: "${opt_brtree}"
-    TOOLCHAIN_BUILDER_VERSION: "${opt_version}"
-
-EOF
-    mv .gitlab-ci.yml.tmp .gitlab-ci.yml
-    git add frags/
-    git add -f .gitlab-ci.yml
-    git commit -m "Build bot: trigger new builds"
-    if [ "$opt_target" != "no_push" ]; then
-	git push -u -f git@gitlab.com:bootlin/toolchains-builder.git ${branch}
-    fi
-    git checkout $git_current_branch
-}
-
-function delete_git_branch {
-    local branch="$1"
-    git checkout $git_current_branch
-    git branch -D ${branch}
-}
-
 function handle_special {
-    local git_build_branch="builds-$(date +%Y-%m-%d--%H-%M-%S)"
-    prepare_git_branch ${git_build_branch}
+    mkdir -p ${frag_dir}
+
     for special in $(ls ./configs/special/*.config); do
 	special_name=$(basename ${special} .config)
 	cp ${special} ${frag_dir}/
     done
-    submit_git_branch ${git_build_branch}
 }
 
 function handle_normal {
     printf "| %20s | %7s | %14s | %30s | %50s | status\n" "arch" "libc" "variant" "extras" "optionals"
     echo
 
-	local git_build_branch="builds-$(date +%Y-%m-%d--%H-%M-%S)"
-	prepare_git_branch ${git_build_branch}
+    mkdir -p ${frag_dir}
 
     for arch_config in $(ls ./configs/arch/${opt_arch}.config); do
 	local arch=$(basename ${arch_config} .config)
@@ -203,13 +164,6 @@ function handle_normal {
 	ls frags/
 
     done
-
-	local nfrags=$(ls -1 ${frag_dir} | wc -l)
-	if test ${nfrags} -eq 0; then
-	    delete_git_branch ${git_build_branch}
-	else
-	    submit_git_branch ${git_build_branch}
-	fi
 }
 
 function main {
