@@ -3,15 +3,26 @@
 
 image: buildroot/base:20200814.2228
 
+# Create pipelines by selecting Run pipeline in the GitLab UI, from the project’s CI/CD > Pipelines section.
+# User will customize pre-filled variables if needed.
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "web"
+
 stages:
   - generate-gitlab-ci
   - build
 
 generate-gitlab-ci-yml:
   stage: generate-gitlab-ci
-  script: .gitlab-ci/generate-gitlab-ci-yml .gitlab-ci/gitlab-ci.yml.in > generated-gitlab-ci.yml
+  script:
+    - echo "Generating config fragments artifacts"
+    - ./update_gitlab-ci.sh -b ${TOOLCHAIN_BUILDER_BRTREE} -t ${TOOLCHAIN_BUILDER_TARGET} -v ${TOOLCHAIN_BUILDER_VARIANT} -n ${TOOLCHAIN_BUILDER_VERSION}
+    - .gitlab-ci/generate-gitlab-ci-yml .gitlab-ci/gitlab-ci.yml.in > generated-gitlab-ci.yml
   artifacts:
+    when: always
     paths:
+      - frags
       - generated-gitlab-ci.yml
 
 buildroot-pipeline:
@@ -21,3 +32,19 @@ buildroot-pipeline:
       - artifact: generated-gitlab-ci.yml
         job: generate-gitlab-ci-yml
     strategy: depend
+
+variables:
+  PARENT_PIPELINE_ID: $CI_PIPELINE_ID
+# pre-filled variables
+  TOOLCHAIN_BUILDER_BRTREE:
+    value: "master"
+    description: "tree-ish checkout Buildroot to that tree-ish object (default is master)"
+  TOOLCHAIN_BUILDER_TARGET:
+    value: "releases"
+    description: "Launch the ci jobs and compiles the toolchains, then send them in the <folder_name>"
+  TOOLCHAIN_BUILDER_VARIANT:
+    value: "*"
+    description: "Select the toolchain variant bleeding-edge or stable or * for both (default)"
+  TOOLCHAIN_BUILDER_VERSION:
+    value: "1"
+    description: "Version string appended to tarball name"
