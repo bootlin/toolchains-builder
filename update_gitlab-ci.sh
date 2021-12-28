@@ -221,7 +221,7 @@ function main {
     # Grab the specified version of Buildroot
     pushd ${br_path}
     git fetch origin
-    git reset --hard ${opt_brtree}
+    git checkout ${opt_brtree}
     popd
 
     if test "${opt_variant}" = "special" ; then
