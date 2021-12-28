@@ -6,7 +6,7 @@
     script:
         - echo "Start building toolchain for ${DEFCONFIG_FRAG_NAME}"
         - |
-            ./build-toolchain.sh ${DEFCONFIG_FRAG_NAME} ${TOOLCHAIN_BUILDER_TARGET} ${TOOLCHAIN_BUILDER_BRTREE} ${TOOLCHAIN_BUILDER_VERSION} 2>&1 || {
+            ./build-toolchain.sh ${DEFCONFIG_FRAG_NAME} ${TOOLCHAIN_BUILDER_TARGET_GENERATED} ${TOOLCHAIN_BUILDER_BRTREE_GENERATED} ${TOOLCHAIN_BUILDER_VERSION_GENERATED} 2>&1 || {
                 echo 'Failed build last output'
                 tail -200 build/*-build.log
                 exit 1
@@ -34,7 +34,7 @@
     script:
         - echo "Start testing toolchain for ${DEFCONFIG_FRAG_NAME}"
         - |
-            ./test-toolchain.sh ${DEFCONFIG_FRAG_NAME} ${TOOLCHAIN_BUILDER_TARGET} ${TOOLCHAIN_BUILDER_BRTREE} ${TOOLCHAIN_BUILDER_VERSION} 2>&1 || {
+            ./test-toolchain.sh ${DEFCONFIG_FRAG_NAME} ${TOOLCHAIN_BUILDER_TARGET_GENERATED} ${TOOLCHAIN_BUILDER_BRTREE_GENERATED} ${TOOLCHAIN_BUILDER_VERSION_GENERATED} 2>&1 || {
                 echo 'Failed test last output'
                 tail -200 test/*-test-build.log
                 tail -200 test/*-test-boot.log
@@ -65,4 +65,4 @@
         - '[[ -f /.dockerenv ]] && echo "$SSH_SERVER_HOSTKEYS" > ~/.ssh/known_hosts'
     script:
       - echo "Uploading toolchain for ${DEFCONFIG_FRAG_NAME}"
-      - ./upload-toolchain.sh ${DEFCONFIG_FRAG_NAME} ${TOOLCHAIN_BUILDER_TARGET} ${TOOLCHAIN_BUILDER_BRTREE} ${TOOLCHAIN_BUILDER_VERSION}
+      - ./upload-toolchain.sh ${DEFCONFIG_FRAG_NAME} ${TOOLCHAIN_BUILDER_TARGET_GENERATED} ${TOOLCHAIN_BUILDER_BRTREE_GENERATED} ${TOOLCHAIN_BUILDER_VERSION_GENERATED}
