@@ -160,7 +160,7 @@ EOF
     git add -f .gitlab-ci.yml
     git commit -m "Build bot: trigger new builds"
     if [ "$opt_target" != "no_push" ]; then
-	git push -u -f git@gitlab.com:bootlin/toolchains-builder.git ${branch}
+	git push -u -f git@gitlab.com:buildroot.org/toolchains-builder.git ${branch}
     fi
     git checkout $git_current_branch
 }
