@@ -114,6 +114,7 @@ function set_test_config {
         ;;
     s390x-z13)
         test_defconfig="qemu_s390x_defconfig"
+        test_defconfig_extra_opts='BR2_TARGET_ROOTFS_EXT2_SIZE="120M"'
         test_board_dir="s390x"
         ;;
     sh-sh4)
@@ -230,6 +231,7 @@ function build_test {
     testconfigfile=${test_build_dir}/.config
     echo "  generating configuration"
     cp ${buildroot_dir}/configs/${test_defconfig} ${testconfigfile}
+    echo ${test_defconfig_extra_opts} >> ${testconfigfile}
     echo "BR2_ROOTFS_OVERLAY=\"${test_build_dir}/overlay\"" >> ${testconfigfile}
 
     local fragment_file=${build_dir}/br_fragment
