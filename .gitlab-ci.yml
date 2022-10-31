@@ -1,5 +1,5 @@
 # Configuration for Gitlab-CI.
-# Builds appear on https://gitlab.com/kubu93/toolchains-builder/pipelines
+# Builds appear on https://gitlab.com/buildroot.org/toolchains-builder/-/pipelines
 
 image: $CI_REGISTRY/buildroot.org/buildroot/base:20230207.1123
 
