@@ -1,6 +1,6 @@
 .toolchain_build:
     stage: toolchain_build
-    image: kubu93/toolchain-builder:20210227.0043
+    image: $CI_REGISTRY/buildroot.org/toolchains-builder/builder:20210227.0043
     before_script:
         - DEFCONFIG_FRAG_NAME=$(echo ${CI_JOB_NAME} | sed -e 's,_build$,,g')
     script:
