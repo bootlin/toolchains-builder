@@ -28,7 +28,7 @@
 
 .toolchain_test:
     stage: toolchain_test
-    image: buildroot/base:20200814.2228
+    image: $CI_REGISTRY/buildroot.org/buildroot/base:20230207.1123
     before_script:
         - DEFCONFIG_FRAG_NAME=$(echo ${CI_JOB_NAME} | sed -e 's,_test$,,g')
     script:

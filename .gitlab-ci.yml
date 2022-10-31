@@ -1,7 +1,7 @@
 # Configuration for Gitlab-CI.
 # Builds appear on https://gitlab.com/kubu93/toolchains-builder/pipelines
 
-image: buildroot/base:20200814.2228
+image: $CI_REGISTRY/buildroot.org/buildroot/base:20230207.1123
 
 stages:
   - generate-gitlab-ci
