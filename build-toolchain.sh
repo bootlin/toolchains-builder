@@ -164,6 +164,16 @@ function make_br_fragment {
     else
         echo "# BR2_TOOLCHAIN_EXTERNAL_FORTRAN is not set" >> ${fragment_file}
     fi
+    if grep -q "BR2_TOOLCHAIN_BUILDROOT_DLANG=y" ${configfile}; then
+        echo "BR2_TOOLCHAIN_EXTERNAL_DLANG=y" >> ${fragment_file}
+    else
+        echo "# BR2_TOOLCHAIN_EXTERNAL_DLANG is not set" >> ${fragment_file}
+    fi
+    if grep -q "BR2_GCC_ENABLE_OPENMP=y" ${configfile}; then
+        echo "BR2_TOOLCHAIN_EXTERNAL_OPENMP=y" >> ${fragment_file}
+    else
+        echo "# BR2_TOOLCHAIN_EXTERNAL_OPENMP is not set" >> ${fragment_file}
+    fi
     if grep -q "BR2_TOOLCHAIN_HAS_SSP=y" ${configfile}; then
         echo "BR2_TOOLCHAIN_EXTERNAL_HAS_SSP=y" >> ${fragment_file}
     else
