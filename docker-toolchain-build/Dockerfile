@@ -1,7 +1,7 @@
 # This Dockerfile generates the docker image that gets used by toolchain-builder Gitlab CI
 # To build it (YYYYMMDD.HHMM is the current date and time in UTC):
-#   sudo docker build -t kubu93/toolchain-builder:YYYYMMDD.HHMM debian-jessie
-#   sudo docker push kubu93/toolchain-builder:YYYYMMDD.HHMM
+#   docker build -t registry.gitlab.com/buildroot.org/toolchains-builder/builder:YYYYMMDD.HHMM debian-jessie
+#   docker push registry.gitlab.com/buildroot.org/toolchains-builder/builder:YYYYMMDD.HHMM
 
 # We use a specific tag for the base image *and* the corresponding date
 # for the repository., so do not forget to update the apt-sources.list
