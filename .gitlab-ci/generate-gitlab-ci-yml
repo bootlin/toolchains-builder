@@ -14,7 +14,7 @@ preamble() {
 
     cat - "${template}" <<-_EOF_
 	# This file is generated; do not edit!
-	# Builds appear on https://gitlab.com/kubu93/toolchains-builder/pipelines
+	# Builds appear on https://gitlab.com/buildroot.org/toolchains-builder/-/pipelines
 
 	stages:
 	  - toolchain_build
