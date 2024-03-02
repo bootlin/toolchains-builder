@@ -11,6 +11,11 @@
                 tail -200 build/*-build.log
                 exit 1
             }
+    retry:
+        max: 2
+        when:
+            - runner_system_failure
+            - stuck_or_timeout_failure
     artifacts:
         when: always
         expire_in: 2 weeks
@@ -40,6 +45,11 @@
                 tail -200 test/*-test-boot.log
                 exit 1
             }
+    retry:
+        max: 2
+        when:
+            - runner_system_failure
+            - stuck_or_timeout_failure
     artifacts:
         when: always
         expire_in: 2 weeks
@@ -63,6 +73,11 @@
         - ssh-add <(echo "$SSH_PRIVATE_KEY")
         - mkdir -p ~/.ssh
         - '[[ -f /.dockerenv ]] && echo "$SSH_SERVER_HOSTKEYS" > ~/.ssh/known_hosts'
+    retry:
+        max: 2
+        when:
+            - runner_system_failure
+            - stuck_or_timeout_failure
     script:
       - echo "Uploading toolchain for ${DEFCONFIG_FRAG_NAME}"
       - ./upload-toolchain.sh ${DEFCONFIG_FRAG_NAME} ${TOOLCHAIN_BUILDER_TARGET} ${TOOLCHAIN_BUILDER_BRTREE} ${TOOLCHAIN_BUILDER_VERSION}
