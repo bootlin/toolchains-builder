@@ -22,7 +22,7 @@
         paths:
             - build/*.config
             - build/*-build.log
-            - build/*.tar.bz2
+            - build/*.tar.xz
             - build/*.sha256
             - build/README.txt
             - build/summary.csv
@@ -55,7 +55,7 @@
         expire_in: 2 weeks
         paths:
             - test/*.config
-            - test/*.tar.bz2
+            - test/*.tar.xz
             - test/*.sha256
             - test/*-test-result.txt
             - test/*-test-build.log

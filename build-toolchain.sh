@@ -148,7 +148,7 @@ function make_br_fragment {
     echo "BR2_TOOLCHAIN_EXTERNAL=y" >> ${fragment_file}
     echo "BR2_TOOLCHAIN_EXTERNAL_CUSTOM=y" >> ${fragment_file}
     echo "BR2_TOOLCHAIN_EXTERNAL_DOWNLOAD=y" >> ${fragment_file}
-    echo "BR2_TOOLCHAIN_EXTERNAL_URL=\"${base_url}/toolchains/${arch_name}/tarballs/${release_name}.tar.bz2\"" >> ${fragment_file}
+    echo "BR2_TOOLCHAIN_EXTERNAL_URL=\"${base_url}/toolchains/${arch_name}/tarballs/${release_name}.tar.xz\"" >> ${fragment_file}
     echo "BR2_TOOLCHAIN_EXTERNAL_GCC_${gcc_version}=y" >> ${fragment_file}
     echo "BR2_TOOLCHAIN_EXTERNAL_HEADERS_${linux_version}=y" >> ${fragment_file}
     if [ "${locale}" == "y" ]; then
@@ -274,10 +274,10 @@ follow these steps:
 EOF
 
     # Make the tarball
-    echo "Packaging the toolchain as ${release_name}.tar.bz2"
+    echo "Packaging the toolchain as ${release_name}.tar.xz"
     cd ${build_dir}
-    tar cjf `basename ${release_name}`.tar.bz2 `basename ${toolchain_dir}`
-    sha256sum ${release_name}.tar.bz2 > ${release_name}.sha256
+    tar cJf `basename ${release_name}`.tar.xz `basename ${toolchain_dir}`
+    sha256sum ${release_name}.tar.xz > ${release_name}.sha256
 
     cp ${readme_file} ${build_dir}/README.txt
     cp ${summary_file} ${build_dir}/summary.csv

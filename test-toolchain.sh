@@ -311,13 +311,13 @@ function get_buildroot {
 function extract_toolchain {
     mkdir -p ${toolchain_dir}
 
-    if ! test -e ${build_dir}/${release_name}.tar.bz2 ; then
-        echo "Artifacts ${release_name}.tar.bz2 missing"
+    if ! test -e ${build_dir}/${release_name}.tar.xz ; then
+        echo "Artifacts ${release_name}.tar.xz missing"
         exit 1
     fi
 
     echo "Extracting toolchain tarball"
-    tar --strip-components=1 -C ${toolchain_dir} -xf ${build_dir}/${release_name}.tar.bz2
+    tar --strip-components=1 -C ${toolchain_dir} -xf ${build_dir}/${release_name}.tar.xz
 }
 
 function main {

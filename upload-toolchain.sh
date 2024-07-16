@@ -70,7 +70,7 @@ function main {
     rsync ${build_dir}/summary.csv \
 	  ${ssh_server}:${upload_folder}/summaries/${release_name}.csv
     # Toolchain tarball
-    rsync ${build_dir}/${release_name}.tar.bz2 \
+    rsync ${build_dir}/${release_name}.tar.xz \
 	  ${ssh_server}:${upload_folder}/tarballs/
     # Toolchain tarball checksum
     rsync ${build_dir}/${release_name}.sha256 \
