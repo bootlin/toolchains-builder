@@ -1,7 +1,6 @@
 # Configuration for Gitlab-CI.
-# Builds appear on https://gitlab.com/kubu93/toolchains-builder/pipelines
 
-image: buildroot/base:20200814.2228
+image: tpetazzoni/toolchain-builder-build:202407162158
 
 stages:
   - generate-gitlab-ci

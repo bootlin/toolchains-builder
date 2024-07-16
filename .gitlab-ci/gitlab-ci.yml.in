@@ -1,6 +1,6 @@
 .toolchain_build:
     stage: toolchain_build
-    image: kubu93/toolchain-builder:20210227.0043
+    image: tpetazzoni/toolchain-builder-build:202407162158
     before_script:
         - DEFCONFIG_FRAG_NAME=$(echo ${CI_JOB_NAME} | sed -e 's,_build$,,g')
     script:
@@ -33,7 +33,7 @@
 
 .toolchain_test:
     stage: toolchain_test
-    image: buildroot/base:20200814.2228
+    image: tpetazzoni/toolchain-builder-test-upload:202407162158
     before_script:
         - DEFCONFIG_FRAG_NAME=$(echo ${CI_JOB_NAME} | sed -e 's,_test$,,g')
     script:
@@ -66,7 +66,7 @@
 
 .toolchain_upload:
     stage: toolchain_upload
-    image: tpetazzoni/toolchain-upload:20211224.1113
+    image: tpetazzoni/toolchain-builder-test-upload:202407162158
     before_script:
         - DEFCONFIG_FRAG_NAME=$(echo ${CI_JOB_NAME} | sed -e 's,_upload,,g')
         - eval $(ssh-agent -s)
