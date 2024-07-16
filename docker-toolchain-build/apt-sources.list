@@ -1,4 +1,3 @@
-# Latest just before 20210208T213147Z:
-deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/20210208T213147Z/ jessie main
-deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/20210208T213147Z/ jessie-updates main
-deb [check-valid-until=no] http://snapshot.debian.org/archive/debian-security/20210208T213147Z/ jessie/updates main
+deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/20240701T023644Z/ bullseye main
+deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/20240701T023644Z/ bullseye-updates main
+deb [check-valid-until=no] http://snapshot.debian.org/archive/debian-security/20240701T082523Z/ bullseye-security main

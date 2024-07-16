@@ -1,16 +1,16 @@
 # This Dockerfile generates the docker image that gets used by toolchain-builder Gitlab CI
 # To build it (YYYYMMDD.HHMM is the current date and time in UTC):
-#   sudo docker build -t kubu93/toolchain-builder:YYYYMMDD.HHMM debian-jessie
-#   sudo docker push kubu93/toolchain-builder:YYYYMMDD.HHMM
+#   sudo docker build -t tpetazzoni/toolchain-builder-build:YYYYMMDD.HHMM .
+#   sudo docker push tpetazzoni/toolchain-builder-build:YYYYMMDD.HHMM
 
 # We use a specific tag for the base image *and* the corresponding date
 # for the repository., so do not forget to update the apt-sources.list
 # file that is shipped next to this Dockerfile.
-FROM debian:jessie-20210208
+FROM debian:bullseye-20240701
 
-LABEL maintainer="Buildroot mailing list <buildroot@buildroot.org>" \
-      vendor="Buildroot" \
-description="Container with everything needed to run Buildroot"
+LABEL maintainer="Thomas Petazzoni <thomas.petazzoni@bootlin.com>" \
+      vendor="Bootlin" \
+description="Container used to build toolchains.bootlin.com toolchains"
 
 # Setup environment
 ENV DEBIAN_FRONTEND noninteractive
@@ -28,22 +28,13 @@ RUN apt-get install -y --no-install-recommends \
         ca-certificates \
         cmake \
         cpio \
-        cvs \
         file \
         g++-multilib \
         git \
         libc6:i386 \
         libncurses5-dev \
         locales \
-        mercurial \
-        python3 \
-        python3-flake8 \
-        python3-nose2 \
-        python3-pexpect \
-        qemu-system-arm \
-        qemu-system-x86 \
         rsync \
-        subversion \
         unzip \
         wget \
         && \
