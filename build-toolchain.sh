@@ -214,6 +214,62 @@ function make_br_fragment {
     echo "INFO: toolchain fragment ends"
 }
 
+# Do a bit of filtering on which files we preserve in the toolchain
+function cleanup_toolchain {
+    local toolchain_dir=$1
+    local flist_file=$2
+
+    while IFS=, read pkg file; do
+	keep=yes
+	case ${pkg} in
+	# Remove everything
+	host-autoconf|host-autoconf-archive|host-automake|host-bison|host-fakeroot|host-gawk|host-m4|host-makedevs|host-patchelf|host-pkgconf|host-tar)
+	    keep=no
+	    ;;
+	# Keep only shared library
+	host-acl|host-attr|host-expat|host-libffi|host-libiberty|host-libzlib|host-ncurses|host-libtool)
+	    if ! [[ "${file}" =~ ./lib/lib.*\.so\..* ]]; then
+		keep=no
+	    fi
+	    ;;
+	# Keep shared library and header (headers needed for gcc plugins)
+	host-gmp|host-mpc|host-mpfr|host-isl)
+	    if ! [[ "${file}" =~ ./lib/lib.*\.so\..* || "${file}" =~ ./include/.* ]]; then
+		keep=no
+	    fi
+	    ;;
+	# Drop documentation and GDB headers
+	host-binutils|host-gcc-final|host-gdb)
+	    if [[ "${file}" =~ ./share/man/.* ]]; then
+		keep=no
+	    elif [[ "${file}" =~ ./share/info/.* ]]; then
+		keep=no
+	    elif [[ "${file}" =~ ./include/gdb/.* ]]; then
+		keep=no
+	    fi
+	    ;;
+	host-python3)
+	    if [[ "${file}" =~ .*__pycache__.* ]]; then
+		keep=no
+	    elif [[ "${file}" =~ ./lib/python.*/.*libpython.*.a ]]; then
+		keep=no
+	    elif ! [[ "${file}" =~ ./lib/(lib)?python.* ]]; then
+		keep=no
+	    fi
+	esac
+
+	if test "${keep}" = no; then
+	    echo "Remove ${file}"
+	    rm -f ${toolchain_dir}/"${file}"
+	fi
+    done < ${flist_file}
+
+    while test "$(find ${toolchain_dir} -type d -empty | wc -l)" -ne 0; do
+	echo "Removing empty dirs"
+	find ${toolchain_dir} -type d -empty -delete
+    done
+}
+
 function package {
     local readme_file=${toolchain_dir}/README.txt
     local summary_file=${toolchain_dir}/summary.csv
@@ -276,6 +332,7 @@ EOF
     # Make the tarball
     echo "Packaging the toolchain as ${release_name}.tar.xz"
     cd ${build_dir}
+    cleanup_toolchain ${toolchain_dir} ${build_dir}/output/build/packages-file-list-host.txt
     tar cJf `basename ${release_name}`.tar.xz `basename ${toolchain_dir}`
     sha256sum ${release_name}.tar.xz > ${release_name}.sha256
 
