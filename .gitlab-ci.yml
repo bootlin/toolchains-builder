@@ -2,26 +2,9 @@
 
 image: tpetazzoni/toolchain-builder-build:202407162158
 
-stages:
-  - generate-gitlab-ci
-  - build
-
-generate-gitlab-ci-yml:
-  stage: generate-gitlab-ci
-  script: .gitlab-ci/generate-gitlab-ci-yml .gitlab-ci/gitlab-ci.yml.in > generated-gitlab-ci.yml
-  retry:
-    max: 2
-    when:
-      - runner_system_failure
-      - stuck_or_timeout_failure
-  artifacts:
-    paths:
-      - generated-gitlab-ci.yml
-
-buildroot-pipeline:
+build-job:
   stage: build
-  trigger:
-    include:
-      - artifact: generated-gitlab-ci.yml
-        job: generate-gitlab-ci-yml
-    strategy: depend
+  script:
+    - mkdir -p build/plop/machin/truc/bidule
+    - touch build/plop/machin/truc/bidule/chose.txt
+
