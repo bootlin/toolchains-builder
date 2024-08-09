@@ -56,11 +56,14 @@ function set_test_config {
         test_defconfig="qemu_mips32r2el_malta_defconfig"
         test_board_dir="mips32r2el-malta"
 	;;
-    mips32r5el)
-        test_defconfig="qemu_mips32r2el_malta_defconfig"
-        test_board_dir="mips32r2el-malta"
-        test_qemu_args="-cpu P5600"
-	;;
+    # This is disabled for now, due to a regression in Qemu:
+    # https://gitlab.com/qemu-project/qemu/-/issues/2470
+    #
+    # mips32r5el)
+    #     test_defconfig="qemu_mips32r2el_malta_defconfig"
+    #     test_board_dir="mips32r2el-malta"
+    #     test_qemu_args="-cpu P5600"
+    # 	;;
     mips32r6el)
         test_defconfig="qemu_mips32r6el_malta_defconfig"
         test_board_dir="mips32r6el-malta"
