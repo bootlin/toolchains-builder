@@ -117,7 +117,7 @@ function gen_fragment {
     for extra in $(ls -1 ${base_dir}/configs/extra/); do
         extra_m=${extra%.config}
         if [[ $name = $extra_m ]]; then
-           extras="${extras} ${extra}"
+            extras="${extras} ${extra}"
             cat "${base_dir}/configs/extra/$extra" >> ${config_file}
         fi
     done
@@ -126,7 +126,7 @@ function gen_fragment {
         for optional in $(ls -1 ${base_dir}/configs/optionals/); do
             optional_m=${optional%.config}
             if [[ $name = $optional_m ]]; then
-               optionals="${optionals} ${optional}"
+		optionals="${optionals} ${optional}"
                 cat "${base_dir}/configs/optionals/$optional" >> ${config_file}
             fi
         done
