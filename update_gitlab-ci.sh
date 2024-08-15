@@ -61,12 +61,13 @@ EOF
 }
 
 function check_config {
+    local config_file=$1
+    local release_name=$2
     cp ${config_file} ${br_path}/.config
     make -C ${br_path} olddefconfig 1>/dev/null 2>&1
 
     local libc_name=$(grep "^BR2_TOOLCHAIN_BUILDROOT_LIBC=\".*\"" ${br_path}/.config |
                     sed 's/BR2_TOOLCHAIN_BUILDROOT_LIBC="\(.*\)"/\1/')
-    local release_name="${arch_name}--${libc_name}--${variant_name}"
 
     sort ${br_path}/.config > /tmp/sorted.config
     sort ${config_file} > /tmp/sortedfragmentfile
@@ -105,10 +106,11 @@ function gen_fragment {
     local libc_name=$2
     local variant_name=$3
     local name="${arch_name}-${libc_name}-${variant_name}"
+    local release_name="${arch_name}--${libc_name}--${variant_name}"
     local extras=""
     local optionals=""
     local disables=""
-    local config_file=${frag_dir}/${name}
+    local config_file=$(mktemp)
     cat configs/arch/${arch}.config \
 	configs/libc/${libc}.config \
 	configs/version/${variant}.config \
@@ -120,7 +122,7 @@ function gen_fragment {
             cat "${base_dir}/configs/extra/$extra" >> ${config_file}
         fi
     done
-    if check_config; then
+    if check_config ${config_file} ${release_name}; then
         for optional in $(ls -1 ${base_dir}/configs/optionals/); do
             local optional_m=${optional%.config}
             if [[ $name = $optional_m ]]; then
