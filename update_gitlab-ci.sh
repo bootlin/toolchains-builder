@@ -150,7 +150,7 @@ function gen_fragment {
 
 function prepare_git_branch {
     local branch="$1"
-    git branch -D ${branch} || true
+    git branch -q -D ${branch} || true
     git checkout -b ${branch}
 
     mkdir -p ${frag_dir}
