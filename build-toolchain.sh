@@ -28,7 +28,7 @@ version_name=$(echo "${name}" |sed "s/--/\t/" |cut -f 3)
 
 function show_help {
     cat - <<EOF
-    Usage: $0 name target buildroot_treeish
+    Usage: $0 name target buildroot_treeish version
 
 name:
         This is the name of the toolchain you are compiling. The name should at
