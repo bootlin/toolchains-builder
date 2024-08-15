@@ -62,7 +62,7 @@ EOF
 
 function check_config {
     cp ${config_file} ${br_path}/.config
-    make -C ${br_path} olddefconfig 2>&1 1>/dev/null
+    make -C ${br_path} olddefconfig 1>/dev/null 2>&1
 
     libc_name=$(grep "^BR2_TOOLCHAIN_BUILDROOT_LIBC=\".*\"" ${br_path}/.config |
                     sed 's/BR2_TOOLCHAIN_BUILDROOT_LIBC="\(.*\)"/\1/')
