@@ -192,13 +192,14 @@ function handle_special {
 }
 
 function handle_normal {
+    local git_build_branch="builds-$(date +%Y-%m-%d--%H-%M-%S)"
+    prepare_git_branch ${git_build_branch}
+
     printf "| %20s | %7s | %14s | %30s | %50s | status\n" "arch" "libc" "variant" "extras" "optionals"
     echo
 
     for arch_config in $(ls ./configs/arch/${opt_arch}.config); do
 	local arch=$(basename ${arch_config} .config)
-	local git_build_branch="builds-${arch}-$(date +%Y-%m-%d--%H-%M-%S)"
-	prepare_git_branch ${git_build_branch}
 
 	for libc_config in $(ls ./configs/libc/${opt_libc}.config); do
 	    local libc=$(basename ${libc_config} .config)
@@ -208,16 +209,14 @@ function handle_normal {
 		gen_fragment ${arch} ${libc} ${variant}
 	    done
 	done
-
-	ls frags/
-
-	nfrags=$(ls -1 ${frag_dir} | wc -l)
-	if test ${nfrags} -eq 0; then
-	    delete_git_branch ${git_build_branch}
-	else
-	    submit_git_branch ${git_build_branch}
-	fi
     done
+
+    nfrags=$(ls -1 ${frag_dir} | wc -l)
+    if test ${nfrags} -eq 0; then
+	delete_git_branch ${git_build_branch}
+    else
+	submit_git_branch ${git_build_branch}
+    fi
 }
 
 function main {
