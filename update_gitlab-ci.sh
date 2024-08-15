@@ -64,13 +64,13 @@ function check_config {
     cp ${config_file} ${br_path}/.config
     make -C ${br_path} olddefconfig 1>/dev/null 2>&1
 
-    libc_name=$(grep "^BR2_TOOLCHAIN_BUILDROOT_LIBC=\".*\"" ${br_path}/.config |
+    local libc_name=$(grep "^BR2_TOOLCHAIN_BUILDROOT_LIBC=\".*\"" ${br_path}/.config |
                     sed 's/BR2_TOOLCHAIN_BUILDROOT_LIBC="\(.*\)"/\1/')
-    release_name="${arch_name}--${libc_name}--${variant_name}"
+    local release_name="${arch_name}--${libc_name}--${variant_name}"
 
     sort ${br_path}/.config > /tmp/sorted.config
     sort ${config_file} > /tmp/sortedfragmentfile
-    rejects_file=$(mktemp)
+    local rejects_file=$(mktemp)
     comm -23 /tmp/sortedfragmentfile /tmp/sorted.config > ${rejects_file}
 
     # If the reject file is empty, the configuration is valid
@@ -82,7 +82,7 @@ function check_config {
     # Check if the reject matches an exception file. If so, the
     # configuration is considered valid.
     for exception in $(ls -1 configs/exceptions/); do
-        exception_m=${exception%.config}
+        local exception_m=${exception%.config}
         if [[ $name = $exception_m ]]; then
             if cmp -s configs/exceptions/${exception} ${rejects_file}; then
                 rm ${rejects_file}
@@ -114,7 +114,7 @@ function gen_fragment {
 	configs/version/${variant}.config \
 	configs/common.config > ${config_file}
     for extra in $(ls -1 ${base_dir}/configs/extra/); do
-        extra_m=${extra%.config}
+        local extra_m=${extra%.config}
         if [[ $name = $extra_m ]]; then
             extras="${extras} ${extra}"
             cat "${base_dir}/configs/extra/$extra" >> ${config_file}
@@ -122,7 +122,7 @@ function gen_fragment {
     done
     if check_config; then
         for optional in $(ls -1 ${base_dir}/configs/optionals/); do
-            optional_m=${optional%.config}
+            local optional_m=${optional%.config}
             if [[ $name = $optional_m ]]; then
 		optionals="${optionals} ${optional}"
                 cat "${base_dir}/configs/optionals/$optional" >> ${config_file}
@@ -130,7 +130,7 @@ function gen_fragment {
         done
 
         for disable in $(ls -1 ${base_dir}/configs/disables/); do
-            disable_m=${disable%.config}
+            local disable_m=${disable%.config}
             if [[ $name = $disable_m ]]; then
 		disables="${disables} ${disable}"
 		cat "${base_dir}/configs/disables/$disable" >> ${config_file}
