@@ -49,8 +49,7 @@ Usage: $0 -n version [-a arch] [-l libc] [-v variant] [-t target] [-dh]
            This option defaults to no_push in order not to trigger builds
            by accident or misuse.
 
-    -b tree-ish checkout Buildroot to that tree-ish object (default is
-                ${opt_brtree})
+    -b tree-ish checkout Buildroot to that tree-ish object
     -n version  version string appended to tarball name
 
     -a arch     specify architecture to build (see \`ls configs/arch/*\`)
@@ -264,6 +263,11 @@ done
 
 if [ -z $opt_version ] ; then
 	echo "ERROR: -n option is mandatory"
+	exit 1
+fi
+
+if [ -z $opt_brtree ] ; then
+	echo "ERROR: -b option is mandatory"
 	exit 1
 fi
 
