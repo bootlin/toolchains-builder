@@ -109,7 +109,6 @@ function gen_fragment {
     local optionals=""
     local disables=""
     local config_file=${frag_dir}/${name}
-    printf "| %20s | %7s | %14s |" ${arch_name} ${libc_name} ${variant_name}
     cat configs/arch/${arch}.config \
 	configs/libc/${libc}.config \
 	configs/version/${variant}.config \
@@ -121,7 +120,6 @@ function gen_fragment {
             cat "${base_dir}/configs/extra/$extra" >> ${config_file}
         fi
     done
-    printf " %30s |" "${extras}"
     if check_config; then
         for optional in $(ls -1 ${base_dir}/configs/optionals/); do
             optional_m=${optional%.config}
@@ -141,9 +139,13 @@ function gen_fragment {
 
         mv ${config_file} ${frag_dir}/${release_name}.config
 
-       printf " %50s | %50s | OK\n" "${optionals}" "${disables}"
+	printf "\e[0;32m - %s-%s-%s: OK\e[m\n" ${arch_name} ${libc_name} ${variant_name}
+	printf "   extras:    ${extras}\n"
+	printf "   optionals: ${optionals}\n"
+	printf "   disables:  ${disables}\n"
     else
-       printf " %50s | %50s | NOK\n" # ${optionals}
+	printf "\e[0;31m - %s-%s-%s: NOK\e[m\n" ${arch_name} ${libc_name} ${variant_name}
+	printf "   extras: ${extras}\n"
         rm ${config_file}
     fi
 }
@@ -194,9 +196,6 @@ function handle_special {
 function handle_normal {
     local git_build_branch="builds-$(date +%Y-%m-%d--%H-%M-%S)"
     prepare_git_branch ${git_build_branch}
-
-    printf "| %20s | %7s | %14s | %30s | %50s | status\n" "arch" "libc" "variant" "extras" "optionals"
-    echo
 
     for arch_config in $(ls ./configs/arch/${opt_arch}.config); do
 	local arch=$(basename ${arch_config} .config)
