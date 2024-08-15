@@ -107,6 +107,7 @@ function gen_fragment {
     local name="${arch_name}-${libc_name}-${variant_name}"
     local extras=""
     local optionals=""
+    local disables=""
     local config_file=${frag_dir}/${name}
     printf "| %20s | %7s | %14s |" ${arch_name} ${libc_name} ${variant_name}
     cat configs/arch/${arch}.config \
@@ -129,11 +130,20 @@ function gen_fragment {
                 cat "${base_dir}/configs/optionals/$optional" >> ${config_file}
             fi
         done
+
+        for disable in $(ls -1 ${base_dir}/configs/disables/); do
+            disable_m=${disable%.config}
+            if [[ $name = $disable_m ]]; then
+		disables="${disables} ${disable}"
+		cat "${base_dir}/configs/disables/$disable" >> ${config_file}
+            fi
+        done
+
         mv ${config_file} ${frag_dir}/${release_name}.config
 
-       printf " %50s | OK\n" "${optionals}"
+       printf " %50s | %50s | OK\n" "${optionals}" "${disables}"
     else
-       printf " %50s | NOK\n" # ${optionals}
+       printf " %50s | %50s | NOK\n" # ${optionals}
         rm ${config_file}
     fi
 }
