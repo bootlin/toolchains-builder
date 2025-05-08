@@ -72,7 +72,7 @@
         - eval $(ssh-agent -s)
         - ssh-add <(echo "$SSH_PRIVATE_KEY")
         - mkdir -p ~/.ssh
-        - '[[ -f /.dockerenv ]] && echo "$SSH_SERVER_HOSTKEYS" > ~/.ssh/known_hosts'
+        - echo "$SSH_SERVER_HOSTKEYS" > ~/.ssh/known_hosts
     retry:
         max: 2
         when:
