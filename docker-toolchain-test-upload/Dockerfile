@@ -6,14 +6,14 @@
 # We use a specific tag for the base image *and* the corresponding date
 # for the repository., so do not forget to update the apt-sources.list
 # file that is shipped next to this Dockerfile.
-FROM debian:bullseye-20240701
+FROM debian:bullseye-20250721
 
 LABEL maintainer="Thomas Petazzoni <thomas.petazzoni@bootlin.com>" \
       vendor="Bootlin" \
 description="Container used to test and upload toolchains.bootlin.com toolchains"
 
 # Setup environment
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
 # This repository can be a bit slow at times. Don't panic...
 COPY apt-sources.list /etc/apt/sources.list
@@ -55,5 +55,5 @@ RUN useradd -ms /bin/bash br-user && \
 
 USER br-user
 WORKDIR /home/br-user
-ENV HOME /home/br-user
-ENV LC_ALL en_US.UTF-8
+ENV HOME=/home/br-user
+ENV LC_ALL=en_US.UTF-8
