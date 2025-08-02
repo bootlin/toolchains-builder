@@ -1,6 +1,6 @@
 # Configuration for Gitlab-CI.
 
-image: registry.gitlab.com/buildroot.org/toolchains-builder/toolchain-builder-build:202407162158
+image: registry.gitlab.com/buildroot.org/toolchains-builder/toolchain-builder-build:20250802190000
 
 stages:
   - generate-gitlab-ci
