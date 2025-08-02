@@ -56,7 +56,7 @@ function build_toolchain {
     # Create the configuration
     cp ${frag_dir}/${name}.config ${output_dir}/.config
     echo "BR2_HOST_DIR=\"${toolchain_dir}\"" >> ${output_dir}/.config
-    echo "BR2_WGET=\"wget --passive-ftp -nd -t 3 --no-check-certificate\"" >> ${output_dir}/.config
+    echo "BR2_WGET=\"wget --passive-ftp -nd -t 10 --no-check-certificate\"" >> ${output_dir}/.config
     echo "BR2_GNU_MIRROR=\"https://mirrors.kernel.org/gnu/\"" >> ${output_dir}/.config
 
     echo "  starting at $(date)"

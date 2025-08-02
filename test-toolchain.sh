@@ -250,7 +250,7 @@ function build_test {
     sed -i "s/DOWNLOAD/PREINSTALLED/" ${test_build_dir}/br_fragment
     sed -i "/^BR2_TOOLCHAIN_EXTERNAL_URL/d" ${test_build_dir}/br_fragment
     echo "BR2_TOOLCHAIN_EXTERNAL_PATH=\"${toolchain_dir}\"" >> ${test_build_dir}/br_fragment
-    echo "BR2_WGET=\"wget --passive-ftp -nd -t 3 --no-check-certificate\"" >> ${test_build_dir}/br_fragment
+    echo "BR2_WGET=\"wget --passive-ftp -nd -t 10 --no-check-certificate\"" >> ${test_build_dir}/br_fragment
 
     cat ${test_build_dir}/br_fragment >> ${testconfigfile}
 
