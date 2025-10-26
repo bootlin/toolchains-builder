@@ -22,7 +22,7 @@ output_dir=${build_dir}/output
 release_name=${name}-${version}
 toolchain_dir=${build_dir}/${release_name}
 logfile=${build_dir}/${release_name}-build.log
-base_url="http://toolchains.bootlin.com/downloads/${target}"
+base_url="https://toolchains.bootlin.com/downloads/${target}"
 arch_name=$(echo "${name}" |sed "s/--/\t/" |cut -f 1)
 version_name=$(echo "${name}" |sed "s/--/\t/" |cut -f 3)
 
