@@ -139,6 +139,7 @@ function set_test_config {
         sed -i "s/tty1/ttyS0/" ${buildroot_dir}/configs/${test_defconfig}
         test_board_dir="x86"
         test_qemu_append="rw console=ttyS0"
+	test_qemu_args="-cpu core2duo"
 	;;
     x86-i686)
         test_defconfig="qemu_x86_defconfig"
